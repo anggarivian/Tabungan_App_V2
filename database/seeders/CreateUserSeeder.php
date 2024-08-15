@@ -18,31 +18,47 @@ class CreateUserSeeder extends Seeder
             [
                 'name'      => 'isKepsek',
                 'username'  => 'isKepsek',
+                'jenis_kelamin'  => 'L',
+                'kontak'    => '085712341234',
+                'alamat'    => 'Cianjur',
                 'email'     => 'kepsek@mail.com',
                 'password'  => bcrypt('12345'),
+                'kelas_id'  => 1,
                 'roles_id'  => 1
             ],
             [
                 'name'      => 'isBendahara',
                 'username'  => 'isBendahara',
+                'jenis_kelamin'  => 'L',
+                'kontak'    => '085712341234',
+                'alamat'    => 'Cianjur',
                 'email'     => 'bendahara@mail.com',
                 'password'  => bcrypt('12345'),
+                'kelas_id'  => 1,
                 'roles_id'  => 2
             ]
             ,
             [
                 'name'      => 'isWalikelas',
                 'username'  => 'isWalikelas',
+                'jenis_kelamin'  => 'L',
+                'kontak'    => '085712341234',
+                'alamat'    => 'Cianjur',
                 'email'     => 'walikelas@mail.com',
                 'password'  => bcrypt('12345'),
+                'kelas_id'  => 1,
                 'roles_id'  => 3
             ]
             ,
             [
                 'name'      => 'isSiswa',
                 'username'  => 'isSiswa',
+                'jenis_kelamin'  => 'L',
+                'kontak'    => '085712341234',
+                'alamat'    => 'Cianjur',
                 'email'     => 'siswa@mail.com',
                 'password'  => bcrypt('12345'),
+                'kelas_id'  => 1,
                 'roles_id'  => 4
             ]
         ];

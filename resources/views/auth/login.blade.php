@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mazer Admin Dashboard</title>
-    
+
     <link rel="shortcut icon" href="{{ asset('dist/assets/compiled/svg/favicon.svg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app-dark.css') }}">
@@ -30,12 +30,14 @@
 
                     @if(session()->has('LoginError'))
                         <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-file-excel"></i>
                             {{ session('LoginError') }}
                         </div>
                     @endif
                     @if(session()->has('logoutSuccess'))
-                        <div class="alert alert-primary" role="alert">
-                            <p>Berhasil Logout !</p>
+                        <div class="alert alert-success" role="alert">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Berhasil Logout !</span>
                         </div>
                     @endif
                     <form action="/login" method="POST">
@@ -47,7 +49,7 @@
                             </div>
                             @error('username')
                                 <div class="invalid-feedback">
-                                    {{$message}}    
+                                    {{$message}}
                                 </div>
                             @enderror
                         </div>
@@ -58,7 +60,7 @@
                             </div>
                             @error('password')
                                 <div class="invalid-feedback">
-                                    {{$message}}    
+                                    {{$message}}
                                 </div>
                             @enderror
                         </div>

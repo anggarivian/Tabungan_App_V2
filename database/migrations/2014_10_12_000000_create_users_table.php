@@ -19,7 +19,12 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('jenis_kelamin')->nullable();
+            $table->string('kontak', 12)->nullable();
             $table->string('password');
+            $table->string('orang_tua')->nullable();
+            $table->string('alamat')->nullable();
+            $table->foreignId('kelas_id')->constrained();
             $table->foreignId('roles_id')->constrained();
             $table->rememberToken();
             $table->timestamps();
