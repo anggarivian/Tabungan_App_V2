@@ -22,26 +22,31 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Login routes ----------------------------------------------------------------
+// Login routes ------------------------------------------------------------------------------------------------------------------
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 
-// Logout routes ---------------------------------------------------------------
+// Logout routes -----------------------------------------------------------------------------------------------------------------
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Register routes -------------------------------------------------------------
+// Register routes ---------------------------------------------------------------------------------------------------------------
 Route::get('/register', [RegisterController::class, 'index'])->name('register');
 
 Route::middleware(['auth'])->group(function () {
 
     // Kepsek --------------------------------------------------------------------------------------------------------------------
-    Route::get('/kepsek/dashboard', [DashboardController::class, 'kepsek'])->name('kepsek.dashboard');
+    Route::middleware('isKepsek')->group(function () {
+        // Kepsek Dashboard ------------------------------------------------------------------------------------------------------
+        Route::get('/kepsek/dashboard', [DashboardController::class, 'kepsek'])->name('kepsek.dashboard');
+
+    });
 
     // Bendahara -----------------------------------------------------------------------------------------------------------------
-    Route::get('/bendahara/dashboard', [DashboardController::class, 'bendahara'])->name('bendahara.dashboard');
+    Route::middleware('isBendahara')->group(function () {
+        // Bendahara Dashboard ---------------------------------------------------------------------------------------------------
+        Route::get('/bendahara/dashboard', [DashboardController::class, 'bendahara'])->name('bendahara.dashboard');
 
         // Bendahara Kelola Walikelas --------------------------------------------------------------------------------------------
-        Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('walikelas.index');
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('walikelas.index');
         Route::post('/bendahara/kelola-walikelas/tambah', [WalikelasController::class, 'add'])->name('walikelas.add');
         Route::get('/bendahara/kelola-walikelas/get-data/{id}', [WalikelasController::class, 'getWalikelasData'])->name('walikelas.getData');
@@ -56,10 +61,20 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/bendahara/kelola-siswa/edit/{id}', [SiswaController::class, 'edit'])->name('siswa.edit');
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('siswa.delete');
 
+    });
+
     // Walikelas -----------------------------------------------------------------------------------------------------------------
-    Route::get('/walikelas/dashboard', [DashboardController::class, 'walikelas'])->name('walikelas.dashboard');
+    Route::middleware('isWalikelas')->group(function () {
+        // Walikelas Dashboard ---------------------------------------------------------------------------------------------------
+        Route::get('/walikelas/dashboard', [DashboardController::class, 'walikelas'])->name('walikelas.dashboard');
+
+    });
 
     // Siswa ---------------------------------------------------------------------------------------------------------------------
-    Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('siswa.dashboard');
+    Route::middleware('isBendahara')->group(function () {
+        // Siswa Dashboard -------------------------------------------------------------------------------------------------------
+        Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('siswa.dashboard');
+
+    });
 
 });

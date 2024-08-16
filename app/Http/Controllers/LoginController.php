@@ -18,14 +18,14 @@ class LoginController extends Controller
         $credentials = $request->validate([
             'username' => ['required'],
             'password' => ['required'],
-        ]); 
-    
+        ]);
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             // Dapatkan role pengguna
             $role = Auth::user()->roles_id; // Pastikan kolom `role` ada di tabel `users`
-    
+
             // Redirect berdasarkan role
             switch ($role) {
                 case 1:
@@ -40,9 +40,9 @@ class LoginController extends Controller
                     return redirect('/home'); // Default redirect jika role tidak cocok
             }
         }
-    
+
         return back()->with('LoginError', 'Login Gagal !');
-    }    
+    }
 
     public function logout() {
         Auth::logout();
