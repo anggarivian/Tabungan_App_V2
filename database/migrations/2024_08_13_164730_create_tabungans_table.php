@@ -18,7 +18,7 @@ class CreateTabungansTable extends Migration
             $table->string('saldo');
             $table->string('premi');
             $table->string('sisa');
-            $table->foreignId('tabungans_id')->constrained();
+            $table->foreignId('users_id')->constrained();
             $table->timestamps();
         });
     }

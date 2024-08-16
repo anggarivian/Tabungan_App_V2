@@ -17,27 +17,27 @@ class CreateKelasSeeder extends Seeder
         $kelas = [
             [
                 'id' => 1,
-                'name' => '1 A'
+                'name' => '1A'
             ],
             [
                 'id' => 2,
-                'name' => '1 B'
+                'name' => '1B'
             ],
             [
                 'id' => 3,
-                'name' => '2 A'
+                'name' => '2A'
             ],
             [
                 'id' => 4,
-                'name' => '2 B'
+                'name' => '2B'
             ],
             [
                 'id' => 5,
-                'name' => '3 A'
+                'name' => '3A'
             ],
             [
                 'id' => 6,
-                'name' => '3 B'
+                'name' => '3B'
             ],
             [
                 'id' => 7,

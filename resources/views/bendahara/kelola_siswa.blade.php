@@ -1,10 +1,10 @@
 @extends('layout.main')
 
-@section('title') Kelola Data Walikelas @endsection
+@section('title') Kelola Data Siswa @endsection
 
 @section('content')
 <div class="page-heading">
-    <h3>Kelola Walikelas</h3>
+    <h3>Kelola Siswa</h3>
 </div>
 <div class="page-content">
     <div class="card">
@@ -25,12 +25,12 @@
             </script>
             <div class="d-flex justify-content-between">
                 <div class="input-group">
-                    <button type="button" class="btn  btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
                         Tambah Data
                     </button>
                     <button type="button" class="btn btn-success">Import</button>
                 </div>
-                <form action="/bendahara/kelola-walikelas" method="GET">
+                <form action="/bendahara/kelola-siswa" method="GET">
                     <div class="input-group">
                         <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
                         <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
@@ -45,10 +45,11 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th>Nama</th>
-                            <th>Username</th>
-                            <th>Email</th>
+                            <th class="text-center">Kode</th>
+                            {{-- <th>Email</th> --}}
                             <th class="text-center">Kelas</th>
-                            {{-- <th class="text-center">Jenis Kelamin</th> --}}
+                            <th class="text-center">Jenis Kelamin</th>
+                            <th class="text-center">Orang Tua</th>
                             <th class="text-center">Kontak</th>
                             <th>Alamat</th>
                             <th class="text-center">Action</th>
@@ -59,10 +60,11 @@
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>{{ $users->name }}</td>
-                                <td>{{ $users->username }}</td>
-                                <td>{{ $users->email }}</td>
+                                <td class="text-center">{{ $users->username }}</td>
+                                {{-- <td>{{ $users->email }}</td> --}}
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
-                                {{-- <td class="text-center">{{ $users->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td> --}}
+                                <td class="text-center">{{ $users->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
+                                <td >{{ $users->orang_tua }}</td>
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ $users->alamat }}</td>
                                 <td class="text-center">
@@ -90,10 +92,10 @@
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="tambahModalLabel">Tambah Data Walikelas</h1>
+                <h1 class="modal-title fs-5" id="tambahModalLabel">Tambah Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('walikelas.add') }}" method="POST">
+            <form action="{{ route('siswa.add') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -104,16 +106,10 @@
                             <input type="text" id="name-horizontal" class="form-control" name="name" placeholder="Nama" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="username-horizontal">Username</label>
+                            <label for="siswa-horizontal">Kelas</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="username-horizontal" class="form-control" name="username" placeholder="Username" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="walikelas-horizontal">Wali kelas</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="walikelas-horizontal" class="form-select" name="kelas" required>
+                            <select id="siswa-horizontal" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
                                     <option value="{{ $k->id }}">{{ $k->name }}</option>
@@ -154,6 +150,12 @@
                         <div class="col-md-8 form-group">
                             <textarea id="address-horizontal" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
                         </div>
+                        <div class="col-md-4">
+                            <label for="orang-tua-horizontal">Orang Tua</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="orang-tua-horizontal" class="form-control" name="orang_tua" placeholder="Orang Tua" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -170,10 +172,10 @@
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Walikelas</h1>
+                <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="{{ route('walikelas.edit', '') }}">
+            <form id="editForm" method="POST" action="{{ route('siswa.edit', '') }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -194,12 +196,6 @@
                                     <option value="{{ $k->id }}">{{ $k->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-username">Username</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-username" class="form-control" name="username" placeholder="Username" required>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-email">Email</label>
@@ -229,6 +225,12 @@
                         <div class="col-md-8 form-group">
                             <textarea id="edit-alamat" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
                         </div>
+                        <div class="col-md-4">
+                            <label for="edit-orang-tua">Orang Tua</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-orang_tua" class="form-control" name="orang_tua" placeholder="Orang Tua" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -253,7 +255,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" method="POST" action="{{ route('walikelas.delete', '') }}">
+                <form id="deleteForm" method="POST" action="{{ route('siswa.delete', '') }}">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Hapus</button>
@@ -271,19 +273,19 @@
         $('.btn-warning').on('click', function() {
             var id = $(this).data('id');
             $.ajax({
-                url: "{{ route('walikelas.getData', '') }}/" + id,
+                url: "{{ route('siswa.getData', '') }}/" + id,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
                         $('#edit-name').val(response.name);
-                        $('#edit-username').val(response.username);
                         $('#edit-email').val(response.email);
                         $('#edit-jenis_kelamin').val(response.jenis_kelamin);
                         $('#edit-kontak').val(response.kontak);
                         $('#edit-alamat').val(response.alamat);
+                        $('#edit-orang_tua').val(response.orang_tua);
                         $('#edit-kelas').val(response.kelas_id);
 
-                        $('#editModal form').attr('action', "{{ route('walikelas.edit', '') }}/" + id);
+                        $('#editModal form').attr('action', "{{ route('siswa.edit', '') }}/" + id);
                         $('#editModal').modal('show');
                     } else {
                         alert('Gagal mengambil data');
@@ -296,7 +298,7 @@
         });
     });
     function confirmDelete(id) {
-        $('#deleteForm').attr('action', '/bendahara/kelola-walikelas/hapus/' + id);
+        $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
         $('#deleteModal').modal('show');
     }
 

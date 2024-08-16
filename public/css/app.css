@@ -1,10 +1,8 @@
-/* public/css/app.css */
-
 #loading-screen {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Background hitam dengan transparansi 80% */
+    background: #f3f3f3;
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -12,8 +10,8 @@
 }
 
 .spinner {
-    border: 16px solid rgba(255, 255, 255, 0.2); /* Warna border spinner lebih terang */
-    border-top: 16px solid #ffffff; /* Warna border atas putih */
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -24,3 +22,4 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
