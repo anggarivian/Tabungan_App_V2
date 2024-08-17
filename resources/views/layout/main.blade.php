@@ -120,9 +120,9 @@
                             @endif
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->is('bendahara/transaksi*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-bank2"></i> Transaksi </span>
+                            <li class="menu-item {{ request()->routeIs('tabungan.index*') ? 'active' : '' }}">
+                                <a href="{{ route ('tabungan.index')}}" class='menu-link' style="margin-top: -3px">
+                                    <span><i class="bi bi-bank2"></i> Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
@@ -231,16 +231,14 @@
 
     <script src="{{ asset('/dist/assets/compiled/js/app.js') }}"></script>
 
-    {{-- <script src="{{ asset('/dist/assets/extensions/apexcharts/apexcharts.min.js') }}"></script> --}}
     <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     <script>
         window.addEventListener('load', function() {
             setTimeout(function() {
-                // Menghilangkan loading screen setelah penundaan
                 document.getElementById('loading-screen').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-            }, 200); // Delay 1000ms (1 detik) sebelum menghilangkan loading screen
+            }, 200);
         });
     </script>
 

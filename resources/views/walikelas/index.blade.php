@@ -1,6 +1,6 @@
 @extends('layout.main')
 
-@section('title') Dashboard @endsection
+@section('title') Dashboard - SakuRame @endsection
 
 @section('content')
 <div class="page-heading">

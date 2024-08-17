@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WalikelasController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TabunganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,11 +56,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Bendahara Kelola Siswa ------------------------------------------------------------------------------------------------
         Route::get('/bendahara/kelola-siswa', [SiswaController::class, 'index'])->name('siswa.index');
-        Route::get('/bendahara/kelola-siswa', [SiswaController::class, 'index'])->name('siswa.index');
         Route::post('/bendahara/kelola-siswa/tambah', [SiswaController::class, 'add'])->name('siswa.add');
         Route::get('/bendahara/kelola-siswa/get-data/{id}', [SiswaController::class, 'getSiswaData'])->name('siswa.getData');
         Route::put('/bendahara/kelola-siswa/edit/{id}', [SiswaController::class, 'edit'])->name('siswa.edit');
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('siswa.delete');
+
+        // Bendahara Kelola Tabungan ---------------------------------------------------------------------------------------------
+        Route::get('/bendahara/tabungan', [TabunganController::class, 'index'])->name('tabungan.index');
+        Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'stor'])->name('tabungan.stor');
 
     });
 

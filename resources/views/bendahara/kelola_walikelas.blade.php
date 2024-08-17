@@ -4,7 +4,23 @@
 
 @section('content')
 <div class="page-heading">
-    <h3>Kelola Walikelas</h3>
+    <div class="d-flex justify-content-between">
+        <h3>Kelola Walikelas</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-right">
+                @if(auth()->user()->roles_id == 1)
+                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                @elseif(auth()->user()->roles_id == 2)
+                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
+                @elseif(auth()->user()->roles_id == 3)
+                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
+                @elseif(auth()->user()->roles_id == 4)
+                    <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
+                @endif
+                <li class="breadcrumb-item active" aria-current="page">Kelola Walikelas</li>
+            </ol>
+        </nav>
+    </div>
 </div>
 <div class="page-content">
     <div class="card">
@@ -97,7 +113,7 @@
 </div>
 
 {{-- Modal Tambah --}}
-<div class="modal fade" id="tambahModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
+<div class="modal fade modal-borderless" id="tambahModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header">
@@ -177,7 +193,7 @@
 </div>
 
 {{-- Modal Edit --}}
-<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header">
@@ -252,7 +268,7 @@
 </div>
 
 {{-- Modal Konfirmasi Delete --}}
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade modal-borderless" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
