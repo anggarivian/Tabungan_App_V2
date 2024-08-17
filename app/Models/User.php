@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Kelas;
 use App\Models\Role;
+use App\Models\Tabungan;
 
 class User extends Authenticatable
 {
@@ -35,6 +36,11 @@ class User extends Authenticatable
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
+    }
+
+    public function tabungan()
+    {
+        return $this->belongsTo(Tabungan::class);
     }
 
     /**

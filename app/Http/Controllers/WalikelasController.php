@@ -47,7 +47,7 @@ class WalikelasController extends Controller
      */
     public function add(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
@@ -55,16 +55,29 @@ class WalikelasController extends Controller
             'jenis_kelamin' => 'required|in:L,P',
             'kontak' => 'required|string|max:15',
             'alamat' => 'required|string',
+        ], [
+            'name.required' => 'Nama harus diisi.',
+            'username.unique' => 'Username sudah digunakan.',
+            'email.required' => 'Email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.required' => 'Password harus diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
+            'kontak.required' => 'Kontak harus diisi.',
+            'kontak.max' => 'Kontak maksimal 15 karakter.',
+            'alamat.required' => 'Alamat harus diisi.',
         ]);
 
         $user = new User();
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->kontak = $request->kontak;
-        $user->alamat = $request->alamat;
+        $user->name = $validatedData['name'];
+        $user->username = $validatedData['username'];
+        $user->email = $validatedData['email'];
+        $user->password = bcrypt($validatedData['password']);
+        $user->jenis_kelamin = $validatedData['jenis_kelamin'];
+        $user->kontak = $validatedData['kontak'];
+        $user->alamat = $validatedData['alamat'];
         $user->kelas_id = $request->kelas;
         $user->roles_id = 3;
         $user->save();

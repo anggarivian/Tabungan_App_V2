@@ -25,9 +25,9 @@
             <header class="mb-5">
                 <div class="header-top">
                     <div class="container">
-                        <div class="logo">
-                            <a href="#"><img src="{{ asset('/dist/assets/compiled/svg/logo.svg') }}" alt="Logo"></a>
-                        </div>
+                        {{-- <div class="logo"> --}}
+                            <a href="#"><img src="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" height="40px" width="190px" alt="Logo"></a>
+                        {{-- </div> --}}
                         <div class="header-top-right">
                             <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
                                 <div class="form-check form-switch fs-6">
@@ -231,7 +231,7 @@
 
     <script src="{{ asset('/dist/assets/compiled/js/app.js') }}"></script>
 
-    <script src="{{ asset('/dist/assets/extensions/apexcharts/apexcharts.min.js') }}"></script>
+    {{-- <script src="{{ asset('/dist/assets/extensions/apexcharts/apexcharts.min.js') }}"></script> --}}
     <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     <script>

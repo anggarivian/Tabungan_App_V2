@@ -23,6 +23,17 @@
                     }, {{ session('alert-duration') }});
                 @endif
             </script>
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
+                    <strong>Terjadi Kesalahan!</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="d-flex justify-content-between">
                 <div class="input-group">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">

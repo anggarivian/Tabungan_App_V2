@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Kelas;
+use App\Models\Tabungan;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
@@ -47,27 +48,40 @@ class SiswaController extends Controller
      */
     public function add(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'jenis_kelamin' => 'required|in:L,P',
             'kontak' => 'required|string|max:15',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
+        ], [
+            'name.required' => 'Nama harus diisi.',
+            'username.unique' => 'Username sudah digunakan.',
+            'email.required' => 'Email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.required' => 'Password harus diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
+            'kontak.required' => 'Kontak harus diisi.',
+            'kontak.max' => 'Kontak maksimal 15 karakter.',
+            'alamat.required' => 'Alamat harus diisi.',
+            'orang_tua.required' => 'Nama orang tua harus diisi.',
         ]);
 
         $user = new User();
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->kontak = $request->kontak;
-        $user->alamat = $request->alamat;
-        $user->orang_tua = $request->orang_tua;
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->password = bcrypt($validatedData['password']);
+        $user->jenis_kelamin = $validatedData['jenis_kelamin'];
+        $user->kontak = $validatedData['kontak'];
+        $user->alamat = $validatedData['alamat'];
+        $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $request->kelas;
+        $user->roles_id = 4;
 
         $kelasMap = [ 1 => '1A', 2 => '1B', 3 => '2A', 4 => '2B', 5 => '3A', 6 => '3B', 7 => '40', 8 => '5', 9 => '60',];
 
@@ -78,9 +92,15 @@ class SiswaController extends Controller
         } else {
             $user->username = $kelasMap[$request->kelas] . '001';
         }
-
-        $user->roles_id = 4;
         $user->save();
+
+        $tabungan = new Tabungan ;
+        $tabungan->saldo = 0 ;
+        $tabungan->premi = 0 ;
+        $tabungan->sisa = 0 ;
+        $tabungan->users_id =  User::latest()->first()->id;
+
+        $tabungan->save();
 
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data siswa berhasil ditambahkan')->with('alert-duration', 3000);
     }

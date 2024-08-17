@@ -71,7 +71,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Siswa ---------------------------------------------------------------------------------------------------------------------
-    Route::middleware('isBendahara')->group(function () {
+    Route::middleware('isSiswa')->group(function () {
         // Siswa Dashboard -------------------------------------------------------------------------------------------------------
         Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('siswa.dashboard');
 
