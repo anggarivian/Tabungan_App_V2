@@ -14,4 +14,8 @@ class TabunganController extends Controller
     {
         return view('bendahara.tabungan.stor');
     }
+    public function tarik()
+    {
+        return view('bendahara.tabungan.tarik');
+    }
 }

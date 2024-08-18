@@ -64,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
         // Bendahara Kelola Tabungan ---------------------------------------------------------------------------------------------
         Route::get('/bendahara/tabungan', [TabunganController::class, 'index'])->name('tabungan.index');
         Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'stor'])->name('tabungan.stor');
+        Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'tarik'])->name('tabungan.tarik');
 
     });
 

@@ -120,7 +120,7 @@
                             @endif
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('tabungan.index*') ? 'active' : '' }}">
+                            <li class="menu-item {{ request()->routeIs('tabungan.index') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
                                 <a href="{{ route ('tabungan.index')}}" class='menu-link' style="margin-top: -3px">
                                     <span><i class="bi bi-bank2"></i> Tabungan </span>
                                 </a>

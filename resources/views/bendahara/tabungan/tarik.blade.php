@@ -1,11 +1,11 @@
 @extends('layout.main')
 
-@section('title') Stor Tabungan - SakuRame @endsection
+@section('title') Tarik Tabungan - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between">
-        <h3 class="mt-3">Stor Tabungan</h3>
+        <h3 class="mt-3">Tarik Tabungan</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
@@ -18,7 +18,7 @@
                     <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
                 @endif
                 <li class="breadcrumb-item"><a href="{{ route ('tabungan.index')}}">Tabungan</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Stor</li>
+                <li class="breadcrumb-item active" aria-current="page">Tarik</li>
             </ol>
         </nav>
     </div>
@@ -80,12 +80,12 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="jumlah_stor">Jumlah Stor</label>
+                                    <label for="jumlah_tarik">Jumlah Tarik</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor">
+                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik">
                                     </div>
                                 </div>
                             </div>

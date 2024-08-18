@@ -3,9 +3,9 @@
 @section('title') Kelola Data Siswa @endsection
 
 @section('content')
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <h3>Kelola Siswa</h3>
+<div class="page-heading mb-2">
+    <div class="d-flex justify-content-between ">
+        <h3 class="mt-3">Kelola Siswa</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
