@@ -28,6 +28,31 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    @if(session('success'))
+                        <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i>
+                            {{ session('alert-message') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    <script>
+                        @if(session('alert-duration'))
+                            setTimeout(function() {
+                                document.getElementById('alert').style.display = 'none';
+                            }, {{ session('alert-duration') }});
+                        @endif
+                    </script>
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
+                            <strong>Terjadi Kesalahan!</strong>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <form id="searchForm">
                         <div class="form-group mb-0">
                             <div class="row">
@@ -38,7 +63,7 @@
                                 </div>
                                 <div class="col-md-8 mb-1">
                                     <div class="input-group mb-3">
-                                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan ID Tabungan">
+                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan">
                                         <button class="btn btn-primary" type="submit">Cari</button>
                                     </div>
                                 </div>
@@ -46,7 +71,7 @@
                             </div>
                         </div>
                     </form>
-                    <form action="" method="POST">
+                    <form action="{{ route ('tabungan.storTabungan')}}" method="POST">
                         @csrf
                         <div class="form-group">
                             <div class="row">
@@ -54,7 +79,8 @@
                                     <label for="nama">Nama</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" class="form-control" id="name" name="nama" readnly disabled>
+                                    <input type="text" hidden class="form-control" id="username2" name="username" readonly>
+                                    <input type="text" class="form-control" id="name" name="name" readonly>
                                 </div>
                             </div>
                         </div>
@@ -64,7 +90,7 @@
                                     <label for="kelas">Kelas</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" class="form-control" id="kelas" name="kelas" readnly disabled>
+                                    <input type="text" class="form-control" id="kelas" name="kelas" readonly>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +102,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readnly disabled >
+                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readonly >
                                     </div>
                                 </div>
                             </div>
@@ -101,8 +127,8 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="d-flex justify-content-between">
                                         <a href="{{ route ('tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 30%">Kembali</a>
-                                        <button type="submit" class="btn btn-light" style="width: 30%">Input Lagi</button>
-                                        <button type="submit" class="btn btn-primary" style="width: 30%">Tambah</button>
+                                        <button type="button" class="btn btn-light" style="width: 30%">Input Lagi</button>
+                                        <button type="submit" class="btn btn-primary" style="width: 30%">Stor</button>
                                     </div>
                                 </div>
                             </div>
@@ -169,13 +195,15 @@
         });
     });
 
-
+    $('#username').on('change', function() {
+        $('#username2').val($(this).val());
+    });
 
     $(document).ready(function(){
-    setTimeout(function(){
-        $('#username').focus();
-    }, 500);  // menunda fokus selama 500ms
-});
+        setTimeout(function(){
+            $('#username').focus();
+        }, 500);  // menunda fokus selama 500ms
+    });
 
 
 </script>

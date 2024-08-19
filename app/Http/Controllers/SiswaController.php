@@ -64,8 +64,6 @@ class SiswaController extends Controller
             'email.unique' => 'Email sudah digunakan.',
             'password.required' => 'Password harus diisi.',
             'password.min' => 'Password minimal 8 karakter.',
-            'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
-            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
             'kontak.required' => 'Kontak harus diisi.',
             'kontak.max' => 'Kontak maksimal 15 karakter.',
             'alamat.required' => 'Alamat harus diisi.',
@@ -98,7 +96,7 @@ class SiswaController extends Controller
         $tabungan->saldo = 0 ;
         $tabungan->premi = 0 ;
         $tabungan->sisa = 0 ;
-        $tabungan->users_id = User::latest()->first()->id;
+        $tabungan->user_id = User::latest()->first()->id;
 
         $tabungan->save();
 
@@ -125,29 +123,38 @@ class SiswaController extends Controller
      */
     public function edit(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$request->id,
             'jenis_kelamin' => 'required|in:L,P',
             'kontak' => 'required|string|max:15',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
+            'kelas' => 'required|integer',
+            'password' => 'sometimes|required|string|min:8',
+        ], [
+            'name.required' => 'Nama harus diisi',
+            'email.required' => 'Email harus diisi',
+            'jenis_kelamin.required' => 'Jenis kelamin harus diisi',
+            'kontak.required' => 'Kontak harus diisi',
+            'alamat.required' => 'Alamat harus diisi',
+            'orang_tua.required' => 'Orang tua harus diisi',
+            'kelas.required' => 'Kelas harus diisi',
+            'password.required' => 'Password harus diisi',
+            'password.min' => 'Password minimal 8 karakter',
         ]);
 
         $user = User::findOrFail($request->id);
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->kontak = $request->kontak;
-        $user->alamat = $request->alamat;
-        $user->orang_tua = $request->orang_tua;
-        $user->kelas_id = $request->kelas;
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->jenis_kelamin = $validatedData['jenis_kelamin'];
+        $user->kontak = $validatedData['kontak'];
+        $user->alamat = $validatedData['alamat'];
+        $user->orang_tua = $validatedData['orang_tua'];
+        $user->kelas_id = $validatedData['kelas'];
 
-        if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'string|min:8'
-            ]);
-            $user->password = bcrypt($request->password);
+        if ($validatedData['password']) {
+            $user->password = bcrypt($validatedData['password']);
         }
 
         $user->save();

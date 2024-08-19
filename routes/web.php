@@ -62,7 +62,9 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'index'])->name('tabungan.index');
         Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'stor'])->name('tabungan.stor');
+        Route::post('/bendahara/tabungan/stor/add', [TabunganController::class, 'storTabungan'])->name('tabungan.storTabungan');
         Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'tarik'])->name('tabungan.tarik');
+        Route::post('/bendahara/tabungan/tarik/add', [TabunganController::class, 'tarikTabungan'])->name('tabungan.tarikTabungan');
         Route::get('/search', [TabunganController::class, 'search'])->name('search');
     });
 

@@ -105,22 +105,29 @@ class WalikelasController extends Controller
      */
     public function edit(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$request->id,
             'email' => 'required|string|email|max:255|unique:users,email,'.$request->id,
             'jenis_kelamin' => 'required|in:L,P',
             'kontak' => 'required|string|max:15',
             'alamat' => 'required|string',
+        ], [
+            'name.required' => 'Nama harus diisi.',
+            'username.required' => 'Username harus diisi.',
+            'email.required' => 'Email harus diisi.',
+            'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
+            'kontak.required' => 'Kontak harus diisi.',
+            'alamat.required' => 'Alamat harus diisi.',
         ]);
 
         $user = User::findOrFail($request->id);
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->kontak = $request->kontak;
-        $user->alamat = $request->alamat;
+        $user->name = $validatedData['name'];
+        $user->username = $validatedData['username'];
+        $user->email = $validatedData['email'];
+        $user->jenis_kelamin = $validatedData['jenis_kelamin'];
+        $user->kontak = $validatedData['kontak'];
+        $user->alamat = $validatedData['alamat'];
         $user->kelas_id = $request->kelas;
 
         if ($request->filled('password')) {

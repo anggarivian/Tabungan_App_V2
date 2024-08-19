@@ -16,34 +16,44 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Tidak ada atribut yang dapat diisi massal karena menggunakan $guarded untuk mengatur atribut yang tidak dapat diisi.
      *
      * @var array<int, string>
      */
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    // ];
-
     protected $guarded = [];
 
+    /**
+     * Mendapatkan role yang terkait dengan user ini.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
+    /**
+     * Mendapatkan kelas yang terkait dengan user ini.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
     }
+
+    /**
+     * Mendapatkan tabungan yang terkait dengan user ini.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function tabungan()
     {
-        return $this->hasOne(Tabungan::class, 'users_id');
+        return $this->hasOne(Tabungan::class, 'user_id');
     }
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atribut yang harus disembunyikan untuk serialisasi.
      *
      * @var array<int, string>
      */
@@ -53,7 +63,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Atribut yang harus di-cast.
      *
      * @var array<string, string>
      */

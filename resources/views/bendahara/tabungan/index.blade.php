@@ -3,6 +3,11 @@
 @section('title') Tabungan - SakuRame @endsection
 
 @section('content')
+<style>
+    .dropdown-table {
+        display: none;
+    }
+</style>
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between">
         <h3 class="mt-3">Informasi Tabungan</h3>
@@ -88,20 +93,58 @@
     </section>
     <h4 class="card-title mb-4">Transaksi Hari ini</h4>
     <div class="row justify-content-center">
-        @for ($i = 1; $i <= 9; $i++)
-            <div class="col-6 col-sm-4 col-lg-2">
-                <div class="card">
-                    <div class="px-4 py-4-5 text-center">
-                        <p class="text-muted font-semibold">Kelas {{$i}}</p>
-                        <h5 class="font-extrabold mb-0">Rp. 100.000</h5>
+        @for($i = 1; $i <= 9; $i++)
+        <div class="container">
+            <div class="card col-12">
+                <div class="card-body">
+                    <h5 class="card-title">Kelas A</h5>
+                    <p class="card-text">Jumlah: 30 siswa</p>
+                    <button class="btn btn-primary toggle-table">Lihat Detail</button>
+                    <div class="dropdown-table mt-3">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ $i }}</td>
+                                    <td>Budi</td>
+                                    <td>90</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $i+1 }}</td>
+                                    <td>Siti</td>
+                                    <td>85</td>
+                                </tr>
+                                <!-- Tambahkan data siswa lainnya di sini -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
         @endfor
     </div>
 </div>
 @endsection
 
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
+<script>
+    $(document).ready(function(){
+        $('.toggle-table').click(function(){
+            $(this).siblings('.dropdown-table').slideToggle();
+            $(this).text(function(i, text){
+                return text === "Lihat Detail" ? "Tutup Detail" : "Lihat Detail";
+            })
+        });
+    });
+</script>
 @endsection
