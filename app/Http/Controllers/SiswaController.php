@@ -98,7 +98,7 @@ class SiswaController extends Controller
         $tabungan->saldo = 0 ;
         $tabungan->premi = 0 ;
         $tabungan->sisa = 0 ;
-        $tabungan->users_id =  User::latest()->first()->id;
+        $tabungan->users_id = User::latest()->first()->id;
 
         $tabungan->save();
 

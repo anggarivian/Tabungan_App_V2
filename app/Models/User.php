@@ -37,10 +37,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Kelas::class);
     }
-
     public function tabungan()
     {
-        return $this->belongsTo(Tabungan::class);
+        return $this->hasOne(Tabungan::class, 'users_id');
     }
 
     /**

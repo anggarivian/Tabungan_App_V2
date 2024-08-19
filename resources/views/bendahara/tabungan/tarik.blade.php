@@ -28,20 +28,21 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                    <form action="/bendahara/kelola-siswa" method="GET">
+                    <form id="searchForm">
                         <div class="form-group mb-0">
                             <div class="row">
                                 <div class="col-md-4 mb-1">
                                     <div class="input-group mb-3">
-                                        <label for="cari">Cari ID Tabungan</label>
+                                        <label for="username" class="form-label">Cari ID Tabungan</label>
                                     </div>
                                 </div>
                                 <div class="col-md-8 mb-1">
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control " id="search" name="search" placeholder="Cari ID Tabungan" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
-                                        <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
+                                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan ID Tabungan">
+                                        <button class="btn btn-primary" type="submit">Cari</button>
                                     </div>
                                 </div>
+                                <div id="tidak-ada"></div>
                             </div>
                         </div>
                     </form>
@@ -53,7 +54,7 @@
                                     <label for="nama">Nama</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" class="form-control" id="nama" name="nama" readnly disabled>
+                                    <input type="text" class="form-control" id="name" name="nama" readnly disabled>
                                 </div>
                             </div>
                         </div>
@@ -73,7 +74,10 @@
                                     <label for="jumlah_tabungan">Tabungan Saat Ini</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readnly disabled>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="basic-addon1">Rp.</span>
+                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readnly disabled >
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -84,8 +88,8 @@
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
-                                        <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik">
+                                        <span class="input-group-text">Rp.</span>
+                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik" >
                                     </div>
                                 </div>
                             </div>
@@ -119,5 +123,62 @@
 @endsection
 
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#searchForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var username = $('#username').val();
+
+            $.ajax({
+                url: "{{ route('search') }}",
+                method: "GET",
+                data: { username: username },
+                success: function(data) {
+                    if (data) {
+                        console.log(data);
+                        if(data.name !== 'Tidak Ada' && data.kelas !== 'Tidak Ada' && data.tabungan !== 'Tidak Ada') {
+                            $('#name').val(data.name);
+                            $('#kelas').val(data.kelas);
+                            $('#jumlah_tabungan').val(data.tabungan);
+                        } else {
+                            $('#tidak-ada').html('<div class="alert alert-danger">Data tidak ditemukan</div>');
+                            setTimeout(function() {
+                                $('#tidak-ada').empty();
+                            }, 2000);
+                            $('#name').val('');
+                            $('#kelas').val('');
+                            $('#jumlah_tabungan').val('');
+                        }
+                        $('#jumlah_tarik').focus();
+                    } else {
+                        alert('User tidak ditemukan');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Terjadi kesalahan: ' + error);
+                }
+            });
+        });
+
+        $('#username').on('keypress', function(e) {
+            if(e.which === 13) {
+                $('#jumlah_tarik').focus();
+            }
+        });
+    });
+
+
+
+    $(document).ready(function(){
+    setTimeout(function(){
+        $('#username').focus();
+    }, 500);  // menunda fokus selama 500ms
+});
+
+
+</script>
+
 
 @endsection
