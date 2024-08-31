@@ -15,41 +15,31 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Tidak ada atribut yang dapat diisi massal karena menggunakan $guarded untuk mengatur atribut yang tidak dapat diisi.
-     *
-     * @var array<int, string>
-     */
     protected $guarded = [];
 
-    /**
-     * Mendapatkan role yang terkait dengan user ini.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    /**
-     * Mendapatkan kelas yang terkait dengan user ini.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
     }
 
-    /**
-     * Mendapatkan tabungan yang terkait dengan user ini.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function tabungan()
     {
         return $this->hasOne(Tabungan::class, 'user_id');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany(Transaksi::class, 'user_id');
+    }
+
+    public function pengajuan()
+    {
+        return $this->hasMany(Pengajuan::class, 'user_id');
     }
 
     /**

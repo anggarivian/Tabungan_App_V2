@@ -4,13 +4,23 @@
 
 @section('content')
 <style>
-    .dropdown-table {
+    .table-container {
         display: none;
+        margin-top: 10px;
+    }
+    .trigger {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 5px;
+        width: 200px;
     }
 </style>
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between">
-        <h3 class="mt-3">Informasi Tabungan</h3>
+        <h3 class="mt-3">Informasi Tabungan Hari Ini</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
@@ -31,21 +41,7 @@
     <section class="row">
         <div class="col-12 col-lg-12">
             <div class="row">
-                <div class="col-12 col-sm-12 col-lg-4 col-md-12">
-                    <div class="card" style="padding: -20px">
-                        <div class="px-4 py-4-5">
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ route ('tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                                    Stor</a>
-                                <a href="{{ route ('tabungan.tarik')}}" class="btn btn-lg btn-secondary w-100 m-1 p-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg>
-                                    Tarik</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-12 col-lg-5 col-md-12">
+                <div class="col-12 col-sm-12 col-lg-6 col-md-12">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -76,7 +72,24 @@
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-6 col-md-3 col-sm-3 d-flex justify-content-start ">
-                                    <div class="stats-icon red mb-2">
+                                    <div class="stats-icon blue mb-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -130 800 800"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M64 0C28.7 0 0 28.7 0 64L0 416c0 35.3 28.7 64 64 64l16 0 16 32 64 0 16-32 224 0 16 32 64 0 16-32 16 0c35.3 0 64-28.7 64-64l0-352c0-35.3-28.7-64-64-64L64 0zM224 320a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm0-240a160 160 0 1 1 0 320 160 160 0 1 1 0-320zM480 221.3L480 336c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-114.7c-18.6-6.6-32-24.4-32-45.3c0-26.5 21.5-48 48-48s48 21.5 48 48c0 20.9-13.4 38.7-32 45.3z"/></svg>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-9 col-sm-3">
+                                    <h6 class="text-muted font-semibold">Total Jumlah</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. 9.231.000</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
+                    <div class="card">
+                        <div class="card-body px-4 py-4-5">
+                            <div class="row">
+                                <div class="col-6 col-md-3 col-sm-3 d-flex justify-content-start ">
+                                    <div class="stats-icon blue mb-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -130 800 800"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M64 0C28.7 0 0 28.7 0 64L0 416c0 35.3 28.7 64 64 64l16 0 16 32 64 0 16-32 224 0 16 32 64 0 16-32 16 0c35.3 0 64-28.7 64-64l0-352c0-35.3-28.7-64-64-64L64 0zM224 320a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm0-240a160 160 0 1 1 0 320 160 160 0 1 1 0-320zM480 221.3L480 336c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-114.7c-18.6-6.6-32-24.4-32-45.3c0-26.5 21.5-48 48-48s48 21.5 48 48c0 20.9-13.4 38.7-32 45.3z"/></svg>
                                     </div>
                                 </div>
@@ -91,60 +104,84 @@
             </div>
         </div>
     </section>
-    <h4 class="card-title mb-4">Transaksi Hari ini</h4>
     <div class="row justify-content-center">
-        @for($i = 1; $i <= 9; $i++)
         <div class="container">
             <div class="card col-12">
                 <div class="card-body">
-                    <h5 class="card-title">Kelas A</h5>
-                    <p class="card-text">Jumlah: 30 siswa</p>
-                    <button class="btn btn-primary toggle-table">Lihat Detail</button>
+                    <h5 class="card-title">Pilih Transaksi</h5>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ route ('bendahara.tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
+                            Stor</a>
+                        <a href="{{ route ('bendahara.tabungan.tarik')}}" class="btn btn-lg btn-secondary w-100 m-1 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg>
+                            Tarik</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Transaksi</h5>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="btn-group w-100">
+                                <button class="btn btn-secondary" onclick="showTable(1)">Kelas 1 A</button>
+                                <button class="btn btn-secondary" onclick="showTable(2)">Kelas 2 B</button>
+                                <button class="btn btn-secondary" onclick="showTable(3)">Kelas 3 C</button>
+                                <button class="btn btn-secondary" onclick="showTable(4)">Kelas 4 D</button>
+                                <button class="btn btn-secondary" onclick="showTable(5)">Kelas 5 E</button>
+                                <button class="btn btn-secondary" onclick="showTable(6)">Kelas 6 F</button>
+                                <button class="btn btn-secondary" onclick="showTable(7)">Kelas 7 G</button>
+                                <button class="btn btn-secondary" onclick="showTable(8)">Kelas 8 H</button>
+                                <button class="btn btn-secondary" onclick="showTable(9)">Kelas 9 I</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="dropdown-table mt-3">
-                        <table class="table table-striped">
-                            <thead>
+                        <!-- Tempat untuk menampilkan tabel -->
+                        <div id="table1" class="table-container">
+                            <table border="1">
                                 <tr>
-                                    <th>No</th>
-                                    <th>Nama Siswa</th>
-                                    <th>Nilai</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{{ $i }}</td>
-                                    <td>Budi</td>
-                                    <td>90</td>
+                                    <th>a 1</th>
+                                    <th>a 2</th>
                                 </tr>
                                 <tr>
-                                    <td>{{ $i+1 }}</td>
-                                    <td>Siti</td>
-                                    <td>85</td>
+                                    <td>a 1</td>
+                                    <td>a 2</td>
                                 </tr>
-                                <!-- Tambahkan data siswa lainnya di sini -->
-                            </tbody>
-                        </table>
+                            </table>
+                        </div>
+
+                        <div id="table2" class="table-container">
+                            <table border="1">
+                                <tr>
+                                    <th>Column 1</th>
+                                    <th>Column 2</th>
+                                </tr>
+                                <tr>
+                                    <td>Data 1</td>
+                                    <td>Data 2</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        @endfor
     </div>
 </div>
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
 <script>
-    $(document).ready(function(){
-        $('.toggle-table').click(function(){
-            $(this).siblings('.dropdown-table').slideToggle();
-            $(this).text(function(i, text){
-                return text === "Lihat Detail" ? "Tutup Detail" : "Lihat Detail";
-            })
-        });
-    });
+    function showTable(tableNumber) {
+        // Sembunyikan semua tabel terlebih dahulu
+        for (let i = 1; i <= 9; i++) {
+            if (document.getElementById(`table${i}`)) {
+                document.getElementById(`table${i}`).style.display = 'none';
+            }
+        }
+        // Tampilkan tabel yang sesuai
+        document.getElementById(`table${tableNumber}`).style.display = 'block';
+    }
 </script>
+
 @endsection

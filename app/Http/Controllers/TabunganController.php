@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Tabungan;
 use App\Models\Transaksi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class TabunganController extends Controller
 {
@@ -49,13 +52,18 @@ class TabunganController extends Controller
     {
         $username = $request->get('username');
 
-        $user = User::with('tabungan')->where('username', $username)->first();
+        $user = DB::table('users')
+            ->join('tabungans', 'tabungans.user_id', '=', 'users.id') // Melakukan join antara tabel users dan tabungans
+            ->join('kelas', 'kelas.id', '=', 'users.kelas_id') // Melakukan join antara tabel users dan kelas jika ada relasi kelas
+            ->where('users.username', $username)
+            ->select('users.name as user_name', 'kelas.name as kelas_name', 'tabungans.saldo as tabungan_saldo') // Pilih kolom yang diperlukan
+            ->first();
 
         if ($user) {
             return response()->json([
-                'name' => $user->name,
-                'kelas' => $user->kelas->name,
-                'tabungan' => $user->tabungan->saldo,
+                'name' => $user->user_name,
+                'kelas' => $user->kelas_name,
+                'tabungan' => $user->tabungan_saldo,
             ]);
         } else {
             return response()->json([
@@ -164,5 +172,19 @@ class TabunganController extends Controller
         $tabungan->save();
 
         return redirect()->back()->with('success', 'Tabungan berhasil ditarik')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil ditarik')->with('alert-duration', 3000);
+    }
+
+    /**
+     * Menampilkan data tabungan berdasarkan kelas yang dipilih.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showByKelas(Request $request)
+    {
+        $kelas = $request->input('kelas');
+        $tabungan = Tabungan::where('kelas', $kelas)->whereDate('created_at', Carbon::today())->get();
+
+        return response()->json($tabungan);
     }
 }

@@ -4,29 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Tabungan;
+use App\Models\User;
 
-/**
- * Model untuk mengelola data transaksi.
- *
- * @property int $id
- * @property \Illuminate\Database\Eloquent\Relations\HasMany $transaksis
- *
- * @method static \Illuminate\Database\Eloquent\Builder|Transaksi newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Transaksi newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Transaksi query()
- * @method static \Illuminate\Database\Eloquent\Builder|Transaksi whereId($value)
- */
 class Transaksi extends Model
 {
     use HasFactory;
 
-    /**
-     * Mendapatkan transaksi yang terkait dengan transaksi ini.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function transaksis()
+    public function tabungan()
     {
-        return $this->hasMany(Transaksi::class);
+        return $this->belongsTo(Tabungan::class, 'tabungan_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }

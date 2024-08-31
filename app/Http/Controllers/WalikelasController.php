@@ -82,7 +82,7 @@ class WalikelasController extends Controller
         $user->roles_id = 3;
         $user->save();
 
-        return redirect()->route('walikelas.index')->with('success', 'Data walikelas berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data walikelas berhasil ditambahkan')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data walikelas berhasil ditambahkan')->with('alert-duration', 3000);
     }
 
     /**
@@ -139,7 +139,7 @@ class WalikelasController extends Controller
 
         $user->save();
 
-        return redirect()->route('walikelas.index')->with('success', 'Data walikelas berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data walikelas berhasil diperbarui')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data walikelas berhasil diperbarui')->with('alert-duration', 3000);
     }
 
     /**
@@ -153,7 +153,7 @@ class WalikelasController extends Controller
         $walikelas = User::findOrFail($id);
         $walikelas->delete();
 
-        return redirect()->route('walikelas.index')
+        return redirect()->route('bendahara.walikelas.index')
             ->with('success', 'Data walikelas berhasil dihapus')
             ->with('alert-type', 'danger')
             ->with('alert-message', 'Data walikelas berhasil dihapus')

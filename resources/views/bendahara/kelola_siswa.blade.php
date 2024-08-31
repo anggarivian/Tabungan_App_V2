@@ -1,6 +1,6 @@
 @extends('layout.main')
 
-@section('title') Kelola Data Siswa @endsection
+@section('title') Kelola Siswa - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
@@ -9,13 +9,13 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
-                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 2)
                     <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 3)
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 4)
-                    <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @endif
                 <li class="breadcrumb-item active" aria-current="page">Kelola Siswa</li>
             </ol>
@@ -122,7 +122,7 @@
                 <h1 class="modal-title fs-5" id="tambahModalLabel">Tambah Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('siswa.add') }}" method="POST">
+            <form action="{{ route('bendahara.siswa.add') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -202,7 +202,7 @@
                 <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="{{ route('siswa.edit', '') }}">
+            <form id="editForm" method="POST" action="{{ route('bendahara.siswa.edit', '') }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -282,7 +282,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" method="POST" action="{{ route('siswa.delete', '') }}">
+                <form id="deleteForm" method="POST" action="{{ route('bendahara.siswa.delete', '') }}">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Hapus</button>
@@ -300,7 +300,7 @@
         $('.btn-warning').on('click', function() {
             var id = $(this).data('id');
             $.ajax({
-                url: "{{ route('siswa.getData', '') }}/" + id,
+                url: "{{ route('bendahara.siswa.getData', '') }}/" + id,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
@@ -312,7 +312,7 @@
                         $('#edit-orang_tua').val(response.orang_tua);
                         $('#edit-kelas').val(response.kelas_id);
 
-                        $('#editModal form').attr('action', "{{ route('siswa.edit', '') }}/" + id);
+                        $('#editModal form').attr('action', "{{ route('bendahara.siswa.edit', '') }}/" + id);
                         $('#editModal').modal('show');
                     } else {
                         alert('Gagal mengambil data');

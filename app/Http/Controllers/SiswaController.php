@@ -100,7 +100,7 @@ class SiswaController extends Controller
 
         $tabungan->save();
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data siswa berhasil ditambahkan')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.siswa.index')->with('success', 'Data siswa berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data siswa berhasil ditambahkan')->with('alert-duration', 3000);
     }
 
     /**
@@ -159,7 +159,7 @@ class SiswaController extends Controller
 
         $user->save();
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data siswa berhasil diperbarui')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.siswa.index')->with('success', 'Data siswa berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data siswa berhasil diperbarui')->with('alert-duration', 3000);
     }
 
     /**
@@ -173,7 +173,7 @@ class SiswaController extends Controller
         $siswa = User::findOrFail($id);
         $siswa->delete();
 
-        return redirect()->route('siswa.index')
+        return redirect()->route('bendahara.siswa.index')
             ->with('success', 'Data siswa berhasil dihapus')
             ->with('alert-type', 'danger')
             ->with('alert-message', 'Data siswa berhasil dihapus')

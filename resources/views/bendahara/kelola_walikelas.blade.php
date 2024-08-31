@@ -1,6 +1,6 @@
 @extends('layout.main')
 
-@section('title') Kelola Data Walikelas @endsection
+@section('title') Kelola Walikelas - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
@@ -120,7 +120,7 @@
                 <h1 class="modal-title fs-5" id="tambahModalLabel">Tambah Data Walikelas</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('walikelas.add') }}" method="POST">
+            <form action="{{ route('bendahara.walikelas.add') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -200,7 +200,7 @@
                 <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Walikelas</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="{{ route('walikelas.edit', '') }}">
+            <form id="editForm" method="POST" action="{{ route('bendahara.walikelas.edit', '') }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -280,7 +280,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" method="POST" action="{{ route('walikelas.delete', '') }}">
+                <form id="deleteForm" method="POST" action="{{ route('bendahara.walikelas.delete', '') }}">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Hapus</button>
@@ -298,7 +298,7 @@
         $('.btn-warning').on('click', function() {
             var id = $(this).data('id');
             $.ajax({
-                url: "{{ route('walikelas.getData', '') }}/" + id,
+                url: "{{ route('bendahara.walikelas.getData', '') }}/" + id,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
@@ -310,7 +310,7 @@
                         $('#edit-alamat').val(response.alamat);
                         $('#edit-kelas').val(response.kelas_id);
 
-                        $('#editModal form').attr('action', "{{ route('walikelas.edit', '') }}/" + id);
+                        $('#editModal form').attr('action', "{{ route('bendahara.walikelas.edit', '') }}/" + id);
                         $('#editModal').modal('show');
                     } else {
                         alert('Gagal mengambil data');

@@ -17,7 +17,7 @@
                 @elseif(auth()->user()->roles_id == 4)
                     <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
                 @endif
-                <li class="breadcrumb-item"><a href="{{ route ('tabungan.index')}}">Tabungan</a></li>
+                <li class="breadcrumb-item"><a href="{{ route ('bendahara.tabungan.index')}}">Tabungan</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Stor</li>
             </ol>
         </nav>
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                     </form>
-                    <form action="{{ route ('tabungan.storTabungan')}}" method="POST">
+                    <form action="{{ route ('bendahara.tabungan.storTabungan')}}" method="POST">
                         @csrf
                         <div class="form-group">
                             <div class="row">
@@ -126,7 +126,7 @@
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="d-flex justify-content-between">
-                                        <a href="{{ route ('tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 30%">Kembali</a>
+                                        <a href="{{ route ('bendahara.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 30%">Kembali</a>
                                         <button type="button" class="btn btn-light" style="width: 30%">Input Lagi</button>
                                         <button type="submit" class="btn btn-primary" style="width: 30%">Stor</button>
                                     </div>

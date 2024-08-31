@@ -49,7 +49,7 @@ class LoginController extends Controller
                 4 => '/siswa/dashboard',
             ];
 
-            return redirect()->intended($dashboardRoutes[$role] ?? '/home');
+            return redirect()->intended($dashboardRoutes[$role] ?? '/');
         }
 
         return back()->with('LoginError', 'Login Gagal !');
