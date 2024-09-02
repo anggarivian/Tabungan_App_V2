@@ -110,75 +110,54 @@
                 <div class="card-body">
                     <h5 class="card-title">Pilih Transaksi</h5>
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route ('bendahara.tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-3">
+                        <a href="{{ route ('walikelas.tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-3">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
                             Stor</a>
-                        <a href="{{ route ('bendahara.tabungan.tarik')}}" class="btn btn-lg btn-light w-100 m-1 p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg>
-                            Tarik</a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi</h5>
-                    <div class="row">
-                        <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group with nested dropdown">
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 1 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 2 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 2 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 3 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 3 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(7)">Kelas 4</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(8)">Kelas 5</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(9)">Kelas 6</button>
+                    <h5 class="card-title">Transaksi Hari Ini</h5>
+                    <div class="dropdown-table mt-3 w-100">
+                        <div class="table-responsive-lg">
+                            <table class="table table-hover" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">No.</th>
+                                        <th class="text-center">ID</th>
+                                        <th>Nama</th>
+                                        <th class="text-center">Kelas</th>
+                                        <th class="text-center">Saldo Awal</th>
+                                        <th class="text-center">Jumlah Transaksi</th>
+                                        <th class="text-center">Saldo Akhir</th>
+                                        <th class="text-center">Transaksi</th>
+                                        <th class="text-center">Pembayaran</th>
+                                        <th class="text-center">Pembuat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($kelas as $transaksis)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="text-center">{{ $transaksis->user->username }}</td>
+                                            <td>{{ $transaksis->user->name }}</td>
+                                            <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
+                                            <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
+                                            <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
+                                            <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
+                                            <td class="text-center"><span class="badge bg-success">{{ $transaksis->tipe_transaksi ?? '-' }}</span></td>
+                                            <td class="text-center">{{ $transaksis->pembayaran ?? '-' }}</td>
+                                            <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="10" class="text-center">Data Kosong</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            {{ $kelas->links('layout.pagination.bootstrap-5') }}
                         </div>
                     </div>
-
-                    <div class="dropdown-table mt-3 w-100">
-                        @foreach (['kelas1a' => 'Kelas 1A', 'kelas1b' => 'Kelas 1B', 'kelas2a' => 'Kelas 2A', 'kelas2b' => 'Kelas 2B', 'kelas3a' => 'Kelas 3A', 'kelas3b' => 'Kelas 3B', 'kelas4' => 'Kelas 4', 'kelas5' => 'Kelas 5', 'kelas6' => 'Kelas 6'] as $kelas => $namaKelas)
-                            <div id="table{{ $loop->index + 1 }}" class="table-responsive-lg" style="display: none;">
-                                <h6 class="mt-5 ">Transaksi Hari ini dari {{ $namaKelas }}</h6>
-                                <table class="table table-hover" style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">No.</th>
-                                            <th class="text-center">ID</th>
-                                            <th>Nama</th>
-                                            <th class="text-center">Kelas</th>
-                                            <th class="text-center">Saldo Awal</th>
-                                            <th class="text-center">Jumlah Transaksi</th>
-                                            <th class="text-center">Saldo Akhir</th>
-                                            <th class="text-center">Transaksi</th>
-                                            <th class="text-center">Pembayaran</th>
-                                            <th class="text-center">Pembuat</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($$kelas as $transaksis)
-                                            <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td class="text-center">{{ $transaksis->user->username }}</td>
-                                                <td>{{ $transaksis->user->name }}</td>
-                                                <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
-                                                <td class="text-center"><span class="badge bg-success">{{ $transaksis->tipe_transaksi ?? '-' }}</span></td>
-                                                <td class="text-center">{{ $transaksis->pembayaran ?? '-' }}</td>
-                                                <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="10" class="text-center">Data Kosong</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $$kelas->links('layout.pagination.bootstrap-5') }}
-                            </div>
-                        @endforeach
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -187,23 +166,5 @@
 @endsection
 
 @section('js')
-<script>
-    function showTable(tableId) {
-        for (let i = 1; i <= 9; i++) {
-            const table = document.getElementById('table' + i);
-            if (table) {
-                table.style.display = 'none';
-            }
-        }
 
-        const selectedTable = document.getElementById('table' + tableId);
-        if (selectedTable) {
-            selectedTable.style.display = 'block';
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        showTable(1);
-    });
-</script>
 @endsection

@@ -126,9 +126,8 @@
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="d-flex justify-content-between">
-                                        <a href="{{ route ('bendahara.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 30%">Kembali</a>
-                                        <button type="button" class="btn btn-light" style="width: 30%">Input Lagi</button>
-                                        <button type="submit" class="btn btn-primary" style="width: 30%">Stor</button>
+                                        <a href="{{ route ('bendahara.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 48%">Kembali</a>
+                                        <button type="submit" class="btn btn-primary" style="width: 48%">Stor</button>
                                     </div>
                                 </div>
                             </div>
@@ -158,7 +157,7 @@
             var username = $('#username').val();
 
             $.ajax({
-                url: "{{ route('search') }}",
+                url: "{{ route('bendahara.search') }}",
                 method: "GET",
                 data: { username: username },
                 success: function(data) {

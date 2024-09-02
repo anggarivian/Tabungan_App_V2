@@ -71,15 +71,15 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('bendahara.siswa.delete');
 
         // Menangani pengelolaan Tabungan.
-        Route::get('/bendahara/tabungan', [TabunganController::class, 'index'])->name('bendahara.tabungan.index');
-        Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'stor'])->name('bendahara.tabungan.stor');
-        Route::post('/bendahara/tabungan/stor/add', [TabunganController::class, 'storTabungan'])->name('bendahara.tabungan.storTabungan');
-        Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'tarik'])->name('bendahara.tabungan.tarik');
-        Route::post('/bendahara/tabungan/tarik/add', [TabunganController::class, 'tarikTabungan'])->name('bendahara.tabungan.tarikTabungan');
-        Route::get('/search', [TabunganController::class, 'search'])->name('search');
+        Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
+        Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'bendahara_stor'])->name('bendahara.tabungan.stor');
+        Route::post('/bendahara/tabungan/stor/add', [TabunganController::class, 'bendahara_storTabungan'])->name('bendahara.tabungan.storTabungan');
+        Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'bendahara_tarik'])->name('bendahara.tabungan.tarik');
+        Route::post('/bendahara/tabungan/tarik/add', [TabunganController::class, 'bendahara_tarikTabungan'])->name('bendahara.tabungan.tarikTabungan');
+        Route::get('/bendahara/tabungan/search', [TabunganController::class, 'bendahara_search'])->name('bendahara.search');
 
         // Menangani pengelolaan Pengajuan.
-        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
+        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'index'])->name('bendahara.pengajuan.index');
 
         // Menangani pengelolaan Laporan.
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
@@ -91,6 +91,16 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('isWalikelas')->group(function () {
         // Menampilkan dashboard untuk Walikelas.
         Route::get('/walikelas/dashboard', [DashboardController::class, 'walikelas'])->name('walikelas.dashboard');
+
+        // Menangani pengelolaan Tabungan.
+        Route::get('/walikelas/tabungan', [TabunganController::class, 'walikelas_index'])->name('walikelas.tabungan.index');
+        Route::get('/walikelas/tabungan/stor', [TabunganController::class, 'walikelas_stor'])->name('walikelas.tabungan.stor');
+        Route::post('/walikelas/tabungan/stor/add', [TabunganController::class, 'walikelas_storTabungan'])->name('walikelas.tabungan.storTabungan');
+        Route::get('/walikelas/tabungan/search', [TabunganController::class, 'walikelas_search'])->name('walikelas.search');
+
+        // Menangani pengelolaan Laporan.
+        Route::get('/walikelas/laporan/tabungan', [LaporanController::class, 'lap_walikelas_tabungan'])->name('laporan.walikelas.tabungan');
+        Route::get('/walikelas/laporan/transaksi', [LaporanController::class, 'lap_walikelas_transaksi'])->name('laporan.walikelas.transaksi');
     });
 
     // Grup middleware untuk pengguna dengan role Siswa.

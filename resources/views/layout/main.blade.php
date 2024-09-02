@@ -26,14 +26,13 @@
             <header class="mb-5">
                 <div class="header-top">
                     <div class="container">
-                        {{-- <div class="logo"> --}}
-                            <a href="#"><img src="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" height="40px" width="190px" alt="Logo"></a>
-                        {{-- </div> --}}
+                        <a href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
+                            <img src="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" height="40px" width="190px" alt="Logo">
+                        </a>
                         <div class="header-top-right">
                             <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
                                 <div class="form-check form-switch fs-6">
                                     <input class="form-check-input  me-0" type="checkbox" id="toggle-dark" style="cursor: pointer">
-                                    {{-- <label class="form-check-label">Theme</label> --}}
                                 </div>
                             </div>
                             <div class="dropdown">
@@ -69,14 +68,12 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
-                                        {{-- <a class="dropdown-item" href="#" --}}
                                             onclick="event.preventDefault();
                                                 document.getElementById('logout-form').submit();">
                                             {{ __('Logout') }}
                                         </a>
 
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        {{-- <form id="logout-form" action="#" method="POST" class="d-none"> --}}
                                             @csrf
                                         </form>
                                     </li>
@@ -127,8 +124,8 @@
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
-                            <li class="menu-item {{ request()->is('walikelas/stor-tabungan*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                            <li class="menu-item {{ request()->routeIs('walikelas.tabungan.index') ? 'active' : '' }}">
+                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="margin-top: -3px">
                                     <span><i class="bi bi-bank2"></i> Stor Tabungan </span>
                                 </a>
                             </li>
@@ -204,10 +201,22 @@
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
-                            <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                            <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }} has-sub">
+                                <a href="#" class="menu-link" style="margin-top: -3px">
                                     <span><i class="bi bi-book-fill"></i> Laporan</span>
                                 </a>
+                                <div class="submenu">
+                                    <div class="submenu-group-wrapper">
+                                        <ul class="submenu-group">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.tabungan') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.walikelas.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.transaksi') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.walikelas.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }}">

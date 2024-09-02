@@ -1,11 +1,11 @@
 @extends('layout.main')
 
-@section('title') Tarik Tabungan - SakuRame @endsection
+@section('title') Stor Tabungan - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between">
-        <h3 class="mt-3">Tarik Tabungan</h3>
+        <h3 class="mt-3">Stor Tabungan</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
@@ -13,12 +13,12 @@
                 @elseif(auth()->user()->roles_id == 2)
                     <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 3)
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.bendahara')}}">Bendahara</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 4)
                     <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
                 @endif
-                <li class="breadcrumb-item"><a href="{{ route ('bendahara.tabungan.index')}}">Tabungan</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Tarik</li>
+                <li class="breadcrumb-item"><a href="{{ route ('walikelas.tabungan.index')}}">Tabungan</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Stor</li>
             </ol>
         </nav>
     </div>
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                     </form>
-                    <form action="{{ route ('bendahara.tabungan.tarikTabungan')}}" method="POST">
+                    <form action="{{ route ('walikelas.tabungan.storTabungan')}}" method="POST">
                         @csrf
                         <div class="form-group">
                             <div class="row">
@@ -110,12 +110,12 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="jumlah_tarik">Jumlah Tarik</label>
+                                    <label for="jumlah_stor">Jumlah Stor</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik" >
+                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" >
                                     </div>
                                 </div>
                             </div>
@@ -126,8 +126,8 @@
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="d-flex justify-content-between">
-                                        <a href="{{ route ('bendahara.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 48%">Kembali</a>
-                                        <button type="submit" class="btn btn-primary" style="width: 48%">Tarik</button>
+                                        <a href="{{ route ('walikelas.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 48%">Kembali</a>
+                                        <button type="submit" class="btn btn-primary" style="width: 48%">Stor</button>
                                     </div>
                                 </div>
                             </div>
@@ -157,7 +157,7 @@
             var username = $('#username').val();
 
             $.ajax({
-                url: "{{ route('bendahara.search') }}",
+                url: "{{ route('walikelas.search') }}",
                 method: "GET",
                 data: { username: username },
                 success: function(data) {
@@ -176,7 +176,7 @@
                             $('#kelas').val('');
                             $('#jumlah_tabungan').val('');
                         }
-                        $('#jumlah_tarik').focus();
+                        $('#jumlah_stor').focus();
                     } else {
                         alert('User tidak ditemukan');
                     }
@@ -189,7 +189,7 @@
 
         $('#username').on('keypress', function(e) {
             if(e.which === 13) {
-                $('#jumlah_tarik').focus();
+                $('#jumlah_stor').focus();
             }
         });
     });
