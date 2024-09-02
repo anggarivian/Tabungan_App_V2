@@ -159,16 +159,16 @@
                                 <a href="#" class="menu-link" style="margin-top: -3px">
                                     <span><i class="bi bi-book-fill"></i> Laporan</span>
                                 </a>
-                                <div class="submenu ">
+                                <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.tabungan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.kepsek.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
                                             </li>
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.transaksi') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.kepsek.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
                                             </li>
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.pengajuan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.kepsek.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
                                             </li>
                                         </ul>
@@ -180,23 +180,23 @@
                                 <a href="#" class="menu-link" style="margin-top: -3px">
                                     <span><i class="bi bi-book-fill"></i> Laporan</span>
                                 </a>
-                                <div class="submenu ">
+                                <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.tabungan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.bendahara.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
                                             </li>
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.transaksi') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.bendahara.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
                                             </li>
-                                            <li class="submenu-item  ">
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.pengajuan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.bendahara.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
                             </li>
-                            @elseif( auth()->user()->roles_id == 2)
+
                             @elseif( auth()->user()->roles_id == 2)
                             <li class="menu-item {{ request()->is('bendahara/laporan*') ? 'active' : '' }}">
                                 <a href="{{ route ('bendahara.laporan.index')}}" class='menu-link' style="margin-top: -3px">
@@ -216,27 +216,33 @@
                                 </a>
                             </li>
                             @endif
-                            {{-- Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
+                            {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('walikelas.index') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.walikelas.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-people-fill"></i> Walikelas </span>
-                                </a>
-                            </li>
+                            <li class="menu-item {{ request()->is('bendahara/kelola-*') ? 'active' : '' }} has-sub">
+                                    <a href="#" class="menu-link" style="margin-top: -3px">
+                                        <span><i class="bi bi-people-fill"></i> Data Pengguna</span>
+                                    </a>
+                                    <div class="submenu">
+                                        <div class="submenu-group-wrapper">
+                                            <ul class="submenu-group">
+                                                {{-- Walikelas --}}
+                                                <li class="submenu-item {{ request()->routeIs('bendahara.walikelas.index') ? 'active' : '' }}">
+                                                    <a href="{{ route('bendahara.walikelas.index') }}" class="submenu-link">Walikelas</a>
+                                                </li>
+                                                {{-- Siswa --}}
+                                                <li class="submenu-item {{ request()->routeIs('bendahara.siswa.index') ? 'active' : '' }}">
+                                                    <a href="{{ route('bendahara.siswa.index') }}" class="submenu-link">Siswa</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
                             @endif
-                            {{-- Siswa -------------------------------------------------------------------------------------------------------------------- --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('siswa.index') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.siswa.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-people-fill"></i> Siswa </span>
-                                </a>
-                            </li>
-                            @endif
-                            <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
+                            {{-- <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
                                 <a href="#" class='menu-link' style="margin-top: -3px">
                                     <span><i class="bi bi-building-fill-gear"></i> Profil Sekolah</span>
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                 </nav>

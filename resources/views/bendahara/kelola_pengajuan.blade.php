@@ -78,18 +78,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($user as $users)
+                        @foreach ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $users->username }}</td>
-                                <td>{{ $users->name }}</td>
-                                <td class="text-center">{{ $users->kelas->name }}</td>
-                                <td class="text-center">{{ $users->saldo}}</td>
-                                <td class="text-center">{{ $users->pengajuan->jumlah_penarikan ?? '-' }}</td>
-                                <td class="text-center">{{ $users->pengajuan->status ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->username }}</td>
+                                <td>{{ $pengajuans->name }}</td>
+                                <td class="text-center">{{ $pengajuans->kelas->name }}</td>
+                                <td class="text-center">{{ $pengajuans->saldo}}</td>
+                                <td class="text-center">{{ $pengajuans->pengajuan->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->pengajuan->status ?? '-' }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-success" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
+                                        <button type="button" class="btn btn-sm btn-success" data-id="{{ $pengajuans->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
                                             Proses !
                                         </button>
                                     </div>
@@ -98,7 +98,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                {{ $user->links('layout.pagination.bootstrap-5') }}
+                {{ $pengajuan->links('layout.pagination.bootstrap-5') }}
             </div>
         </div>
     </div>

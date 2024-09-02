@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/search', [TabunganController::class, 'search'])->name('search');
 
         // Menangani pengelolaan Pengajuan.
-        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'index'])->name('bendahara.pengajuan.index');
+        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
 
         // Menangani pengelolaan Laporan.
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
