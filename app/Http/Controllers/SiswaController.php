@@ -153,10 +153,6 @@ class SiswaController extends Controller
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
 
-        if ($validatedData['password']) {
-            $user->password = bcrypt($validatedData['password']);
-        }
-
         $user->save();
 
         return redirect()->route('bendahara.siswa.index')->with('success', 'Data siswa berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data siswa berhasil diperbarui')->with('alert-duration', 3000);

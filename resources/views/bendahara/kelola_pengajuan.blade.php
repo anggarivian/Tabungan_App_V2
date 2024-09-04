@@ -81,12 +81,22 @@
                         @foreach ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->username }}</td>
-                                <td>{{ $pengajuans->name }}</td>
-                                <td class="text-center">{{ $pengajuans->kelas->name }}</td>
-                                <td class="text-center">{{ $pengajuans->saldo}}</td>
-                                <td class="text-center">{{ $pengajuans->pengajuan->jumlah_penarikan ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->pengajuan->status ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->user->username }}</td>
+                                <td>{{ $pengajuans->user->name }}</td>
+                                <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>
+                                <td class="text-center">{{ $pengajuans->alasan}}</td>
+                                <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">
+                                    @if ($pengajuans->status == 'Pending')
+                                        <span class="badge bg-warning">Pending</span>
+                                    @elseif ($pengajuans->status == 'Tolak')
+                                        <span class="badge bg-danger">Tolak</span>
+                                    @elseif ($pengajuans->status == 'Terima')
+                                        <span class="badge bg-success">Terima</span>
+                                    @else
+                                        <span class="badge bg-secondary">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-success" data-id="{{ $pengajuans->id }}" data-bs-toggle="modal" data-bs-target="#editModal">

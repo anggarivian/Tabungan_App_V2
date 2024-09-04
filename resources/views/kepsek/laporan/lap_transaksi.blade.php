@@ -101,7 +101,15 @@
                                 <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
-                                <td class="text-center"><span class="badge bg-success">{{ $transaksis->tipe_transaksi ?? '-' }}</span></td>
+                                <td class="text-center">
+                                    @if ($transaksis->tipe_transaksi == 'Stor')
+                                        <span class="badge bg-success">Stor</span>
+                                    @elseif ($transaksis->tipe_transaksi == 'Tarik')
+                                        <span class="badge bg-danger">Tarik</span>
+                                    @else
+                                        <span class="badge bg-secondary">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $transaksis->pembayaran ?? '-' }}</td>
                                 <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
                             </tr>

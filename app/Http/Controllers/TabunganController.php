@@ -7,11 +7,13 @@ use App\Models\User;
 use App\Models\Tabungan;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use App\Helpers\RupiahHelper;
 use Illuminate\Support\Facades\DB;
 
 
 class TabunganController extends Controller
 {
+    // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
     public function bendahara_index()
     {
         $kelas1a = Transaksi::whereHas('user.kelas', function ($query) {
@@ -95,8 +97,8 @@ class TabunganController extends Controller
             'username' => 'required',
             'name' => 'required',
             'kelas' => 'required',
-            'jumlah_tabungan' => 'required|numeric',
-            'jumlah_stor' => 'required|numeric',
+            'jumlah_tabungan' => 'required|numeric|min:0',
+            'jumlah_stor' => 'required|numeric|min:0',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -139,8 +141,8 @@ class TabunganController extends Controller
             'username' => 'required',
             'name' => 'required',
             'kelas' => 'required',
-            'jumlah_tabungan' => 'required|numeric',
-            'jumlah_tarik' => 'required|numeric',
+            'jumlah_tabungan' => 'required|numeric|min:0',
+            'jumlah_tarik' => 'required|numeric|min:0',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -153,30 +155,36 @@ class TabunganController extends Controller
 
         $user = User::where('username', $validatedData['username'])->firstOrFail();
 
+        $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+
+        // Cek apakah jumlah tarik melebihi saldo awal
+        if ($validatedData['jumlah_tarik'] > $tabungan->saldo) {
+            return redirect()->back()->withErrors(['jumlah_tarik' => 'Penarikan tabungan melebihi saldo tabungan'])->withInput();
+        }
+
         $transaksi = new Transaksi();
         $transaksi->jumlah_transaksi = $validatedData['jumlah_tarik'];
-        $transaksi->saldo_awal = $validatedData['jumlah_tabungan'];
-        $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] - $validatedData['jumlah_tarik'];
+        $transaksi->saldo_awal = $tabungan->saldo;
+        $transaksi->saldo_akhir = $tabungan->saldo - $validatedData['jumlah_tarik'];
         $transaksi->tipe_transaksi = 'Tarik';
         $transaksi->pembayaran = 'Offline';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
         $transaksi->user_id = $user->id;
-        $transaksi->tabungan_id = $user->tabungan->id;
-
-        $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+        $transaksi->tabungan_id = $tabungan->id;
 
         $tabungan->saldo = $transaksi->saldo_akhir;
-        $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
-        $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
+        $tabungan->premi = $tabungan->saldo / 100 * 2.5;
+        $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
 
         $transaksi->save();
-
         $tabungan->save();
 
         return redirect()->back()->with('success', 'Tabungan berhasil ditarik')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil ditarik')->with('alert-duration', 3000);
     }
 
+
+    // Walikelas ------------------------------------------------------------------------------------------------------------------------------------------------
     public function walikelas_index()
     {
         $kelasId = auth()->user()->kelas->id;
@@ -226,8 +234,8 @@ class TabunganController extends Controller
             'username' => 'required',
             'name' => 'required',
             'kelas' => 'required',
-            'jumlah_tabungan' => 'required|numeric',
-            'jumlah_stor' => 'required|numeric',
+            'jumlah_tabungan' => 'required|numeric|min:0',
+            'jumlah_stor' => 'required|numeric|min:0',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -262,5 +270,20 @@ class TabunganController extends Controller
         $tabungan->save();
 
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
+    }
+
+    // Siswa ------------------------------------------------------------------------------------------------------------------------------------------------
+    public function siswa_stor()
+    {
+        $nominal = auth()->user()->tabungan->saldo ;
+        $terbilang = RupiahHelper::terbilangRupiah($nominal);
+        return view('siswa.tabungan.stor', compact('nominal', 'terbilang'));
+    }
+
+    public function siswa_tarik()
+    {
+        $nominal = auth()->user()->tabungan->saldo ;
+        $terbilang = RupiahHelper::terbilangRupiah($nominal);
+        return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
     }
 }

@@ -1,11 +1,11 @@
 @extends('layout.main')
 
-@section('title') Laporan Pengajuan - SakuRame @endsection
+@section('title') Laporan Tabungan - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between ">
-        <h3 class="mt-3">Laporan Pengajuan</h3>
+        <h3 class="mt-3">Laporan Tabungan</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
@@ -17,7 +17,7 @@
                 @elseif(auth()->user()->roles_id == 4)
                     <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
                 @endif
-                <li class="breadcrumb-item active" aria-current="page">Laporan Pengajuan</li>
+                <li class="breadcrumb-item active" aria-current="page">Laporan Tabungan</li>
             </ol>
         </nav>
     </div>
@@ -28,11 +28,11 @@
             <form action="/bendahara/kelola-siswa" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
+                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <p class="card-title" style="margin-top: 7px">Filter :</p>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                            <input type="text" class="form-control" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama atau Username...">
+                        <div class="col-12 col-md-6 col-lg-4 mb-2 mb-lg-0">
+                            <input type="text" class="form-control" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama / ID Tabungan...">
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <select class="form-select" name="kelas" id="kelas">
@@ -49,20 +49,13 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" name="status" id="status">
-                                <option value="">Status</option>
-                                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="Non-Aktif" {{ request('status') == 'Non-Aktif' ? 'selected' : '' }}>Non-Aktif</option>
+                            <select class="form-select" name="sort_saldo" id="sort_saldo">
+                                <option value="">Urutkan Saldo</option>
+                                <option value="desc" {{ request('sort_saldo') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
+                                <option value="asc" {{ request('sort_saldo') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                            <select class="form-select" name="sort_penarikan" id="sort_penarikan">
-                                <option value="">Urutkan Penarikan</option>
-                                <option value="desc" {{ request('sort_penarikan') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
-                                <option value="asc" {{ request('sort_penarikan') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
+                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <button type="submit" class="btn btn-primary w-100">
                                 Cari
                             </button>
@@ -72,8 +65,6 @@
 
             </form>
         </div>
-
-        {{-- Table Tabungan --}}
         <div class="card-body pb-1 pt-3">
             <div class="table-responsive-lg">
                 <table class="table table-hover" style="width: 100%">
@@ -84,44 +75,28 @@
                             <th>Nama</th>
                             <th class="text-center">Kelas</th>
                             <th class="text-center">Saldo</th>
-                            <th class="text-center">Jumlah Penarikan</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Pembayaran</th>
-                            <th class="text-center">Alasan</th>
+                            <th class="text-center">Sisa</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($pengajuan as $pengajuans)
+                        @forelse ($user as $users)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->user->username }}</td>
-                                <td>{{ $pengajuans->user->name }}</td>
-                                <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
-                                <td class="text-center">
-                                    @if ($pengajuans->status == 'Pending')
-                                        <span class="badge bg-warning">Pending</span>
-                                    @elseif ($pengajuans->status == 'Tolak')
-                                        <span class="badge bg-danger">Tolak</span>
-                                    @elseif ($pengajuans->status == 'Terima')
-                                        <span class="badge bg-success">Terima</span>
-                                    @else
-                                        <span class="badge bg-secondary">-</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $pengajuans->pembayaran ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
+                                <td class="text-center">{{ $users->username }}</td>
+                                <td>{{ $users->name }}</td>
+                                <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ $users->tabungan->saldo ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ $users->tabungan->sisa ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">Data Kosong</td>
+                                <td colspan="6" class="text-center">Data Kosong</td>
                             </tr>
                         @endforelse
                     </tbody>
 
                 </table>
-                {{ $pengajuan->links('layout.pagination.bootstrap-5') }}
+                {{ $user->links('layout.pagination.bootstrap-5') }}
             </div>
         </div>
 

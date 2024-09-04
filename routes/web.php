@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bendahara/tabungan/search', [TabunganController::class, 'bendahara_search'])->name('bendahara.search');
 
         // Menangani pengelolaan Pengajuan.
-        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'index'])->name('bendahara.pengajuan.index');
+        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
 
         // Menangani pengelolaan Laporan.
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
@@ -107,5 +107,15 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('isSiswa')->group(function () {
         // Menampilkan dashboard untuk Siswa.
         Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('siswa.dashboard');
+
+        // Menangani pengelolaan Tabungan.
+        Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
+        Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
+        Route::post('/siswa/tabungan/tarik/add', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
+
+        // Menangani pengelolaan Laporan.
+        Route::get('/siswa/laporan/tabungan', [LaporanController::class, 'lap_siswa_tabungan'])->name('laporan.siswa.tabungan');
+        Route::get('/siswa/laporan/transaksi', [LaporanController::class, 'lap_siswa_transaksi'])->name('laporan.siswa.transaksi');
+        Route::get('/siswa/laporan/pengajuan', [LaporanController::class, 'lap_siswa_pengajuan'])->name('laporan.siswa.pengajuan');
     });
 });

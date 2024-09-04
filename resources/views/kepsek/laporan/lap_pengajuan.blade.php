@@ -99,7 +99,17 @@
                                 <td class="text-center">{{ $pengajuans->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
                                 <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->status ?? '-' }}</td>
+                                <td class="text-center">
+                                    @if ($pengajuans->status == 'Pending')
+                                        <span class="badge bg-warning">Pending</span>
+                                    @elseif ($pengajuans->status == 'Tolak')
+                                        <span class="badge bg-danger">Tolak</span>
+                                    @elseif ($pengajuans->status == 'Terima')
+                                        <span class="badge bg-success">Terima</span>
+                                    @else
+                                        <span class="badge bg-secondary">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $pengajuans->pembayaran ?? '-' }}</td>
                                 <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
                             </tr>

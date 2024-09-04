@@ -130,8 +130,8 @@
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
-                            <li class="menu-item {{ request()->is('siswa/stor*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                            <li class="menu-item {{ request()->routeIs('siswa.tabungan.stor') ? 'active' : '' }}">
+                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="margin-top: -3px">
                                     <span><i class="bi bi-bank2"></i> Stor </span>
                                 </a>
                             </li>
@@ -144,8 +144,8 @@
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
-                            <li class="menu-item {{ request()->is('siswa/tarik*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                            <li class="menu-item {{ request()->routeIs('siswa.tabungan.tarik*') ? 'active' : '' }}">
+                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="margin-top: -3px">
                                     <span><i class="bi bi-bank2"></i> Tarik </span>
                                 </a>
                             </li>
@@ -219,10 +219,25 @@
                                 </div>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
-                            <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                            <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }} has-sub">
+                                <a href="#" class="menu-link" style="margin-top: -3px">
                                     <span><i class="bi bi-book-fill"></i> Laporan</span>
                                 </a>
+                                <div class="submenu">
+                                    <div class="submenu-group-wrapper">
+                                        <ul class="submenu-group">
+                                            {{-- <li class="submenu-item {{ request()->routeIs('laporan.siswa.tabungan') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.siswa.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
+                                            </li> --}}
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.transaksi') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.siswa.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.pengajuan') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.siswa.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>
                             @endif
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
