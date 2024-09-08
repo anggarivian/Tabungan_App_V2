@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Transaksi;
 use App\Models\Tabungan;
 use App\Models\Pengajuan;
+use App\Models\Transaksi;
+use Illuminate\Http\Request;
+use App\Helpers\RupiahHelper;
 use Illuminate\Support\Facades\DB;
 
 class PengajuanController extends Controller
@@ -16,6 +17,21 @@ class PengajuanController extends Controller
         $pengajuan= Pengajuan::paginate(10);
 
         return view('bendahara.kelola_pengajuan', compact('pengajuan'));
+    }
+
+    public function getPengajuanData($id)
+    {
+        $pengajuan = Pengajuan::findOrFail($id);
+
+        return response()->json([
+            'id' => $pengajuan->user->id ?? '-',
+            'username' => $pengajuan->user->username ?? '-',
+            'name' => $pengajuan->user->name ?? '-',
+            'kelas' => $pengajuan->user->kelas->name ?? '-',
+            'tabungan' => $pengajuan->user->tabungan->saldo ?? '-',
+            'alasan' => $pengajuan->alasan ?? '-',
+            'jumlah_penarikan' => $pengajuan->jumlah_penarikan ?? '-',
+        ]);
     }
 
     public function ajukan(Request $request)

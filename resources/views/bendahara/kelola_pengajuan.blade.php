@@ -78,7 +78,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($pengajuan as $pengajuans)
+                        @forelse ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">{{ $pengajuans->user->username }}</td>
@@ -100,12 +100,16 @@
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-success" data-id="{{ $pengajuans->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
-                                            Proses !
+                                            Proses
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center">Data Kosong</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $pengajuan->links('layout.pagination.bootstrap-5') }}
@@ -131,7 +135,8 @@
                             <label for="edit-id">ID</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-id" class="form-control" name="id" placeholder="ID" required readonly>
+                            <input type="text" id="edit-id" hidden class="form-control" name="id" placeholder="ID" required readonly>
+                            <input type="text" id="edit-username" class="form-control" name="id" placeholder="ID" required readonly>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-name">Nama</label>
@@ -152,21 +157,16 @@
                             <textarea id="edit-alasan" class="form-control" name="alasan" placeholder="Alasan" rows="3" required></textarea>
                         </div>
                         <div class="col-md-4">
+                            <label for="edit-tabungan">Jumlah Penarikan</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" placeholder="Jumlah Penarikan" required>
+                        </div>
+                        <div class="col-md-4">
                             <label for="edit-jumlah_penarikan">Jumlah Penarikan</label>
                         </div>
                         <div class="col-md-8 form-group">
                             <input type="number" id="edit-jumlah_penarikan" class="form-control" name="jumlah_penarikan" placeholder="Jumlah Penarikan" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-status">Status</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="edit-status" class="form-select" name="status" required>
-                                <option value="">Pilih Status</option>
-                                <option value="Diterima">Diterima</option>
-                                <option value="Ditolak">Ditolak</option>
-                                <option value="Diproses">Diproses</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -184,23 +184,21 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('.btn-warning').on('click', function() {
+        $('.btn-success').on('click', function() {
             var id = $(this).data('id');
             $.ajax({
-                url: "{{ route('bendahara.siswa.getData', '') }}/" + id,
+                url: "{{ route('bendahara.pengajuan.getData', '') }}/" + id,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
                         $('#edit-id').val(response.id);
                         $('#edit-username').val(response.username);
                         $('#edit-name').val(response.name);
-                        $('#edit-email').val(response.email);
+                        $('#edit-kelas').val(response.kelas);
                         $('#edit-jumlah_penarikan').val(response.jumlah_penarikan);
+                        $('#edit-tabungan').val(response.tabungan);
                         $('#edit-alasan').val(response.alasan);
-                        $('#edit-status').val(response.status);
 
-                        $('#editModal form').attr('action', "{{ route('bendahara.siswa.edit', '') }}/" + id);
-                        $('#editModal').modal('show');
                     } else {
                         alert('Gagal mengambil data');
                     }

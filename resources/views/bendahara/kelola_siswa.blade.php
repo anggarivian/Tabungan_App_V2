@@ -83,7 +83,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($user as $users)
+                        @forelse ($user as $users)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>{{ $users->name }}</td>
@@ -105,7 +105,11 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center">Data Kosong</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $user->links('layout.pagination.bootstrap-5') }}
