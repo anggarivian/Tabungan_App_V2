@@ -81,6 +81,8 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Pengajuan.
         Route::get('/bendahara/kelola-pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
         Route::get('/bendahara/kelola-pengajuan/get-data/{id}', [PengajuanController::class, 'getPengajuanData'])->name('bendahara.pengajuan.getData');
+        Route::put('/bendahara/kelola-pengajuan/terima', [PengajuanController::class, 'terima'])->name('bendahara.pengajuan.terima');
+        Route::get('/bendahara/kelola-pengajuan/tolak/{id}', [PengajuanController::class, 'tolak'])->name('bendahara.pengajuan.tolak');
 
         // Menangani pengelolaan Laporan.
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');

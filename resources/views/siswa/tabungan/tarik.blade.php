@@ -64,10 +64,10 @@
                     @endif
                     @php
                         $userId = auth()->user()->id;
-                        $pengajuan = \App\Models\Pengajuan::where('user_id', $userId)->first();
+                        $pengajuan = \App\Models\Pengajuan::where('user_id', $userId)->latest()->first();
                     @endphp
 
-                    @if($pengajuan)
+                    @if($pengajuan && $pengajuan->status == 'Pending')
                         <div class="container">
                             <p class="mt-2">Pengajuan kamu sedang diproses oleh bendahara !!!</p>
                         </div>

@@ -123,10 +123,10 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Siswa</h1>
+                <h1 class="modal-title fs-5" id="editModalLabel">Proses Pengajuan</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="">
+            <form id="editForm" method="POST" action="{{ route ('bendahara.pengajuan.terima') }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -135,43 +135,49 @@
                             <label for="edit-id">ID</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-id" hidden class="form-control" name="id" placeholder="ID" required readonly>
-                            <input type="text" id="edit-username" class="form-control" name="id" placeholder="ID" required readonly>
+                            <input type="text" id="edit-id" class="form-control" name="id"  required readonly hidden>
+                            <input type="text" id="edit-username" class="form-control" name="username"  required readonly>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-name">Nama</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-name" class="form-control" name="name" placeholder="Nama" required>
+                            <input type="text" id="edit-name" class="form-control" name="name"  required readonly>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-kelas">Kelas</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-kelas" class="form-control" name="kelas" placeholder="Kelas" required>
+                            <input type="text" id="edit-kelas" class="form-control" name="kelas" required readonly>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-alasan">Alasan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <textarea id="edit-alasan" class="form-control" name="alasan" placeholder="Alasan" rows="3" required></textarea>
+                            <textarea id="edit-alasan" class="form-control" name="alasan"  rows="3" required readonly></textarea>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-tabungan">Jumlah Penarikan</label>
+                            <label for="edit-tabungan">Jumlah Tabungan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" placeholder="Jumlah Penarikan" required>
+                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" required readonly>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-jumlah_penarikan">Jumlah Penarikan</label>
+                            <label for="edit-jumlah_tarik">Jumlah Penarikan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="number" id="edit-jumlah_penarikan" class="form-control" name="jumlah_penarikan" placeholder="Jumlah Penarikan" required>
+                            <input type="number" id="edit-jumlah_tarik" class="form-control" name="jumlah_tarik" required readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-pembayaran">Pembayaran</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-pembayaran" class="form-control" name="pembayaran" required readonly>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tolak</button>
+                    <a href="#" id="tolakButton" class="btn btn-light" type="button">Tolak</a>
                     <button type="submit" class="btn btn-primary">Setujui</button>
                 </div>
             </form>
@@ -195,9 +201,12 @@
                         $('#edit-username').val(response.username);
                         $('#edit-name').val(response.name);
                         $('#edit-kelas').val(response.kelas);
-                        $('#edit-jumlah_penarikan').val(response.jumlah_penarikan);
+                        $('#edit-jumlah_tarik').val(response.jumlah_tarik);
                         $('#edit-tabungan').val(response.tabungan);
+                        $('#edit-pembayaran').val(response.pembayaran);
                         $('#edit-alasan').val(response.alasan);
+
+                        $('#tolakButton').attr('href', '/bendahara/kelola-pengajuan/tolak/' + response.id);
 
                     } else {
                         alert('Gagal mengambil data');

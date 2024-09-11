@@ -83,7 +83,7 @@
                             <th class="text-center">ID</th>
                             <th>Nama</th>
                             <th class="text-center">Kelas</th>
-                            <th class="text-center">Saldo</th>
+                            <th class="text-center">Saldo Awal</th>
                             <th class="text-center">Jumlah Penarikan</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Pembayaran</th>
@@ -94,12 +94,22 @@
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->username }}</td>
-                                <td>{{ $pengajuans->name }}</td>
-                                <td class="text-center">{{ $pengajuans->kelas->name ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->user->username }}</td>
+                                <td>{{ $pengajuans->user->name }}</td>
+                                <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->status ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">
+                                    @if ($pengajuans->status == 'Pending')
+                                        <span class="badge bg-warning">Pending</span>
+                                    @elseif ($pengajuans->status == 'Tolak')
+                                        <span class="badge bg-danger">Tolak</span>
+                                    @elseif ($pengajuans->status == 'Terima')
+                                        <span class="badge bg-success">Terima</span>
+                                    @else
+                                        <span class="badge bg-secondary">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $pengajuans->pembayaran ?? '-' }}</td>
                                 <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
                             </tr>

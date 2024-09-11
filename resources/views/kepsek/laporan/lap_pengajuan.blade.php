@@ -94,9 +94,9 @@
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->username }}</td>
-                                <td>{{ $pengajuans->name }}</td>
-                                <td class="text-center">{{ $pengajuans->kelas->name ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->user->username }}</td>
+                                <td>{{ $pengajuans->user->name }}</td>
+                                <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
                                 <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
                                 <td class="text-center">
