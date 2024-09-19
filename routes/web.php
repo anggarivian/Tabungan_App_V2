@@ -122,3 +122,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/siswa/laporan/pengajuan', [LaporanController::class, 'lap_siswa_pengajuan'])->name('laporan.siswa.pengajuan');
     });
 });
+
+route::get('/offline', function () {
+    return view('modules/laravelpwa/offline');
+});

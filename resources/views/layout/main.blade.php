@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> --}}
     <!-- PWA  -->
     <meta name="theme-color" content="#6777ef"/>
-    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.PNG') }}">
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
+
+
     <title>@yield('title')</title>
+    @laravelPWA
     @yield('style')
 
     <link rel="shortcut icon" href="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" type="image/x-icon">
@@ -18,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/iconly.css') }}">
+
 </head>
 
 <body>
@@ -328,7 +332,7 @@
         });
     </script>
 
-    <script src="{{ asset('/sw.js') }}"></script>
+    {{-- <script src="{{ asset('/sw.js') }}"></script>
     <script>
     if ("serviceWorker" in navigator) {
         // Register a service worker hosted at the root of the
@@ -344,7 +348,17 @@
     } else {
         console.error("Service workers are not supported.");
     }
+    </script> --}}
+
+    <script src="{{ asset('/sw.js') }}"></script>
+    <script>
+        if (!navigator.serviceWorker.controller) {
+            navigator.serviceWorker.register("/sw.js").then(function (reg) {
+            console.log("Service worker registered for scope: " + reg.scope);
+            });
+        }
     </script>
+
 
 </body>
 
