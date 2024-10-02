@@ -2,12 +2,12 @@
 
 return [
 
-    'name' => 'My PWA App',
+    'name' => 'SakuRame',
 
     'manifest' => [
 
-        'name' => env('APP_NAME', 'My PWA App'),
-        'short_name' => 'PWA',
+        'name' => env('APP_NAME', 'SakuRame'),
+        'short_name' => 'SakuRame',
         'start_url' => '/',
         'background_color' => '#00be9c',
         'theme_color' => '#1c3c50',

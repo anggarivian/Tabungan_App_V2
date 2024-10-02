@@ -20,7 +20,10 @@
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
                     <div class="auth-logo">
-                        <a href="index.html"><img src="{{ asset ('/dist/assets/compiled/svg/logo.svg')}}" alt="Logo"></a>
+                        <a href="/">
+                            <i class="bi bi-arrow-left"></i>
+                            <img src="{{ asset ('/dist/assets/compiled/svg/Logo Dark.svg')}}" alt="Logo">
+                        </a>
                     </div>
                     <h1 class="auth-title">Sign Up</h1>
                     <p class="auth-subtitle mb-5">Input your data to register to our website.</p>
