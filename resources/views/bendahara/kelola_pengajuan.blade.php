@@ -54,7 +54,7 @@
                 <div class="input-group">
                     <p class="card-title">Data Pengajuan Penarikan Tabungan</p>
                 </div>
-                <form action="/bendahara/kelola-siswa" method="GET">
+                <form action="/bendahara/kelola-pengajuan" method="GET">
                     <div class="input-group">
                         <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
                         <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>

@@ -12,9 +12,32 @@ use Illuminate\Support\Facades\DB;
 
 class PengajuanController extends Controller
 {
-    public function kelola_pengajuan()
+    public function kelola_pengajuan(Request $request)
     {
-        $pengajuan = Pengajuan::where('status', 'Pending')->paginate(10);
+        $query = Pengajuan::query()->where('status', 'Pending');
+        $query->select('id', 'jumlah_penarikan', 'status', 'pembayaran', 'alasan', 'user_id', 'tabungan_id');
+        $searchTerm = $request->input('search');
+
+        if (!empty($searchTerm)) {
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('jumlah_penarikan', 'LIKE', '%'.$searchTerm.'%')
+                    ->orWhere('status', 'LIKE', '%'.$searchTerm.'%')
+                    ->orWhere('pembayaran', 'LIKE', '%'.$searchTerm.'%')
+                    ->orWhere('alasan', 'LIKE', '%'.$searchTerm.'%');
+            });
+
+            $query->orWhereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%'.$searchTerm.'%');
+            });
+
+            $query->orWhereHas('user.kelas', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%'.$searchTerm.'%');
+            });
+        }
+
+        $query->orderBy('created_at', 'desc');
+        $pengajuan = $query->paginate(10);
+
 
         return view('bendahara.kelola_pengajuan', compact('pengajuan'));
     }

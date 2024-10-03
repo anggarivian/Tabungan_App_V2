@@ -26,9 +26,9 @@ class SiswaController extends Controller
             $query->where(function ($query) use ($searchTerm) {
                 $query->where('name', 'LIKE', '%'.$searchTerm.'%')
                     ->orWhere('email', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('alamat', 'LIKE', '%'.$searchTerm.'%')
                     ->orWhere('username', 'LIKE', '%'.$searchTerm.'%')
                     ->orWhere('kontak', 'LIKE', '%'.$searchTerm.'%')
+                    ->orWhere('orang_tua', 'LIKE', '%'.$searchTerm.'%')
                     ->orWhere('alamat', 'LIKE', '%'.$searchTerm.'%');
             });
         }

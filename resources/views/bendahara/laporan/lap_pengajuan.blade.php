@@ -25,7 +25,7 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body" style="margin-bottom: -20px">
-            <form action="/bendahara/kelola-siswa" method="GET">
+            <form action="/bendahara/laporan/pengajuan" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
@@ -51,8 +51,9 @@
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <select class="form-select" name="status" id="status">
                                 <option value="">Status</option>
-                                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="Non-Aktif" {{ request('status') == 'Non-Aktif' ? 'selected' : '' }}>Non-Aktif</option>
+                                <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="Diterima" {{ request('status') == 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="Ditolak" {{ request('status') == 'Ditolak' ? 'selected' : '' }}>Diterima</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">

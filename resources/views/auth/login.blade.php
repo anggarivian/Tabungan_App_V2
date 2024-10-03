@@ -28,7 +28,6 @@
                         <div class="auth-logo">
                             <a href="/">
                                 <i class="bi bi-arrow-left"></i>
-                                <img src="{{ asset ('/dist/assets/compiled/svg/Logo Dark.svg')}}" alt="Logo">
                             </a>
                         </div>
                         <h1 class="auth-title">Log in.</h1>

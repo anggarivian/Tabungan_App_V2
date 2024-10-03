@@ -10,7 +10,7 @@
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
 
     <title>@yield('title')</title>
-    @laravelPWA
+    {{-- @laravelPWA --}}
     @yield('style')
 
     <link rel="shortcut icon" href="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" type="image/x-icon">

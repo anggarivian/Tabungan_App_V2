@@ -25,7 +25,7 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body" style="margin-bottom: -20px">
-            <form action="/bendahara/kelola-siswa" method="GET">
+            <form action="/bendahara/laporan/transaksi" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
