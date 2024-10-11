@@ -25,45 +25,41 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body" style="margin-bottom: -20px">
-            <form action="/bendahara/kelola-siswa" method="GET">
+            <form action="/siswa/laporan/pengajuan" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
-                            <p class="card-title" style="margin-top: 7px">Filter :</p>
+                        <div class="col-12 col-md-12 col-lg-1 mb-2 mb-lg-0">
+                            <p class="card-title" style="margin-bottom: 20px" >Filter :</p>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                            <input type="text" class="form-control" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama atau Username...">
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" name="kelas" id="kelas">
-                                <option value="">Kelas</option>
-                                <option value="1A" {{ request('kelas') == '1A' ? 'selected' : '' }}>1 - A</option>
-                                <option value="1B" {{ request('kelas') == '1B' ? 'selected' : '' }}>1 - B</option>
-                                <option value="2A" {{ request('kelas') == '2A' ? 'selected' : '' }}>2 - A</option>
-                                <option value="2B" {{ request('kelas') == '2B' ? 'selected' : '' }}>2 - B</option>
-                                <option value="3A" {{ request('kelas') == '3A' ? 'selected' : '' }}>3 - A</option>
-                                <option value="3B" {{ request('kelas') == '3B' ? 'selected' : '' }}>3 - B</option>
-                                <option value="4" {{ request('kelas') == '4' ? 'selected' : '' }}>4</option>
-                                <option value="5" {{ request('kelas') == '5' ? 'selected' : '' }}>5</option>
-                                <option value="6" {{ request('kelas') == '6' ? 'selected' : '' }}>6</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" name="status" id="status">
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
+                            <select class="form-select" style="margin-bottom: 20px" name="status" id="status">
                                 <option value="">Status</option>
-                                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="Non-Aktif" {{ request('status') == 'Non-Aktif' ? 'selected' : '' }}>Non-Aktif</option>
+                                <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="Terima" {{ request('status') == 'Terima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="Tolak" {{ request('status') == 'Tolak' ? 'selected' : '' }}>Ditolak</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                            <select class="form-select" name="sort_penarikan" id="sort_penarikan">
-                                <option value="">Urutkan Penarikan</option>
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
+                            <select class="form-select" style="margin-bottom: 20px" name="sort_penarikan" id="sort_penarikan">
+                                <option value="">Urutkan</option>
                                 <option value="desc" {{ request('sort_penarikan') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
                                 <option value="asc" {{ request('sort_penarikan') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
-                            <button type="submit" class="btn btn-primary w-100">
+                        <div class="col-12 col-md-12 col-lg-1 mb-2 mb-lg-0">
+                            <p class="card-title text-center" style="margin-top: -10px">Dari :</p>
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
+                            <input type="date" class="form-control" style="margin-bottom: 20px" name="start_date" value="{{ request('start_date') }}" placeholder="Tanggal Mulai">
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-1 mb-2 mb-lg-0">
+                            <p class="card-title text-center" style="margin-top: -10px">s/d :</p>
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
+                            <input type="date" class="form-control" style="margin-bottom: 20px" name="end_date" value="{{ request('end_date') }}" placeholder="Tanggal Akhir">
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-1 mb-2 mb-lg-0">
+                            <button type="submit" class="btn btn-primary w-100" style="margin-bottom: 20px">
                                 Cari
                             </button>
                         </div>

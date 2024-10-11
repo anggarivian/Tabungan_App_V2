@@ -25,7 +25,7 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body" style="margin-bottom: -20px">
-            <form action="/bendahara/kelola-siswa" method="GET">
+            <form action="/kepsek/laporan/tabungan" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
@@ -55,7 +55,7 @@
                                 <option value="asc" {{ request('sort_saldo') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
                             <button type="submit" class="btn btn-primary w-100">
                                 Cari
                             </button>

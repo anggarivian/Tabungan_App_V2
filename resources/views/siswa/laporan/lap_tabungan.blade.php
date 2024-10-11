@@ -25,7 +25,7 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body" style="margin-bottom: -20px">
-            <form action="/bendahara/kelola-siswa" method="GET">
+            <form action="/siswa/laporan/tabungan" method="GET">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
@@ -50,7 +50,7 @@
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <select class="form-select" name="sort_saldo" id="sort_saldo">
-                                <option value="">Urutkan Saldo</option>
+                                <option value="">Urutkan</option>
                                 <option value="desc" {{ request('sort_saldo') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
                                 <option value="asc" {{ request('sort_saldo') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>

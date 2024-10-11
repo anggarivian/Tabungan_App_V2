@@ -50,12 +50,12 @@
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <select class="form-select" name="sort_saldo" id="sort_saldo">
-                                <option value="">Urutkan Saldo</option>
+                                <option value="">Urutkan</option>
                                 <option value="desc" {{ request('sort_saldo') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
                                 <option value="asc" {{ request('sort_saldo') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
+                        <div class="col-12 col-md-12 col-lg-2 mb-2 mb-lg-0">
                             <button type="submit" class="btn btn-primary w-100">
                                 Cari
                             </button>
