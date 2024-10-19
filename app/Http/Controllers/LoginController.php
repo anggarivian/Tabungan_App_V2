@@ -42,6 +42,12 @@ class LoginController extends Controller
         if (Auth::attempt($validatedData)) {
             $request->session()->regenerate();
 
+            // Cek password pengguna setelah login
+            if ($validatedData['password'] === '12345') {
+                // Arahkan ke halaman ganti password
+                return redirect('/change-password');
+            }
+
             $role = Auth::user()->roles_id;
             $dashboardRoutes = [
                 1 => '/kepsek/dashboard',
@@ -55,6 +61,7 @@ class LoginController extends Controller
 
         return back()->with('LoginError', 'Login Gagal !');
     }
+
 
     /**
      * Menangani proses logout pengguna.
