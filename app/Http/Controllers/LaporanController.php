@@ -328,19 +328,14 @@ class LaporanController extends Controller
         return view('siswa.laporan.lap_tabungan', compact('user'));
     }
     public function lap_siswa_transaksi(Request $request){
-        $kelasId = auth()->user()->kelas->id;
-        $kelas = auth()->user()->kelas->name;
-
         $tipeTransaksi = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         $transaksi = Transaksi::with(['user.kelas'])
-            ->when($kelas, function ($query) use ($kelas) {
-                $query->whereHas('user.kelas', function ($q) use ($kelas) {
-                    $q->where('name', $kelas);
-                });
+            ->whereHas('user', function ($query) {
+                $query->where('id', auth()->id());  // Filter data berdasarkan user yang login
             })
             ->when($tipeTransaksi, function ($query) use ($tipeTransaksi) {
                 $query->where('tipe_transaksi', $tipeTransaksi);
@@ -357,19 +352,14 @@ class LaporanController extends Controller
     }
 
     public function lap_siswa_pengajuan(Request $request){
-        $kelasId = auth()->user()->kelas->id;
-        $kelas = auth()->user()->kelas->name;
-
         $status = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         $pengajuan = Pengajuan::with(['user.kelas'])
-            ->when($kelas, function ($query) use ($kelas) {
-                $query->whereHas('user.kelas', function ($q) use ($kelas) {
-                    $q->where('name', $kelas);
-                });
+            ->whereHas('user', function ($query) {
+                $query->where('id', auth()->id());  // Filter data berdasarkan user yang login
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);

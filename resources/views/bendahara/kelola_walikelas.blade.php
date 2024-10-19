@@ -55,7 +55,6 @@
                     <button type="button" class="btn  btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
                         Tambah Data
                     </button>
-                    <button type="button" class="btn btn-success">Import</button>
                 </div>
                 <form action="/bendahara/kelola-walikelas" method="GET">
                     <div class="input-group">

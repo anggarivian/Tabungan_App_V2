@@ -55,7 +55,9 @@
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
                         Tambah Data
                     </button>
-                    <button type="button" class="btn btn-success">Import</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                        Import
+                    </button>
                 </div>
                 <form action="/bendahara/kelola-siswa" method="GET">
                     <div class="input-group">
@@ -292,6 +294,31 @@
                     <button type="submit" class="btn btn-danger">Hapus</button>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Import --}}
+<div class="modal fade modal-borderless" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="importModalLabel">import Data Siswa</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Pilih File ( Format : .xls .xlsx)</label>
+                        <input class="form-control" type="file" name="file" id="formFile">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

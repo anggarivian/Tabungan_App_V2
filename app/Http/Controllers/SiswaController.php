@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Kelas;
 use App\Models\Tabungan;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
 
 class SiswaController extends Controller
 {
@@ -183,6 +185,21 @@ class SiswaController extends Controller
             ->with('success', 'Data siswa berhasil dihapus')
             ->with('alert-type', 'danger')
             ->with('alert-message', 'Data siswa berhasil dihapus')
+            ->with('alert-duration', 3000);
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xls,xlsx',
+        ]);
+
+        Excel::import(new UsersImport, $request->file('file'));
+
+        return redirect()->route('bendahara.siswa.index')
+            ->with('success', 'Data siswa berhasil di Import')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Data siswa berhasil di Import')
             ->with('alert-duration', 3000);
     }
 }
