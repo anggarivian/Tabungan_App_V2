@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * LoginController menghandle proses autentikasi pengguna.
@@ -67,4 +68,26 @@ class LoginController extends Controller
         request()->session()->regenerateToken();
         return redirect('/login')->with('logoutSuccess', 'Anda sudah logout!');
     }
+
+    public function change_password()
+    {
+        return view('auth.change_password');
+    }
+    public function change_password_submit(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->back()
+            ->with('success', 'Password berhasil diubah (Tunggu 3 detik, Halaman ini akan beralih)')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Password berhasil diubah (Tunggu 3 detik, Halaman ini akan beralih)')
+            ->with('alert-duration', 3000);
+        }
 }

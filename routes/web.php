@@ -35,6 +35,9 @@ Route::get('/login', [LoginController::class, 'index'])->name('login')->middlewa
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('/change-password', [LoginController::class, 'change_password'])->name('change.password')->middleware('auth');
+Route::post('/change-password', [LoginController::class, 'change_password_submit'])->name('change.password.submit')->middleware('auth');
+
 // Menangani proses registrasi pengguna baru.
 Route::get('/register', [RegisterController::class, 'index'])->name('register');
 
