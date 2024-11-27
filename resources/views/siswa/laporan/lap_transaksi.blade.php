@@ -74,9 +74,6 @@
                     <thead>
                         <tr>
                             <th colspan="1" class="text-center">No.</th>
-                            <th class="text-center">ID</th>
-                            <th>Nama</th>
-                            <th class="text-center">Kelas</th>
                             <th class="text-center">Saldo Awal</th>
                             <th class="text-center">Jumlah Transaksi</th>
                             <th class="text-center">Saldo Akhir</th>
@@ -89,9 +86,6 @@
                         @forelse ($transaksi as $transaksis)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $transaksis->user->username }}</td>
-                                <td>{{ $transaksis->user->name }}</td>
-                                <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>

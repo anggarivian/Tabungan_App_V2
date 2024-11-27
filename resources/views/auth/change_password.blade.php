@@ -24,14 +24,14 @@
             </div>
             <div class="col-lg-7 col-12">
                 <div id="auth-left">
-                    <div class="p-5">
-                        <div class="auth-logo">
+                    <div class="p-1">
+                        <div class="auth-logo mb-5">
                             <a href="/bendahara/dashboard">
                                 <i class="bi bi-arrow-left"></i>
                             </a>
                         </div>
-                        <h1 class="auth-title">Ubah Password</h1>
-                        <p class="auth-subtitle mb-5">Ubah password anda</p>
+                        <h1 class="auth-title" style="font-size: 47px">Ubah Password</h1>
+                        <p class="auth-subtitle mb-3" style="font-size: 24px">Ubah password anda</p>
                         @if(session('success'))
                             <div class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
                                 <strong>{{ session('alert-message') }}</strong>
@@ -53,7 +53,7 @@
 
                         <form action="{{ route ('change.password.submit') }}" method="POST">
                             @csrf
-                            <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="form-group position-relative has-icon-left mb-2">
                                 <input type="password" class="form-control form-control-xl" name="password" placeholder="Password Baru" required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-shield-lock" style="margin-left: 5px"></i>
@@ -64,7 +64,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="form-group position-relative has-icon-left mb-2">
                                 <input type="password" class="form-control form-control-xl" name="password_confirmation" placeholder="Konfirmasi Password Baru" required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-shield-lock" style="margin-left: 5px"></i>
@@ -75,7 +75,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Ubah Password</button>
+                            <button class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Ubah Password</button>
                         </form>
                     </div>
                 </div>

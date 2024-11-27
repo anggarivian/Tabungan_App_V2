@@ -52,7 +52,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 183.000</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_masuk}}</h6>
                                 </div>
                                 <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
                                     <div class="stats-icon red mb-2">
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 183.000</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_keluar}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 9.231.000</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{$jumlah_saldo}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Digital</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 9.231.000</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. 0</h6>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +163,15 @@
                                                 <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
                                                 <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
                                                 <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
-                                                <td class="text-center"><span class="badge bg-success">{{ $transaksis->tipe_transaksi ?? '-' }}</span></td>
+                                                <td class="text-center">
+                                                    @if ($transaksis->tipe_transaksi == 'Stor')
+                                                        <span class="badge bg-success">Stor</span>
+                                                    @elseif ($transaksis->tipe_transaksi == 'Tarik')
+                                                        <span class="badge bg-danger">Tarik</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">-</span>
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">{{ $transaksis->pembayaran ?? '-' }}</td>
                                                 <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
                                             </tr>

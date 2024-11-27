@@ -9,6 +9,7 @@ use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use App\Helpers\RupiahHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 class TabunganController extends Controller
@@ -52,7 +53,11 @@ class TabunganController extends Controller
             $query->where('kelas_id', 9);
         })->paginate(10);
 
-        return view('bendahara.tabungan.index', compact('kelas1a','kelas1b','kelas2a','kelas2b','kelas3a','kelas3b','kelas4','kelas5','kelas6'));
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
+        $jumlah_saldo = Tabungan::whereDate('updated_at', Carbon::today())->sum('saldo');
+
+        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas1a','kelas1b','kelas2a','kelas2b','kelas3a','kelas3b','kelas4','kelas5','kelas6'));
     }
 
     public function bendahara_stor()
@@ -187,14 +192,31 @@ class TabunganController extends Controller
     // Walikelas ------------------------------------------------------------------------------------------------------------------------------------------------
     public function walikelas_index()
     {
-        $kelasId = auth()->user()->kelas->id;
+        $kelas_id = Auth::user()->kelas_id; // Mengambil kelas_id dari user yang login
 
-        $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelasId) {
-            $query->where('kelas_id', $kelasId);
+        $transaksi_masuk = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->where('tipe_transaksi', 'Stor')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi');
+
+        $transaksi_keluar = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->where('tipe_transaksi', 'Tarik')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi');
+
+        $jumlah_saldo = Tabungan::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->whereDate('updated_at', Carbon::today())
+        ->sum('saldo');
+
+        $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
         })->paginate(10);
 
 
-        return view('walikelas.tabungan.index', compact('kelas'));
+        return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas'));
     }
 
     public function walikelas_stor()

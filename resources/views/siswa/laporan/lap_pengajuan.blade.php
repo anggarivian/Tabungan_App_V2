@@ -76,9 +76,6 @@
                     <thead>
                         <tr>
                             <th colspan="1" class="text-center">No.</th>
-                            <th class="text-center">ID</th>
-                            <th>Nama</th>
-                            <th class="text-center">Kelas</th>
                             <th class="text-center">Saldo Awal</th>
                             <th class="text-center">Jumlah Penarikan</th>
                             <th class="text-center">Status</th>
@@ -90,9 +87,6 @@
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->user->username }}</td>
-                                <td>{{ $pengajuans->user->name }}</td>
-                                <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
                                 <td class="text-center">

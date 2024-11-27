@@ -24,14 +24,14 @@
             </div>
             <div class="col-lg-7 col-12">
                 <div id="auth-left">
-                    <div class="p-5">
-                        <div class="auth-logo">
+                    <div class="p-1">
+                        <div class="auth-logo mb-5">
                             <a href="/">
                                 <i class="bi bi-arrow-left"></i>
                             </a>
                         </div>
-                        <h1 class="auth-title">Log in.</h1>
-                        <p class="auth-subtitle mb-5">Log in dengan akun anda.</p>
+                        <h1 class="auth-title" style="font-size: 47px">Log in.</h1>
+                        <p class="auth-subtitle mb-3" style="font-size: 24px">Log in dengan akun anda.</p>
 
                         @if(session()->has('LoginError'))
                             <div class="alert alert-danger" role="alert">
@@ -47,7 +47,7 @@
                         @endif
                         <form action="/login" method="POST">
                             @csrf
-                            <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="form-group position-relative has-icon-left mb-2">
                                 <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username" required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-person" style="margin-left: 5px"></i>
@@ -58,7 +58,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="form-group position-relative has-icon-left mb-2">
                                 <input type="password" class="form-control form-control-xl" name="password" placeholder="Password" required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-shield-lock" style="margin-left: 5px"></i>
@@ -69,13 +69,7 @@
                                     </div>
                                 @enderror
                             </div>
-                            {{-- <div class="form-check form-check-lg d-flex align-items-end">
-                                <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label text-gray-600" for="flexCheckDefault">
-                                    Keep me logged in
-                                </label>
-                            </div> --}}
-                            <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
+                            <button class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Log in</button>
                         </form>
                         <div class="text-center mt-5 text-lg fs-4">
                             <h6 class="fst-italic fw-lighter">Jika Lupa Password Silahkan ke Bendahara</h6>
