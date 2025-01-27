@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Transaksi;
 use App\Models\Pengajuan;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -38,7 +39,8 @@ class LaporanController extends Controller
         }
 
         $user = $user->paginate(10);
-        return view('kepsek.laporan.lap_tabungan', compact('user'));
+        $kelasList = Kelas::orderBy('name')->get();
+        return view('kepsek.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
     public function lap_kepsek_transaksi(Request $request){
         $search = $request->input('search');
@@ -51,7 +53,7 @@ class LaporanController extends Controller
 
         $request->validate([
             'search' => 'nullable|string|max:255',
-            'kelas' => 'nullable|in:1A,1B,2A,2B,3A,3B,4,5,6',
+            'kelas' => 'nullable',
             'tipe_transaksi' => 'nullable|in:stor,tarik',
             'tipe_pembayaran' => 'nullable|in:online,offline',
             'sort_penarikan' => 'nullable|in:asc,desc',
@@ -87,7 +89,8 @@ class LaporanController extends Controller
             ->paginate(15)
             ->appends($request->all());
 
-        return view('kepsek.laporan.lap_transaksi', compact('transaksi'));
+        $kelasList = Kelas::orderBy('name')->get();
+        return view('kepsek.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
     }
     public function lap_kepsek_pengajuan(Request $request){
         $search = $request->input('search');
@@ -124,7 +127,8 @@ class LaporanController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('kepsek.laporan.lap_pengajuan', compact('pengajuan'));
+            $kelasList = Kelas::orderBy('name')->get();
+        return view('kepsek.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
 
     // Laporan Bendahara --------------------------------------------------------------------------------
@@ -156,8 +160,8 @@ class LaporanController extends Controller
         }
 
         $user = $user->paginate(10);
-
-        return view('bendahara.laporan.lap_tabungan', compact('user'));
+        $kelasList = Kelas::orderBy('name')->get();
+        return view('bendahara.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
     public function lap_bendahara_transaksi(Request $request){
         $search = $request->input('search');
@@ -170,7 +174,7 @@ class LaporanController extends Controller
 
         $request->validate([
             'search' => 'nullable|string|max:255',
-            'kelas' => 'nullable|in:1A,1B,2A,2B,3A,3B,4,5,6',
+            'kelas' => 'nullable',
             'tipe_transaksi' => 'nullable|in:stor,tarik',
             'tipe_pembayaran' => 'nullable|in:online,offline',
             'sort_penarikan' => 'nullable|in:asc,desc',
@@ -206,7 +210,8 @@ class LaporanController extends Controller
             ->paginate(15)
             ->appends($request->all());
 
-        return view('bendahara.laporan.lap_transaksi', compact('transaksi'));
+        $kelasList = Kelas::orderBy('name')->get();
+        return view('bendahara.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
     }
     public function lap_bendahara_pengajuan(Request $request){
         $search = $request->input('search');
@@ -243,7 +248,8 @@ class LaporanController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('bendahara.laporan.lap_pengajuan', compact('pengajuan'));
+        $kelasList = Kelas::orderBy('name')->get();
+        return view('bendahara.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
 
     // Laporan Walikelas --------------------------------------------------------------------------------

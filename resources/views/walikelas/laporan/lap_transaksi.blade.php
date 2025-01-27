@@ -93,9 +93,9 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                 <td>{{ $transaksis->user->name }}</td>
-                                <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0 ) }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0 ) }}</td>
                                 <td class="text-center">
                                     @if ($transaksis->tipe_transaksi == 'Stor')
                                         <span class="badge bg-success">Stor</span>

@@ -39,7 +39,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Saldo Offline</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$jumlah_saldo}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Transaksi Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_masuk}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Transaksi Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_keluar}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +105,7 @@
                     <h5 class="card-title">Transaksi Tabungan 2024/2025</h5>
                     <div id="chart"></div>
                 </div>
-              </div>
+            </div>
         </div>
     </section>
 </div>

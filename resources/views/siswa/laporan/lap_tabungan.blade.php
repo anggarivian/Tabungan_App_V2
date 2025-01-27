@@ -85,8 +85,8 @@
                                 <td class="text-center">{{ $users->username }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $users->tabungan->saldo ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $users->tabungan->sisa ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($users->tabungan->saldo ?? 0 ) }}</td>
+                                <td class="text-center">Rp. {{ number_format($users->tabungan->sisa ?? 0 ) }}</td>
                             </tr>
                         @empty
                             <tr>

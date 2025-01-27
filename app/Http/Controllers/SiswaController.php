@@ -83,15 +83,19 @@ class SiswaController extends Controller
         $user->kelas_id = $request->kelas;
         $user->roles_id = 4;
 
-        $kelasMap = [ 1 => '1A', 2 => '1B', 3 => '2A', 4 => '2B', 5 => '3A', 6 => '3B', 7 => '40', 8 => '5', 9 => '60',];
+        $kelasMap = [1, 2, 3, 4, 5, 6];
 
-        $existingUser = User::where('username', 'like', $kelasMap[$request->kelas] . '%')->orderBy('username', 'desc')->first();
+        $existingUser = User::where('username', 'like', $kelasMap[$request->kelas - 1] . '%')
+            ->orderBy('username', 'desc')
+            ->first();
+
         if ($existingUser) {
             $nextNumber = (int)substr($existingUser->username, -3) + 1;
-            $user->username = $kelasMap[$request->kelas] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $user->username = $kelasMap[$request->kelas - 1] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         } else {
-            $user->username = $kelasMap[$request->kelas] . '001';
+            $user->username = $kelasMap[$request->kelas - 1] . '001';
         }
+
         $user->save();
 
         $tabungan = new Tabungan ;
@@ -155,14 +159,17 @@ class SiswaController extends Controller
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
 
-        $kelasMap = [ 1 => '1A', 2 => '1B', 3 => '2A', 4 => '2B', 5 => '3A', 6 => '3B', 7 => '40', 8 => '5', 9 => '60',];
+        $kelasMap = [1, 2, 3, 4, 5, 6]; // Hanya angka
 
-        $existingUser = User::where('username', 'like', $kelasMap[$request->kelas] . '%')->orderBy('username', 'desc')->first();
+        $existingUser = User::where('username', 'like', $kelasMap[$request->kelas - 1] . '%')
+            ->orderBy('username', 'desc')
+            ->first();
+
         if ($existingUser) {
             $nextNumber = (int)substr($existingUser->username, -3) + 1;
-            $user->username = $kelasMap[$request->kelas] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $user->username = $kelasMap[$request->kelas - 1] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         } else {
-            $user->username = $kelasMap[$request->kelas] . '001';
+            $user->username = $kelasMap[$request->kelas - 1] . '001';
         }
 
         $user->save();

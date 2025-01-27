@@ -17,47 +17,35 @@ class TabunganController extends Controller
     // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
     public function bendahara_index()
     {
-        $kelas1a = Transaksi::whereHas('user.kelas', function ($query) {
+        $kelas1 = Transaksi::whereHas('user.kelas', function ($query) {
             $query->where('kelas_id', 1);
         })->paginate(10);
 
-        $kelas1b = Transaksi::whereHas('user.kelas', function ($query) {
+        $kelas2 = Transaksi::whereHas('user.kelas', function ($query) {
             $query->where('kelas_id', 2);
         })->paginate(10);
 
-        $kelas2a = Transaksi::whereHas('user.kelas', function ($query) {
+        $kelas3 = Transaksi::whereHas('user.kelas', function ($query) {
             $query->where('kelas_id', 3);
         })->paginate(10);
 
-        $kelas2b = Transaksi::whereHas('user.kelas', function ($query) {
+        $kelas4 = Transaksi::whereHas('user.kelas', function ($query) {
             $query->where('kelas_id', 4);
         })->paginate(10);
 
-        $kelas3a = Transaksi::whereHas('user.kelas', function ($query) {
+        $kelas5 = Transaksi::whereHas('user.kelas', function ($query) {
             $query->where('kelas_id', 5);
         })->paginate(10);
 
-        $kelas3b = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 6);
-        })->paginate(10);
-
-        $kelas4 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 7);
-        })->paginate(10);
-
-        $kelas5 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 8);
-        })->paginate(10);
-
         $kelas6 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 9);
+            $query->where('kelas_id', 6);
         })->paginate(10);
 
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
         $jumlah_saldo = Tabungan::whereDate('updated_at', Carbon::today())->sum('saldo');
 
-        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas1a','kelas1b','kelas2a','kelas2b','kelas3a','kelas3b','kelas4','kelas5','kelas6'));
+        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas1','kelas2','kelas3','kelas4','kelas5','kelas6'));
     }
 
     public function bendahara_stor()

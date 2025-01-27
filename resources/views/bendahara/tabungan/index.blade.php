@@ -52,7 +52,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_masuk}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
                                 </div>
                                 <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
                                     <div class="stats-icon red mb-2">
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_keluar}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$jumlah_saldo}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -118,26 +118,27 @@
                             Tarik</a>
                     </div>
                 </div>
+            </div>
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Transaksi</h5>
+                    <!-- Button Group -->
                     <div class="row">
-                        <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group with nested dropdown">
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 1 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 2 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 2 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 3 A</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 3 B</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(7)">Kelas 4</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(8)">Kelas 5</button>
-                                <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(9)">Kelas 6</button>
+                        <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group for classes">
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1</button>
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 2</button>
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 3</button>
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 4</button>
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 5</button>
+                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 6</button>
                         </div>
                     </div>
 
+                    <!-- Dropdown Table Section -->
                     <div class="dropdown-table mt-3 w-100">
-                        @foreach (['kelas1a' => 'Kelas 1A', 'kelas1b' => 'Kelas 1B', 'kelas2a' => 'Kelas 2A', 'kelas2b' => 'Kelas 2B', 'kelas3a' => 'Kelas 3A', 'kelas3b' => 'Kelas 3B', 'kelas4' => 'Kelas 4', 'kelas5' => 'Kelas 5', 'kelas6' => 'Kelas 6'] as $kelas => $namaKelas)
+                        @foreach (['kelas1' => 'Kelas 1', 'kelas2' => 'Kelas 2', 'kelas3' => 'Kelas 3', 'kelas4' => 'Kelas 4', 'kelas5' => 'Kelas 5', 'kelas6' => 'Kelas 6'] as $kelas => $namaKelas)
                             <div id="table{{ $loop->index + 1 }}" class="table-responsive-lg" style="display: none;">
-                                <h6 class="mt-5 ">Transaksi Hari ini dari {{ $namaKelas }}</h6>
+                                <h6 class="mt-5">Transaksi Hari Ini dari {{ $namaKelas }}</h6>
                                 <table class="table table-hover" style="width: 100%">
                                     <thead>
                                         <tr>
@@ -160,9 +161,9 @@
                                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                                 <td>{{ $transaksis->user->name }}</td>
                                                 <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
-                                                <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
+                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0) }}</td>
+                                                <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</td>
+                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
                                                 <td class="text-center">
                                                     @if ($transaksis->tipe_transaksi == 'Stor')
                                                         <span class="badge bg-success">Stor</span>
@@ -186,7 +187,6 @@
                             </div>
                         @endforeach
                     </div>
-
                 </div>
             </div>
         </div>

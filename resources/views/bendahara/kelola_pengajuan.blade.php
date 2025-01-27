@@ -85,7 +85,7 @@
                                 <td>{{ $pengajuans->user->name }}</td>
                                 <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>
                                 <td class="text-center">{{ $pengajuans->alasan}}</td>
-                                <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
                                 <td class="text-center">
                                     @if ($pengajuans->status == 'Pending')
                                         <span class="badge bg-warning">Pending</span>

@@ -52,7 +52,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_masuk}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
                                 </div>
                                 <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
                                     <div class="stats-icon red mb-2">
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$transaksi_keluar}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{$jumlah_saldo}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -141,9 +141,9 @@
                                             <td class="text-center">{{ $transaksis->user->username }}</td>
                                             <td>{{ $transaksis->user->name }}</td>
                                             <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
-                                            <td class="text-center">Rp. {{ $transaksis->saldo_awal ?? '-' }}</td>
-                                            <td class="text-center">Rp. {{ $transaksis->jumlah_transaksi ?? '-' }}</td>
-                                            <td class="text-center">Rp. {{ $transaksis->saldo_akhir ?? '-' }}</td>
+                                            <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>
+                                            <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0 ) }}</td>
+                                            <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0 ) }}</td>
                                             <td class="text-center">
                                                 @if ($transaksis->tipe_transaksi == 'Stor')
                                                     <span class="badge bg-success">Stor</span>

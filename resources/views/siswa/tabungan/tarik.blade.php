@@ -112,7 +112,7 @@
                                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                         <div class="input-group">
                                             <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                            <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
+                                            <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ number_format(auth()->user()->tabungan->saldo, 0, ',', '.') }}" readonly>
                                         </div>
                                         <p class="fst-italic fw-lighter text-center mb-0">{{$terbilang}}</p>
                                     </div>

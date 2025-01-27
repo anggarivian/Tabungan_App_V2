@@ -87,8 +87,8 @@
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">Rp. {{ $pengajuans->tabungan->saldo ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($pengajuans->tabungan->saldo ?? 0 ) }}</td>
+                                <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
                                 <td class="text-center">
                                     @if ($pengajuans->status == 'Pending')
                                         <span class="badge bg-warning">Pending</span>

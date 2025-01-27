@@ -35,17 +35,14 @@
                             <input type="text" class="form-control" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama / ID Tabungan...">
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" name="kelas" id="kelas">
+                            <select class="form-select" style="margin-bottom: 20px" name="kelas" id="kelas">
                                 <option value="">Kelas</option>
-                                <option value="1A" {{ request('kelas') == '1A' ? 'selected' : '' }}>1 - A</option>
-                                <option value="1B" {{ request('kelas') == '1B' ? 'selected' : '' }}>1 - B</option>
-                                <option value="2A" {{ request('kelas') == '2A' ? 'selected' : '' }}>2 - A</option>
-                                <option value="2B" {{ request('kelas') == '2B' ? 'selected' : '' }}>2 - B</option>
-                                <option value="3A" {{ request('kelas') == '3A' ? 'selected' : '' }}>3 - A</option>
-                                <option value="3B" {{ request('kelas') == '3B' ? 'selected' : '' }}>3 - B</option>
-                                <option value="4" {{ request('kelas') == '4' ? 'selected' : '' }}>4</option>
-                                <option value="5" {{ request('kelas') == '5' ? 'selected' : '' }}>5</option>
-                                <option value="6" {{ request('kelas') == '6' ? 'selected' : '' }}>6</option>
+                                @foreach ($kelasList as $kelas)
+                                    <option value="{{ $kelas->id }}"
+                                        {{ request('kelas') == $kelas->id ? 'selected' : '' }}>
+                                        {{ $kelas->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
@@ -85,8 +82,8 @@
                                 <td class="text-center">{{ $users->username }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $users->tabungan->saldo ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ $users->tabungan->sisa ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($users->tabungan->saldo ?? 0) }}</td>
+                                <td class="text-center">Rp. {{ number_format($users->tabungan->sisa ?? 0) }}</td>
                             </tr>
                         @empty
                             <tr>
