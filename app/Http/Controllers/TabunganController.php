@@ -18,29 +18,43 @@ class TabunganController extends Controller
     // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
     public function bendahara_index()
     {
+        $perPage = request('perPage', 10);
+
         $kelas1 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 1);
-        })->paginate(10);
+                $query->where('kelas_id', 1);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $kelas2 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 2);
-        })->paginate(10);
+                $query->where('kelas_id', 2);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $kelas3 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 3);
-        })->paginate(10);
+                $query->where('kelas_id', 3);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $kelas4 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 4);
-        })->paginate(10);
+                $query->where('kelas_id', 4);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $kelas5 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 5);
-        })->paginate(10);
+                $query->where('kelas_id', 5);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $kelas6 = Transaksi::whereHas('user.kelas', function ($query) {
-            $query->where('kelas_id', 6);
-        })->paginate(10);
+                $query->where('kelas_id', 6);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
@@ -59,15 +73,14 @@ class TabunganController extends Controller
         $kelas = Kelas::find($id);
         $siswa = User::where('kelas_id', $id)->get();
         $walikelas = User::where('kelas_id', $id)->where('roles_id', 3)->first();
-        $kemarin = Carbon::yesterday();
-
         $kemarin = Carbon::yesterday()->toDateString();
 
         $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
-            ->whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', $kelas);
+            ->whereHas('user', function ($query) use ($id) {
+                $query->where('kelas_id', $id);
             })
             ->sum('jumlah_transaksi');
+
 
         return view('bendahara.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
     }
@@ -128,7 +141,7 @@ class TabunganController extends Controller
         $transaksi->saldo_awal = $validatedData['jumlah_tabungan'];
         $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'] ;
         $transaksi->tipe_transaksi = 'Stor';
-        $transaksi->pembayaran = 'Offline';
+        $transaksi->pembayaran = 'Tunai';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
         $transaksi->user_id = $user->id ;
@@ -167,7 +180,7 @@ class TabunganController extends Controller
             $transaksi->saldo_awal = $data['saldo'] ?? 0;
             $transaksi->saldo_akhir = $transaksi->saldo_awal + $data['stor'];
             $transaksi->tipe_transaksi = 'Stor';
-            $transaksi->pembayaran = 'Offline';
+            $transaksi->pembayaran = 'Tunai';
             $transaksi->pembuat = auth()->user()->name;
             $transaksi->token_stor = \Illuminate\Support\Str::random(10);
             $transaksi->user_id = $user->id;
@@ -219,7 +232,7 @@ class TabunganController extends Controller
         $transaksi->saldo_awal = $tabungan->saldo;
         $transaksi->saldo_akhir = $tabungan->saldo - $validatedData['jumlah_tarik'];
         $transaksi->tipe_transaksi = 'Tarik';
-        $transaksi->pembayaran = 'Offline';
+        $transaksi->pembayaran = 'Tunai';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
         $transaksi->user_id = $user->id;
@@ -240,6 +253,7 @@ class TabunganController extends Controller
     public function walikelas_index()
     {
         $kelas_id = Auth::user()->kelas_id;
+        $perPage = request('perPage', 10);
 
         $transaksi_masuk = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
@@ -260,7 +274,7 @@ class TabunganController extends Controller
 
         $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
-        })->paginate(10);
+        })->paginate($perPage);
 
 
         return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas'));
@@ -338,7 +352,7 @@ class TabunganController extends Controller
         $transaksi->saldo_awal = $validatedData['jumlah_tabungan'];
         $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'] ;
         $transaksi->tipe_transaksi = 'Stor';
-        $transaksi->pembayaran = 'Offline';
+        $transaksi->pembayaran = 'Tunai';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
         $transaksi->user_id = $user->id ;
@@ -377,7 +391,7 @@ class TabunganController extends Controller
             $transaksi->saldo_awal = $data['saldo'] ?? 0;
             $transaksi->saldo_akhir = $transaksi->saldo_awal + $data['stor'];
             $transaksi->tipe_transaksi = 'Stor';
-            $transaksi->pembayaran = 'Offline';
+            $transaksi->pembayaran = 'Tunai';
             $transaksi->pembuat = auth()->user()->name;
             $transaksi->token_stor = \Illuminate\Support\Str::random(10);
             $transaksi->user_id = $user->id;

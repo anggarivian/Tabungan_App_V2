@@ -19,6 +19,7 @@ class SiswaController extends Controller
      */
     public function index(Request $request){
         $kelas = Kelas::all();
+        $perPage = request('perPage', 10);
 
         $query = User::query()->where('roles_id', 4);
         $query->select('id','name','email','username','jenis_kelamin','kontak','password','orang_tua','alamat','kelas_id','roles_id','created_at','updated_at');
@@ -37,7 +38,7 @@ class SiswaController extends Controller
 
         $query->orderBy('created_at','desc');
 
-        $user = $query->paginate(10);
+        $user = $query->paginate($perPage);
 
         return view('bendahara.kelola_siswa', compact('user','kelas'));
     }

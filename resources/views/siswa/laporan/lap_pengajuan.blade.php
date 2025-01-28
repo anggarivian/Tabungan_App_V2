@@ -79,28 +79,30 @@
                             <th class="text-center">Saldo Awal</th>
                             <th class="text-center">Jumlah Penarikan</th>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Pembayaran</th>
                             <th class="text-center">Alasan</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
-                                <td class="text-center">{{ $pengajuans->firstItem() + $index }}</td>
+                                <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->tabungan->saldo ?? 0 ) }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
                                 <td class="text-center">
                                     @if ($pengajuans->status == 'Pending')
                                         <span class="badge bg-warning">Pending</span>
+                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @elseif ($pengajuans->status == 'Tolak')
                                         <span class="badge bg-danger">Tolak</span>
+                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @elseif ($pengajuans->status == 'Terima')
                                         <span class="badge bg-success">Terima</span>
+                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
+                                        <span class="badge bg-light">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $pengajuans->pembayaran ?? '-' }}</td>
                                 <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
                             </tr>
                         @empty
@@ -109,9 +111,24 @@
                             </tr>
                         @endforelse
                     </tbody>
-
                 </table>
-                {{ $pengajuan->links('layout.pagination.bootstrap-5') }}
+                <div class="d-flex justify-content-between">
+                    <form method="GET" action="{{ request()->url() }}">
+                        <div class="d-flex justify-content-end mb-3">
+                            <label for="perPage" style="margin-top: 3px">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
+                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
+                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="justify-content-end">
+                        {{ $pengajuan->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+                    </div>
+                </div>
             </div>
         </div>
 

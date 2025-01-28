@@ -96,14 +96,13 @@
                             <th class="text-center">Jumlah Transaksi</th>
                             <th class="text-center">Saldo Akhir</th>
                             <th class="text-center">Transaksi</th>
-                            <th class="text-center">Pembayaran</th>
                             <th class="text-center">Pembuat</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($transaksi as $transaksis)
                             <tr>
-                                <td class="text-center">{{ $transaksis->firstItem() + $index }}</td>
+                                <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                 <td>{{ $transaksis->user->name }}</td>
                                 <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
@@ -113,13 +112,15 @@
                                 <td class="text-center">
                                     @if ($transaksis->tipe_transaksi == 'Stor')
                                         <span class="badge bg-success">Stor</span>
+                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
                                     @elseif ($transaksis->tipe_transaksi == 'Tarik')
                                         <span class="badge bg-danger">Tarik</span>
+                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
+                                        <span class="badge bg-light">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $transaksis->pembayaran ?? '-' }}</td>
                                 <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
                             </tr>
                         @empty
@@ -128,9 +129,24 @@
                             </tr>
                         @endforelse
                     </tbody>
-
                 </table>
-                {{ $transaksi->links('layout.pagination.bootstrap-5') }}
+                <div class="d-flex justify-content-between">
+                    <form method="GET" action="{{ request()->url() }}">
+                        <div class="d-flex justify-content-end mb-3">
+                            <label for="perPage" style="margin-top: 3px">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
+                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
+                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="justify-content-end">
+                        {{ $transaksi->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+                    </div>
+                </div>
             </div>
         </div>
 

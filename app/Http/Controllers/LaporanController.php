@@ -15,6 +15,7 @@ class LaporanController extends Controller
         $search = $request->input('search');
         $kelas = $request->input('kelas');
         $sortSaldo = $request->input('sort_saldo');
+        $perPage = request('perPage', 10);
 
         $user = User::with(['tabungan', 'kelas'])
             ->whereHas('tabungan')
@@ -38,7 +39,7 @@ class LaporanController extends Controller
             $user->orderBy('total_saldo', $sortSaldo);
         }
 
-        $user = $user->paginate(10);
+        $user = $user->paginate($perPage);
         $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
@@ -55,11 +56,13 @@ class LaporanController extends Controller
             'search' => 'nullable|string|max:255',
             'kelas' => 'nullable',
             'tipe_transaksi' => 'nullable|in:stor,tarik',
-            'tipe_pembayaran' => 'nullable|in:online,offline',
+            'tipe_pembayaran' => 'nullable|in:digital,tunai',
             'sort_penarikan' => 'nullable|in:asc,desc',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
+
+        $perPage = request('perPage', 10);
 
         $transaksi = Transaksi::with(['user.kelas'])
             ->when($search, function ($query) use ($search) {
@@ -86,7 +89,7 @@ class LaporanController extends Controller
                 $query->whereDate('created_at', '<=', $endDate);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(15)
+            ->paginate($perPage)
             ->appends($request->all());
 
         $kelasList = Kelas::orderBy('name')->get();
@@ -99,6 +102,8 @@ class LaporanController extends Controller
         $sortPenarikan = $request->input('sort_penarikan');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+
+        $perPage = request('perPage', 10);
 
         $pengajuan = Pengajuan::with(['user', 'user.kelas'])
             ->when($search, function ($query) use ($search) {
@@ -124,7 +129,7 @@ class LaporanController extends Controller
             ->when(in_array($sortPenarikan, ['asc', 'desc']), function ($query) use ($sortPenarikan) {
                 $query->orderBy('jumlah_penarikan', $sortPenarikan);
             })
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
             $kelasList = Kelas::orderBy('name')->get();
@@ -136,6 +141,7 @@ class LaporanController extends Controller
         $search = $request->input('search');
         $kelas = $request->input('kelas');
         $sortSaldo = $request->input('sort_saldo');
+        $perPage = request('perPage', 10);
 
         $user = User::with(['tabungan', 'kelas'])
             ->whereHas('tabungan')
@@ -159,7 +165,7 @@ class LaporanController extends Controller
             $user->orderBy('total_saldo', $sortSaldo);
         }
 
-        $user = $user->paginate(10);
+        $user = $user->paginate($perPage);
         $kelasList = Kelas::orderBy('name')->get();
         return view('bendahara.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
@@ -176,11 +182,13 @@ class LaporanController extends Controller
             'search' => 'nullable|string|max:255',
             'kelas' => 'nullable',
             'tipe_transaksi' => 'nullable|in:stor,tarik',
-            'tipe_pembayaran' => 'nullable|in:online,offline',
+            'tipe_pembayaran' => 'nullable|in:digital,tunai',
             'sort_penarikan' => 'nullable|in:asc,desc',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
+
+        $perPage = request('perPage', 10);
 
         $transaksi = Transaksi::with(['user.kelas'])
             ->when($search, function ($query) use ($search) {
@@ -207,7 +215,7 @@ class LaporanController extends Controller
                 $query->whereDate('created_at', '<=', $endDate);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(15)
+            ->paginate($perPage)
             ->appends($request->all());
 
         $kelasList = Kelas::orderBy('name')->get();
@@ -220,6 +228,8 @@ class LaporanController extends Controller
         $sortPenarikan = $request->input('sort_penarikan');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+
+        $perPage = request('perPage', 10);
 
         $pengajuan = Pengajuan::with(['user', 'user.kelas'])
             ->when($search, function ($query) use ($search) {
@@ -245,7 +255,7 @@ class LaporanController extends Controller
             ->when(in_array($sortPenarikan, ['asc', 'desc']), function ($query) use ($sortPenarikan) {
                 $query->orderBy('jumlah_penarikan', $sortPenarikan);
             })
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         $kelasList = Kelas::orderBy('name')->get();
@@ -256,6 +266,7 @@ class LaporanController extends Controller
     public function lap_walikelas_tabungan(Request $request){
         $kelasId = auth()->user()->kelas->id;
         $kelas = auth()->user()->kelas->name;
+        $perPage = request('perPage', 10);
 
         $search = $request->input('search');
         $sortSaldo = $request->input('sort_saldo');
@@ -287,13 +298,14 @@ class LaporanController extends Controller
             $user->orderBy('total_saldo', $sortSaldo);
         }
 
-        $user = $user->paginate(10)->withQueryString();
+        $user = $user->paginate($perPage)->withQueryString();
 
         return view('walikelas.laporan.lap_tabungan', compact('user', 'kelas'));
     }
     public function lap_walikelas_transaksi(Request $request){
         $kelasId = auth()->user()->kelas->id;
         $kelas = auth()->user()->kelas->name;
+        $perPage = request('perPage', 10);
 
         $search = $request->input('search');
         $tipeTransaksi = $request->input('tipe_transaksi');
@@ -322,7 +334,7 @@ class LaporanController extends Controller
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
-            ->paginate(10);
+            ->paginate($perPage);
 
         return view('walikelas.laporan.lap_transaksi', compact('transaksi', 'kelas'));
     }
@@ -330,7 +342,8 @@ class LaporanController extends Controller
     // Laporan Siswa ------------------------------------------------------------------------------------
     public function lap_siswa_tabungan(Request $request){
         $kelasId = auth()->user()->kelas->id;
-        $user = User::where('roles_id', 4)->where('kelas_id', $kelasId)->paginate(10);
+        $perPage = request('perPage', 10);
+        $user = User::where('roles_id', 4)->where('kelas_id', $kelasId)->paginate($perPage);
         return view('siswa.laporan.lap_tabungan', compact('user'));
     }
     public function lap_siswa_transaksi(Request $request){
@@ -338,6 +351,7 @@ class LaporanController extends Controller
         $tipePembayaran = $request->input('tipe_pembayaran');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $perPage = request('perPage', 10);
 
         $transaksi = Transaksi::with(['user.kelas'])
             ->whereHas('user', function ($query) {
@@ -352,7 +366,7 @@ class LaporanController extends Controller
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
-            ->paginate(10);
+            ->paginate($perPage);
 
         return view('siswa.laporan.lap_transaksi', compact('transaksi'));
     }
@@ -362,6 +376,8 @@ class LaporanController extends Controller
         $sortPenarikan = $request->input('sort_penarikan');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+
+        $perPage = request('perPage', 10);
 
         $pengajuan = Pengajuan::with(['user.kelas'])
             ->whereHas('user', function ($query) {
@@ -376,7 +392,7 @@ class LaporanController extends Controller
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
-            ->paginate(10);
+            ->paginate($perPage);
 
         return view('siswa.laporan.lap_pengajuan', compact('pengajuan'));
     }

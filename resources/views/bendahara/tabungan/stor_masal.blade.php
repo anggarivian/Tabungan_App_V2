@@ -77,7 +77,7 @@
         <div class="card-body">
             <form method="post" action="{{ route('bendahara.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
                 @csrf
-                <div class="table-responsive">
+                <div class="table-responsive-lg">
                     <table id="table-data" class="table table-stripped">
                         <thead>
                             <tr class="text-center">
@@ -111,14 +111,17 @@
                         <tfoot>
                             <tr>
                                 <td colspan="5" class="text-end ">
-                                    <strong>Total Stor: </strong><span id="total-stor">0</span><br>
-                                    <strong>Jumlah Data Diisi: </strong><span id="filled-count">0</span> dari <span id="total-count">{{ count($siswa) }}</span>
+                                    <strong>Jumlah Stor: </strong><span id="total-stor">0</span><br>
+                                    <strong>Jumlah Nabung: </strong><span id="filled-count">0</span> dari <span id="total-count">{{ count($siswa) }}</span>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Stor Tabungan</button>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Stor Tabungan</button>
+                </div>
             </form>
         </div>
     </div>

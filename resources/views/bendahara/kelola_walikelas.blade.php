@@ -74,7 +74,6 @@
                             <th>Username</th>
                             <th>Email</th>
                             <th class="text-center">Kelas</th>
-                            {{-- <th class="text-center">Jenis Kelamin</th> --}}
                             <th class="text-center">Kontak</th>
                             <th>Alamat</th>
                             <th class="text-center">Action</th>
@@ -83,12 +82,11 @@
                     <tbody>
                         @forelse ($user as $users)
                             <tr>
-                                <td class="text-center">{{ $users->firstItem() + $index }}</td>
+                                <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td>{{ $users->username }}</td>
                                 <td>{{ $users->email }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
-                                {{-- <td class="text-center">{{ $users->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td> --}}
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ $users->alamat }}</td>
                                 <td class="text-center">
@@ -109,7 +107,23 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $user->links('layout.pagination.bootstrap-5') }}
+                <div class="d-flex justify-content-between">
+                    <form method="GET" action="{{ request()->url() }}">
+                        <div class="d-flex justify-content-end mb-3">
+                            <label for="perPage" style="margin-top: 3px">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
+                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
+                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="justify-content-end">
+                        {{ $user->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

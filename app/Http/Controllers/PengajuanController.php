@@ -14,6 +14,8 @@ class PengajuanController extends Controller
 {
     public function kelola_pengajuan(Request $request)
     {
+        $perPage = request('perPage', 10);
+
         $query = Pengajuan::query()->where('status', 'Pending');
         $query->select('id', 'jumlah_penarikan', 'status', 'pembayaran', 'alasan', 'user_id', 'tabungan_id');
         $searchTerm = $request->input('search');
@@ -36,7 +38,7 @@ class PengajuanController extends Controller
         }
 
         $query->orderBy('created_at', 'desc');
-        $pengajuan = $query->paginate(10);
+        $pengajuan = $query->paginate($perPage);
 
 
         return view('bendahara.kelola_pengajuan', compact('pengajuan'));
@@ -131,7 +133,7 @@ class PengajuanController extends Controller
         $transaksi->saldo_awal = $tabungan->saldo;
         $transaksi->saldo_akhir = $tabungan->saldo - $validatedData['jumlah_tarik'];
         $transaksi->tipe_transaksi = 'Tarik';
-        $transaksi->pembayaran = 'Offline';
+        $transaksi->pembayaran = 'Tunai';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
         $transaksi->user_id = $user->id;
