@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Kelas;
 use App\Models\Tabungan;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
@@ -51,6 +52,24 @@ class TabunganController extends Controller
     public function bendahara_stor()
     {
         return view('bendahara.tabungan.stor');
+    }
+
+    public function bendahara_storMasal($id)
+    {
+        $kelas = Kelas::find($id);
+        $siswa = User::where('kelas_id', $id)->get();
+        $walikelas = User::where('kelas_id', $id)->where('roles_id', 3)->first();
+        $kemarin = Carbon::yesterday();
+
+        $kemarin = Carbon::yesterday()->toDateString();
+
+        $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
+            ->whereHas('user.kelas', function ($query) {
+                $query->where('kelas_id', $kelas);
+            })
+            ->sum('jumlah_transaksi');
+
+        return view('bendahara.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
     }
 
     public function bendahara_tarik()
@@ -128,6 +147,46 @@ class TabunganController extends Controller
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
     }
 
+    public function bendahara_storMasalTabungan(Request $request)
+    {
+        foreach ($request->input('input') as $data) {
+            if (empty($data['stor']) || $data['stor'] <= 0) {
+                continue;
+            }
+
+            $data['stor'] = str_replace([',', '.'], '', $data['stor']);
+
+            $user = User::where('username', $data['username'])->first();
+
+            if (!$user) {
+                continue;
+            }
+
+            $transaksi = new Transaksi();
+            $transaksi->jumlah_transaksi = $data['stor'];
+            $transaksi->saldo_awal = $data['saldo'] ?? 0;
+            $transaksi->saldo_akhir = $transaksi->saldo_awal + $data['stor'];
+            $transaksi->tipe_transaksi = 'Stor';
+            $transaksi->pembayaran = 'Offline';
+            $transaksi->pembuat = auth()->user()->name;
+            $transaksi->token_stor = \Illuminate\Support\Str::random(10);
+            $transaksi->user_id = $user->id;
+            $transaksi->tabungan_id = $user->tabungan->id ?? null;
+
+            $tabungan = Tabungan::where('user_id', $user->id)->first();
+            if ($tabungan) {
+                $tabungan->saldo = $transaksi->saldo_akhir;
+                $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
+                $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
+                $tabungan->save();
+            }
+
+            $transaksi->save();
+        }
+
+        return redirect()->back()->with('success', 'Data stor tabungan berhasil disimpan.')->with('alert-type', 'success')->with('alert-message', 'Data stor tabungan berhasil disimpan.')->with('alert-duration', 3000);
+    }
+
     public function bendahara_tarikTabungan(Request $request)
     {
         $validatedData = $request->validate([
@@ -180,7 +239,7 @@ class TabunganController extends Controller
     // Walikelas ------------------------------------------------------------------------------------------------------------------------------------------------
     public function walikelas_index()
     {
-        $kelas_id = Auth::user()->kelas_id; // Mengambil kelas_id dari user yang login
+        $kelas_id = Auth::user()->kelas_id;
 
         $transaksi_masuk = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
@@ -210,6 +269,22 @@ class TabunganController extends Controller
     public function walikelas_stor()
     {
         return view('walikelas.tabungan.stor');
+    }
+
+    public function walikelas_storMasal()
+    {
+        $kelas = auth()->user()->kelas;
+        $siswa = User::where('kelas_id', $kelas->id)->get();
+        $walikelas = User::where('kelas_id', $kelas->id)->where('roles_id', 3)->first();
+        $kemarin = Carbon::yesterday()->toDateString();
+
+        $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
+            ->whereHas('user', function ($query) use ($kelas) {
+                $query->where('kelas_id', $kelas->id);
+            })
+            ->sum('jumlah_transaksi');
+
+        return view('walikelas.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
     }
 
     public function walikelas_search(Request $request)
@@ -280,6 +355,46 @@ class TabunganController extends Controller
         $tabungan->save();
 
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
+    }
+
+    public function walikelas_storMasalTabungan(Request $request)
+    {
+        foreach ($request->input('input') as $data) {
+            if (empty($data['stor']) || $data['stor'] <= 0) {
+                continue;
+            }
+
+            $data['stor'] = str_replace([',', '.'], '', $data['stor']);
+
+            $user = User::where('username', $data['username'])->first();
+
+            if (!$user) {
+                continue;
+            }
+
+            $transaksi = new Transaksi();
+            $transaksi->jumlah_transaksi = $data['stor'];
+            $transaksi->saldo_awal = $data['saldo'] ?? 0;
+            $transaksi->saldo_akhir = $transaksi->saldo_awal + $data['stor'];
+            $transaksi->tipe_transaksi = 'Stor';
+            $transaksi->pembayaran = 'Offline';
+            $transaksi->pembuat = auth()->user()->name;
+            $transaksi->token_stor = \Illuminate\Support\Str::random(10);
+            $transaksi->user_id = $user->id;
+            $transaksi->tabungan_id = $user->tabungan->id ?? null;
+
+            $tabungan = Tabungan::where('user_id', $user->id)->first();
+            if ($tabungan) {
+                $tabungan->saldo = $transaksi->saldo_akhir;
+                $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
+                $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
+                $tabungan->save();
+            }
+
+            $transaksi->save();
+        }
+
+        return redirect()->back()->with('success', 'Data stor tabungan berhasil disimpan.')->with('alert-type', 'success')->with('alert-message', 'Data stor tabungan berhasil disimpan.')->with('alert-duration', 3000);
     }
 
     // Siswa ------------------------------------------------------------------------------------------------------------------------------------------------

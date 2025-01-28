@@ -29,7 +29,7 @@
                 <div class="card-body">
                     {{-- <div class="container "> --}}
                         <h5>Informasi Penting</h5>
-                        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. In aliquam et expedita ullam dolore odit? Rerum excepturi nihil porro quae vitae, aspernatur maxime corporis dolores incidunt consequuntur, debitis laudantium consequatur?</p>
+                        <p>Penabung dapat melakukan stor secara mandiri menggunakan fitur QRIS, transfer bank dan e-wallet, perhatikan bahwa terdapat potongan atau penambahan jumlah transaksi (biaya admin) tergantung dari fitur apa yang digunakan</p>
                     {{-- </div> --}}
                 </div>
             </div>

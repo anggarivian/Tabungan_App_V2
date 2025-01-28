@@ -110,9 +110,18 @@
                 <div class="card-body">
                     <h5 class="card-title">Pilih Transaksi</h5>
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route ('walikelas.tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                            Stor</a>
+                        <a href="{{ route('walikelas.tabungan.stor') }}" class="btn btn-primary w-100 m-1 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                                <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                            </svg>
+                            Stor Per Orang
+                        </a>
+                        <a href="{{ route('walikelas.tabungan.stor.masal') }}" class="btn btn-primary w-100 m-1 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                                <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                            </svg>
+                            Stor Per Kelas
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -137,7 +146,7 @@
                                 <tbody>
                                     @forelse ($kelas as $transaksis)
                                         <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="text-center">{{ $transaksis->firstItem() + $index }}</td>
                                             <td class="text-center">{{ $transaksis->user->username }}</td>
                                             <td>{{ $transaksis->user->name }}</td>
                                             <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>

@@ -66,7 +66,7 @@
                     <tbody>
                         @forelse ($user as $users)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $users->firstItem() + $index }}</td>
                                 <td class="text-center">{{ $users->username }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">Rp. {{ number_format($users->tabungan->saldo ?? 0 ) }}</td>

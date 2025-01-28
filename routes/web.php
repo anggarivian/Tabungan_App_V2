@@ -77,6 +77,8 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
         Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'bendahara_stor'])->name('bendahara.tabungan.stor');
+        Route::get('/bendahara/tabungan/stor/kelas/{id}', [TabunganController::class, 'bendahara_storMasal'])->name('bendahara.tabungan.stor.masal');
+        Route::post('/bendahara/tabungan/stor/kelas/add', [TabunganController::class, 'bendahara_storMasalTabungan'])->name('bendahara.tabungan.storMasalTabungan');
         Route::post('/bendahara/tabungan/stor/add', [TabunganController::class, 'bendahara_storTabungan'])->name('bendahara.tabungan.storTabungan');
         Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'bendahara_tarik'])->name('bendahara.tabungan.tarik');
         Route::post('/bendahara/tabungan/tarik/add', [TabunganController::class, 'bendahara_tarikTabungan'])->name('bendahara.tabungan.tarikTabungan');
@@ -102,6 +104,8 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Tabungan.
         Route::get('/walikelas/tabungan', [TabunganController::class, 'walikelas_index'])->name('walikelas.tabungan.index');
         Route::get('/walikelas/tabungan/stor', [TabunganController::class, 'walikelas_stor'])->name('walikelas.tabungan.stor');
+        Route::get('/walikelas/tabungan/stor/kelas', [TabunganController::class, 'walikelas_storMasal'])->name('walikelas.tabungan.stor.masal');
+        Route::post('/walikelas/tabungan/stor/kelas/add', [TabunganController::class, 'walikelas_storMasalTabungan'])->name('walikelas.tabungan.storMasalTabungan');
         Route::post('/walikelas/tabungan/stor/add', [TabunganController::class, 'walikelas_storTabungan'])->name('walikelas.tabungan.storTabungan');
         Route::get('/walikelas/tabungan/search', [TabunganController::class, 'walikelas_search'])->name('walikelas.search');
 

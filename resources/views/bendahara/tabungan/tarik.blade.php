@@ -166,10 +166,7 @@
                         if(data.name !== 'Tidak Ada' && data.kelas !== 'Tidak Ada' && data.tabungan !== 'Tidak Ada') {
                             $('#name').val(data.name);
                             $('#kelas').val(data.kelas);
-
-                            // Format number
-                            let formattedTabungan = formatNumber(data.tabungan);
-                            $('#jumlah_tabungan').val(formattedTabungan);
+                            $('#jumlah_tabungan').val(data.tabungan);
                         } else {
                             $('#tidak-ada').html('<div class="alert alert-danger">Data tidak ditemukan</div>');
                             setTimeout(function() {
@@ -196,14 +193,6 @@
             }
         });
     });
-
-    // Fungsi untuk format angka
-    function formatNumber(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'decimal',
-            maximumFractionDigits: 0
-        }).format(number);
-    }
 
     $('#username').on('change', function() {
         $('#username2').val($(this).val());

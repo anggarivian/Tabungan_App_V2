@@ -48,7 +48,7 @@
                         <form action="/login" method="POST">
                             @csrf
                             <div class="form-group position-relative has-icon-left mb-2">
-                                <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username" required>
+                                <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username" autofocus required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-person" style="margin-left: 5px"></i>
                                 </div>

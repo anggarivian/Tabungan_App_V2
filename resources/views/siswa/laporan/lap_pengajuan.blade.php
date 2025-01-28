@@ -86,7 +86,7 @@
                     <tbody>
                         @forelse ($pengajuan as $pengajuans)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $pengajuans->firstItem() + $index }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->tabungan->saldo ?? 0 ) }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
                                 <td class="text-center">

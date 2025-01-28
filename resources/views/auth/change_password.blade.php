@@ -31,7 +31,7 @@
                             </a>
                         </div>
                         <h1 class="auth-title" style="font-size: 47px">Ubah Password</h1>
-                        <p class="auth-subtitle mb-3" style="font-size: 24px">Ubah password anda</p>
+                        <p class="auth-subtitle mb-3" style="font-size: 24px">Untuk keamanan akun, Ubah password default anda</p>
                         @if(session('success'))
                             <div class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
                                 <strong>{{ session('alert-message') }}</strong>
@@ -39,14 +39,12 @@
                             </div>
 
                             <script>
-                                // Menutup alert setelah durasi tertentu
                                 setTimeout(function() {
                                     $('.alert').alert('close');
                                 }, {{ session('alert-duration') }});
 
-                                // Redirect ke dashboard setelah durasi tertentu
                                 setTimeout(function() {
-                                    window.location.href = 'bendahara/dashboard'; // Ganti dengan route dashboard Anda
+                                    window.location.href = 'bendahara/dashboard';
                                 }, {{ session('alert-duration') }});
                             </script>
                         @endif
@@ -54,7 +52,7 @@
                         <form action="{{ route ('change.password.submit') }}" method="POST">
                             @csrf
                             <div class="form-group position-relative has-icon-left mb-2">
-                                <input type="password" class="form-control form-control-xl" name="password" placeholder="Password Baru" required>
+                                <input type="password" class="form-control form-control-xl" name="password" placeholder="Password Baru" autofocus required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-shield-lock" style="margin-left: 5px"></i>
                                 </div>

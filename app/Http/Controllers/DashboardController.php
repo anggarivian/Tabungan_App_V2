@@ -15,42 +15,39 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
 
+    // Kepsek Dasboard -----------------------------------------------------------------------------------------------
     public function kepsek(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
         $jumlah_saldo = Tabungan::sum('saldo');
 
-        // Data untuk chart
-        $data_masuk = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Stor')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
 
-        $data_keluar = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Tarik')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        // Chart -----------------------------------------------------------------------------------------------
+        $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
+            ->where('tipe_transaksi', 'stor')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'x' => $item->date,
+                    'y' => $item->total
+                ];
+            });
 
-        // Menyiapkan data dalam array berdasarkan bulan
-        $chart_masuk = array_fill(0, 12, 0);
-        $chart_keluar = array_fill(0, 12, 0);
-
-        foreach ($data_masuk as $item) {
-            $chart_masuk[$item->bulan - 1] = $item->total;
-        }
-
-        foreach ($data_keluar as $item) {
-            $chart_keluar[$item->bulan - 1] = $item->total;
-        }
+        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->reduce(function ($carry, $item) {
+                $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
+                $carry->push([
+                    'x' => $item->date,
+                    'y' => (string) ($lastTotal + $item->daily_total)
+                ]);
+                return $carry;
+            }, collect());
 
         return view('kepsek.index', compact(
             'jumlah_penabung',
@@ -60,47 +57,43 @@ class DashboardController extends Controller
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
-            'chart_masuk' => $chart_masuk,
-            'chart_keluar' => $chart_keluar,
+            'chart_frekuensi' => $frekuensi,
+            'chart_total' => $total,
         ]);
     }
 
+    // Bendahara Dasboard -----------------------------------------------------------------------------------------------
     public function bendahara(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
         $jumlah_saldo = Tabungan::sum('saldo');
 
-        // Data untuk chart
-        $data_masuk = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Stor')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        // Chart -----------------------------------------------------------------------------------------------
+        $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
+            ->where('tipe_transaksi', 'stor')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'x' => $item->date,
+                    'y' => $item->total
+                ];
+            });
 
-        $data_keluar = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Tarik')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
-
-        // Menyiapkan data dalam array berdasarkan bulan
-        $chart_masuk = array_fill(0, 12, 0);
-        $chart_keluar = array_fill(0, 12, 0);
-
-        foreach ($data_masuk as $item) {
-            $chart_masuk[$item->bulan - 1] = $item->total;
-        }
-
-        foreach ($data_keluar as $item) {
-            $chart_keluar[$item->bulan - 1] = $item->total;
-        }
+        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->reduce(function ($carry, $item) {
+                $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
+                $carry->push([
+                    'x' => $item->date,
+                    'y' => (string) ($lastTotal + $item->daily_total)
+                ]);
+                return $carry;
+            }, collect());
 
         return view('bendahara.index', compact(
             'jumlah_penabung',
@@ -110,70 +103,89 @@ class DashboardController extends Controller
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
-            'chart_masuk' => $chart_masuk,
-            'chart_keluar' => $chart_keluar,
+            'chart_frekuensi' => $frekuensi,
+            'chart_total' => $total,
         ]);
     }
 
+    // Walikelas Dasboard -----------------------------------------------------------------------------------------------
     public function walikelas(){
-        $kelas_id = auth()->user()->kelas_id; // Mendapatkan kelas_id pengguna yang login
+        $kelas_id = auth()->user()->kelas_id;
 
         $jumlah_penabung = User::where('roles_id', 4)
-            ->where('kelas_id', $kelas_id) // Filter berdasarkan kelas_id
+            ->where('kelas_id', $kelas_id)
             ->count();
 
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
             ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id); // Filter berdasarkan kelas_id
+                $query->where('kelas_id', $kelas_id);
             })
             ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
             ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id); // Filter berdasarkan kelas_id
+                $query->where('kelas_id', $kelas_id);
             })
             ->sum('jumlah_transaksi');
 
         $jumlah_saldo = Tabungan::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id); // Filter berdasarkan kelas_id
+            $query->where('kelas_id', $kelas_id);
         })->sum('saldo');
 
-        // Data untuk chart
-        $data_masuk = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Stor')
-            ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id); // Filter berdasarkan kelas_id
-            })
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        // Chart -----------------------------------------------------------------------------------------------
+        $walikelas = auth()->user();
 
-        $data_keluar = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Tarik')
-            ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id); // Filter berdasarkan kelas_id
-            })
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        $jumlah_penabung = User::where('roles_id', 4)
+            ->where('kelas_id', $walikelas->kelas_id)
+            ->count();
 
-        // Menyiapkan data dalam array berdasarkan bulan
-        $chart_masuk = array_fill(0, 12, 0);
-        $chart_keluar = array_fill(0, 12, 0);
+        $transaksi_masuk = Transaksi::whereHas('user', function($query) use ($walikelas) {
+                    $query->where('kelas_id', $walikelas->kelas_id);
+                })
+                ->where('tipe_transaksi', 'Stor')
+                ->sum('jumlah_transaksi');
 
-        foreach ($data_masuk as $item) {
-            $chart_masuk[$item->bulan - 1] = $item->total;
-        }
+        $transaksi_keluar = Transaksi::whereHas('user', function($query) use ($walikelas) {
+                    $query->where('kelas_id', $walikelas->kelas_id);
+                })
+                ->where('tipe_transaksi', 'Tarik')
+                ->sum('jumlah_transaksi');
 
-        foreach ($data_keluar as $item) {
-            $chart_keluar[$item->bulan - 1] = $item->total;
-        }
+        $jumlah_saldo = Tabungan::whereHas('user', function($query) use ($walikelas) {
+                    $query->where('kelas_id', $walikelas->kelas_id);
+                })
+                ->sum('saldo');
+
+        $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
+                ->whereHas('user', function($query) use ($walikelas) {
+                    $query->where('kelas_id', $walikelas->kelas_id);
+                })
+                ->where('tipe_transaksi', 'stor')
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => $item->date,
+                        'y' => $item->total
+                    ];
+                });
+
+        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+                ->whereHas('user', function($query) use ($walikelas) {
+                    $query->where('kelas_id', $walikelas->kelas_id);
+                })
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->get()
+                ->reduce(function ($carry, $item) {
+                    $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
+                    $carry->push([
+                        'x' => $item->date,
+                        'y' => (string) ($lastTotal + $item->daily_total)
+                    ]);
+                    return $carry;
+                }, collect());
 
         return view('walikelas.index', compact(
             'jumlah_penabung',
@@ -183,67 +195,74 @@ class DashboardController extends Controller
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
-            'chart_masuk' => $chart_masuk,
-            'chart_keluar' => $chart_keluar,
+            'chart_frekuensi' => $frekuensi,
+            'chart_total' => $total,
         ]);
     }
 
+    // Siswa Dasboard -----------------------------------------------------------------------------------------------
     public function siswa(){
-        // Ambil ID pengguna yang sedang login
         $userId = Auth::id();
 
-        // Hitung jumlah penabung yang sesuai dengan user login
         $jumlah_penabung = User::where('roles_id', 4)
             ->where('id', $userId)
             ->count();
 
-        // Hitung transaksi masuk hanya untuk user login
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
             ->where('user_id', $userId)
             ->sum('jumlah_transaksi');
 
-        // Hitung transaksi keluar hanya untuk user login
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
             ->where('user_id', $userId)
             ->sum('jumlah_transaksi');
 
-        // Hitung saldo tabungan hanya untuk user login
         $jumlah_saldo = Tabungan::where('user_id', $userId)
             ->sum('saldo');
 
-        // Data untuk chart transaksi masuk
-        $data_masuk = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Stor')
-            ->where('user_id', $userId) // Hanya untuk user login
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        // Chart -----------------------------------------------------------------------------------------------
+        $siswa = auth()->user();
 
-        // Data untuk chart transaksi keluar
-        $data_keluar = Transaksi::select(
-                DB::raw('SUM(jumlah_transaksi) as total'),
-                DB::raw('MONTH(created_at) as bulan')
-            )
-            ->where('tipe_transaksi', 'Tarik')
-            ->where('user_id', $userId) // Hanya untuk user login
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
+        $jumlah_penabung = User::where('roles_id', 4)
+            ->where('id', $siswa->id)
+            ->count();
 
-        // Menyiapkan data dalam array berdasarkan bulan
-        $chart_masuk = array_fill(0, 12, 0);
-        $chart_keluar = array_fill(0, 12, 0);
+        $transaksi_masuk = Transaksi::where('user_id', $siswa->id)
+                ->where('tipe_transaksi', 'Stor')
+                ->sum('jumlah_transaksi');
 
-        foreach ($data_masuk as $item) {
-            $chart_masuk[$item->bulan - 1] = $item->total;
-        }
+        $transaksi_keluar = Transaksi::where('user_id', $siswa->id)
+                ->where('tipe_transaksi', 'Tarik')
+                ->sum('jumlah_transaksi');
 
-        foreach ($data_keluar as $item) {
-            $chart_keluar[$item->bulan - 1] = $item->total;
-        }
+        $jumlah_saldo = Tabungan::where('user_id', $siswa->id)
+                ->sum('saldo');
+
+        $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
+            ->where('user_id', $siswa->id)
+            ->where('tipe_transaksi', 'stor')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'x' => $item->date,
+                    'y' => $item->total
+                ];
+            });
+
+        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->where('user_id', $siswa->id)
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->reduce(function ($carry, $item) {
+                $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
+                $carry->push([
+                    'x' => $item->date,
+                    'y' => (string) ($lastTotal + $item->daily_total)
+                ]);
+                return $carry;
+            }, collect());
 
         return view('siswa.index', compact(
             'jumlah_penabung',
@@ -253,8 +272,8 @@ class DashboardController extends Controller
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
-            'chart_masuk' => $chart_masuk,
-            'chart_keluar' => $chart_keluar,
+            'chart_frekuensi' => $frekuensi,
+            'chart_total' => $total,
         ]);
     }
 }

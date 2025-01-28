@@ -103,7 +103,13 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Transaksi Tabungan 2024/2025</h5>
-                    <div id="chart"></div>
+                    <div id="frekuensi"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transaksi Tabungan 2024/2025</h5>
+                    <div id="total"></div>
                 </div>
             </div>
         </div>
@@ -115,63 +121,143 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
+    const chartDataFrekuensi = @json($chart_frekuensi); // Data untuk grafik pertama
+    const chartDataTotal = @json($chart_total); // Data untuk grafik kedua
 
-    const chartMasuk = @json($chart_masuk);
-    const chartKeluar = @json($chart_keluar);
-
-    var options = {
+    // Grafik untuk frekuensi
+    var optionsFrekuensi = {
         series: [{
-            name: 'Masuk',
-            data: chartMasuk
-        }, {
-            name: 'Keluar',
-            data: chartKeluar
+            name: 'Data Frekuensi',
+            data: chartDataFrekuensi
         }],
         chart: {
-            type: 'bar',
-            height: 350
-        },
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                columnWidth: '55%',
-                borderRadius: 5,
-                borderRadiusApplication: 'end'
+            type: 'area',
+            stacked: false,
+            height: 350,
+            zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
             },
+            toolbar: {
+                autoSelected: 'zoom'
+            }
         },
         dataLabels: {
             enabled: false
         },
-        stroke: {
-            show: true,
-            width: 2,
-            colors: ['transparent']
+        markers: {
+            size: 0
         },
-        xaxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        title: {
+            text: 'Jumlah Menabung',
+            align: 'left'
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0,
+                stops: [0, 90, 100]
+            }
         },
         yaxis: {
+            labels: {
+                formatter: function (val) {
+                    return "Rp. " + (val).toLocaleString('id-ID');
+                }
+            },
             title: {
                 text: 'Rupiah (Rp.)'
             }
         },
-        fill: {
-            opacity: 1
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+            }
         },
         tooltip: {
+            shared: false,
             y: {
                 formatter: function (val) {
-                    return "Rp. " + val.toLocaleString('id-ID');
+                    return "Rp. " + (val).toLocaleString('id-ID');
                 }
             }
         }
     };
 
-    var chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
+    var chartFrekuensi = new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi);
+    chartFrekuensi.render();
 
+    // Grafik untuk total
+    var optionsTotal = {
+        series: [{
+            name: 'Data Total',
+            data: chartDataTotal
+        }],
+        chart: {
+            type: 'area',
+            stacked: false,
+            height: 350,
+            zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
+            },
+            toolbar: {
+                autoSelected: 'zoom'
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        markers: {
+            size: 0
+        },
+        title: {
+            text: 'Jumlah Saldo',
+            align: 'left'
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0,
+                stops: [0, 90, 100]
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: function (val) {
+                    return "Rp. " + (val).toLocaleString('id-ID');
+                }
+            },
+            title: {
+                text: 'Rupiah (Rp.)'
+            }
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+            }
+        },
+        tooltip: {
+            shared: false,
+            y: {
+                formatter: function (val) {
+                    return "Rp. " + (val).toLocaleString('id-ID');
+                }
+            }
+        }
+    };
 
-
-</script>
-
+    var chartTotal = new ApexCharts(document.querySelector("#total"), optionsTotal);
+    chartTotal.render();
+    </script>
 @endsection

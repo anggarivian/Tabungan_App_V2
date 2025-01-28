@@ -108,20 +108,50 @@
         <div class="container">
             <div class="card col-12">
                 <div class="card-body">
-                    <h5 class="card-title">Pilih Transaksi</h5>
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route ('bendahara.tabungan.stor')}}" class="btn btn-lg btn-primary w-100 m-1 p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                            Stor</a>
-                        <a href="{{ route ('bendahara.tabungan.tarik')}}" class="btn btn-lg btn-light w-100 m-1 p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg>
-                            Tarik</a>
+                    <h5 class="card-title">Input Transaksi</h5>
+                    <div class="row">
+                        <div class="d-flex flex-wrap flex-md-nowrap" role="group">
+                            <!-- Tombol Stor Per Orang -->
+                            <a href="{{ route('bendahara.tabungan.stor') }}" class="btn btn-primary w-100 m-1 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                                    <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                                </svg>
+                                Stor Per Orang
+                            </a>
+
+                            <!-- Tombol Stor Per Kelas dengan Dropdown -->
+                            <div class="btn-group w-100 m-1">
+                                <button type="button" class="btn btn-primary dropdown-toggle w-100 p-2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                                        <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                                    </svg>
+                                    Stor Per Kelas
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/1">Kelas 1</a></li>
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/2">Kelas 2</a></li>
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/3">Kelas 3</a></li>
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/4">Kelas 4</a></li>
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/5">Kelas 5</a></li>
+                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/6">Kelas 6</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Tombol Tarik -->
+                            <a href="{{ route('bendahara.tabungan.tarik') }}" class="btn btn-danger w-100 m-1 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                                    <path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
+                                </svg>
+                                Tarik
+                            </a>
+                        </div>
                     </div>
+
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi</h5>
+                    <h5 class="card-title">Transaksi Hari Ini</h5>
                     <!-- Button Group -->
                     <div class="row">
                         <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group for classes">
@@ -138,7 +168,6 @@
                     <div class="dropdown-table mt-3 w-100">
                         @foreach (['kelas1' => 'Kelas 1', 'kelas2' => 'Kelas 2', 'kelas3' => 'Kelas 3', 'kelas4' => 'Kelas 4', 'kelas5' => 'Kelas 5', 'kelas6' => 'Kelas 6'] as $kelas => $namaKelas)
                             <div id="table{{ $loop->index + 1 }}" class="table-responsive-lg" style="display: none;">
-                                <h6 class="mt-5">Transaksi Hari Ini dari {{ $namaKelas }}</h6>
                                 <table class="table table-hover" style="width: 100%">
                                     <thead>
                                         <tr>
@@ -157,7 +186,7 @@
                                     <tbody>
                                         @forelse ($$kelas as $transaksis)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $transaksis->firstItem() + $index }}</td>
                                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                                 <td>{{ $transaksis->user->name }}</td>
                                                 <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>

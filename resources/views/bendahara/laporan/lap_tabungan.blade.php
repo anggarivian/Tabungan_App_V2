@@ -35,7 +35,7 @@
                             <input type="text" class="form-control" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama / ID Tabungan...">
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" style="margin-bottom: 20px" name="kelas" id="kelas">
+                            <select class="form-select" name="kelas" id="kelas">
                                 <option value="">Kelas</option>
                                 @foreach ($kelasList as $kelas)
                                     <option value="{{ $kelas->id }}"
@@ -78,7 +78,7 @@
                     <tbody>
                         @forelse ($user as $users)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $users->firstItem() + $index }}</td>
                                 <td class="text-center">{{ $users->username }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>

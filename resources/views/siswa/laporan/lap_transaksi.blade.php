@@ -85,7 +85,7 @@
                     <tbody>
                         @forelse ($transaksi as $transaksis)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $transaksis->firstItem() + $index }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0 ) }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0 ) }}</td>

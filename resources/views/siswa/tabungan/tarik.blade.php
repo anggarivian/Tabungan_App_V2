@@ -29,7 +29,9 @@
                 <div class="card-body">
                     {{-- <div class="container "> --}}
                         <h5>Informasi Penting</h5>
-                        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. In aliquam et expedita ullam dolore odit? Rerum excepturi nihil porro quae vitae, aspernatur maxime corporis dolores incidunt consequuntur, debitis laudantium consequatur?</p>
+                        <p>Penabung dapat melakukan pengajuaan penarikan tabungan ke bendahara</p>
+                        <p>- Tunai untuk pengambilan uang cash langsung ke sekolah</p>
+                        <p>- Digital untuk pengambilan yang langsung di transfer ke wallet yang anda pilih</p>
                     {{-- </div> --}}
                 </div>
             </div>
@@ -126,7 +128,7 @@
                                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                         <div class="input-group">
                                             <span class="input-group-text">Rp.</span>
-                                            <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Penarikan">
+                                            <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Penarikan" required>
                                         </div>
                                     </div>
                                 </div>
@@ -137,7 +139,7 @@
                                         <label for="alasan">Alasan</label>
                                     </div>
                                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                        <textarea class="form-control" name="alasan" cols="30" rows="2" placeholder="Mengapa Ingin Melakukan Penarikan Tabungan ..."></textarea>
+                                        <textarea class="form-control" name="alasan" cols="30" rows="2" placeholder="Mengapa Ingin Melakukan Penarikan Tabungan ..." required></textarea>
                                     </div>
                                 </div>
                             </div>

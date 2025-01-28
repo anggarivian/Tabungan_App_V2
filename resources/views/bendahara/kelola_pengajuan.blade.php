@@ -78,9 +78,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($pengajuan as $pengajuans)
+                        @forelse ($pengajuan as $index => $pengajuans)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $pengajuans->firstItem() + $index }}</td>
                                 <td class="text-center">{{ $pengajuans->user->username }}</td>
                                 <td>{{ $pengajuans->user->name }}</td>
                                 <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>

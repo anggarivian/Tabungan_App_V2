@@ -90,7 +90,7 @@
                     <tbody>
                         @forelse ($transaksi as $transaksis)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $transaksis->firstItem() + $index }}</td>
                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                 <td>{{ $transaksis->user->name }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>

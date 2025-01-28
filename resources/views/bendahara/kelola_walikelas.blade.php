@@ -83,7 +83,7 @@
                     <tbody>
                         @forelse ($user as $users)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $users->firstItem() + $index }}</td>
                                 <td>{{ $users->name }}</td>
                                 <td>{{ $users->username }}</td>
                                 <td>{{ $users->email }}</td>
