@@ -23,36 +23,42 @@ class TabunganController extends Controller
         $kelas1 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 1);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         $kelas2 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 2);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         $kelas3 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 3);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         $kelas4 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 4);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         $kelas5 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 5);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         $kelas6 = Transaksi::whereHas('user.kelas', function ($query) {
                 $query->where('kelas_id', 6);
             })
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 

@@ -2,13 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\WalikelasController;
 use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\TabunganController;
-use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\TabunganController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\WalikelasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('isBendahara')->group(function () {
         // Menampilkan dashboard untuk Bendahara.
         Route::get('/bendahara/dashboard', [DashboardController::class, 'bendahara'])->name('bendahara.dashboard');
+        Route::get('/bendahara/laporan/export', [ExportController::class, 'export']);
+            Route::post('/export/tabungan', [LaporanController::class, 'exportTabungan'])->name('export.tabungan');
+            Route::post('/export/transaksi', [LaporanController::class, 'exportTransaksi'])->name('export.transaksi');
+            Route::post('/export/pengajuan', [LaporanController::class, 'exportPengajuan'])->name('export.pengajuan');
 
         // Menangani pengelolaan Walikelas.
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('bendahara.walikelas.index');

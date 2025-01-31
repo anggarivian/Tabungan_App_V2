@@ -87,7 +87,7 @@ class CreateUserSeeder extends Seeder
             foreach (range(1, 10) as $i) {
                 $user = User::create([
                     'name' => $faker->firstName,
-                    'username' => $faker->unique()->numerify('1000##'),
+                    'username' => $faker->unique()->numerify('1##'),
                     'jenis_kelamin' => $faker->randomElement(['L', 'P']),
                     'kontak' => $faker->unique()->phoneNumber,
                     'orang_tua' => $faker->name,

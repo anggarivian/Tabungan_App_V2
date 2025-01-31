@@ -151,16 +151,19 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi Hari Ini</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5 class="card-title">Transaksi Hari Ini</h5>
+                        <button type="button" class="btn btn-success">Print Mingguan</button>
+                    </div>
                     <!-- Button Group -->
                     <div class="row">
                         <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group for classes">
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1</button>
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 2</button>
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 3</button>
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 4</button>
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 5</button>
-                            <button class="btn btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 6</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 2</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 3</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 4</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 5</button>
+                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 6</button>
                         </div>
                     </div>
 
