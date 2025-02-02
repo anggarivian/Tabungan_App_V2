@@ -76,6 +76,7 @@
                             <th class="text-center">Kelas</th>
                             <th class="text-center">Kontak</th>
                             <th>Alamat</th>
+                            <th class="text-center">Tanggal</th>
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -89,6 +90,7 @@
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ $users->alamat }}</td>
+                                <td class="text-center">{{ $users->created_at }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-warning" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">

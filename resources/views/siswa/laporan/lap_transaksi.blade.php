@@ -79,6 +79,7 @@
                             <th class="text-center">Saldo Akhir</th>
                             <th class="text-center">Transaksi</th>
                             <th class="text-center">Pembuat</th>
+                            <th class="text-center">Tanggal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,6 +102,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $transaksis->pembuat ?? '-' }}</td>
+                                <td class="text-center">{{ $transaksis->created_at ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>

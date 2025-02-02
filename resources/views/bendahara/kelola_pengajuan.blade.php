@@ -73,6 +73,7 @@
                             <th class="text-center">Kelas</th>
                             <th class="text-center">Alasan</th>
                             <th class="text-center">Jumlah Penarikan</th>
+                            <th class="text-center">Tanggal</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Action</th>
                         </tr>
@@ -86,6 +87,7 @@
                                 <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>
                                 <td class="text-center">{{ $pengajuans->alasan}}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
+                                <td class="text-center">{{ $pengajuans->created_at }}</td>
                                 <td class="text-center">
                                     @if ($pengajuans->status == 'Pending')
                                         <span class="badge bg-warning">Pending</span>

@@ -97,6 +97,7 @@
                             <th class="text-center">Jumlah Penarikan</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Alasan</th>
+                            <th class="text-center">Tanggal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,6 +125,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->created_at ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>

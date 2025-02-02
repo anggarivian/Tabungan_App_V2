@@ -40,7 +40,6 @@ class PengajuanController extends Controller
         $query->orderBy('created_at', 'desc');
         $pengajuan = $query->paginate($perPage);
 
-
         return view('bendahara.kelola_pengajuan', compact('pengajuan'));
     }
 
