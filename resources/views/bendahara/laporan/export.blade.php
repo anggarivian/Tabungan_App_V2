@@ -45,26 +45,25 @@
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="tabungan" role="tabpanel" aria-labelledby="tabungan-tab">
                         <div class="mt-3">
-                            <form id="exportTabunganForm" action="" method="POST">
+                            <form id="exportTabunganForm" action="{{ route('bendahara.export.tabungan') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label class="form-label">Pilih Jenis Export</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSiswa" value="per_siswa" checked>
+                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSiswa" value="siswa" checked>
                                             <label class="form-check-label" for="tabunganSiswa">Per Siswa</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganKelas" value="per_kelas">
+                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganKelas" value="kelas">
                                             <label class="form-check-label" for="tabunganKelas">Per Kelas</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSemua" value="semua_kelas">
+                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSemua" value="semua">
                                             <label class="form-check-label" for="tabunganSemua">Semua Kelas</label>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row mt-3" id="siswaSection">
                                     <div class="col-md-12">
                                         <label for="siswaTabungan" class="form-label">Pilih Siswa</label>
@@ -76,7 +75,6 @@
                                         </select>
                                     </div>
                                 </div>
-
                                 <div class="row mt-3" id="kelasSection" style="display: none;">
                                     <div class="col-md-12">
                                         <label for="kelasTabungan" class="form-label">Pilih Kelas</label>
@@ -104,7 +102,6 @@
                             <form id="exportTransaksiForm" action="{{ route('bendahara.export.transaksi') }}" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <!-- Pilihan Export -->
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Pilih Opsi Export</label>
                                         <div class="form-check">
@@ -120,8 +117,6 @@
                                             <label class="form-check-label" for="transaksiSemua">Semua Kelas</label>
                                         </div>
                                     </div>
-
-                                    <!-- Pilih Siswa -->
                                     <div class="col-md-6" id="transaksiSiswaSelect">
                                         <label for="siswaTransaksi" class="form-label">Pilih Siswa</label>
                                         <select class="form-select" id="siswaTransaksi" name="siswa_id">
@@ -131,8 +126,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-
-                                    <!-- Pilih Kelas -->
                                     <div class="col-md-6" id="transaksiKelasSelect">
                                         <label for="kelasTransaksi" class="form-label">Pilih Kelas</label>
                                         <select class="form-select" id="kelasTransaksi" name="kelas_id">
@@ -142,13 +135,11 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <!-- Tanggal Awal & Akhir -->
                                     <div class="col-md-6">
                                         <label for="dateRangeTransaksi" class="form-label">Pilih Rentang Tanggal</label>
                                         <input type="text" class="form-control" id="dateRangeTransaksi" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
                                     </div>
                                 </div>
-                                <!-- Tombol Export -->
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
@@ -163,7 +154,6 @@
                             <form id="exportPengajuanForm" action="" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <!-- Pilihan Export -->
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Pilih Opsi Export</label>
                                         <div class="form-check">
@@ -179,8 +169,6 @@
                                             <label class="form-check-label" for="pengajuanSemua">Semua Kelas</label>
                                         </div>
                                     </div>
-
-                                    <!-- Pilih Siswa -->
                                     <div class="col-md-6" id="pengajuanSiswaSelect">
                                         <label for="siswaPengajuan" class="form-label">Pilih Siswa</label>
                                         <select class="form-select" id="siswaPengajuan" name="siswa_id">
@@ -190,8 +178,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-
-                                    <!-- Pilih Kelas -->
                                     <div class="col-md-6" id="pengajuanKelasSelect">
                                         <label for="kelasPengajuan" class="form-label">Pilih Kelas</label>
                                         <select class="form-select" id="kelasPengajuan" name="kelas_id">
@@ -201,13 +187,11 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <!-- Tanggal Awal & Akhir -->
                                     <div class="col-md-6">
                                         <label for="dateRangePengajuan" class="form-label">Pilih Rentang Tanggal</label>
                                         <input type="text" class="form-control" id="dateRangePengajuan" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
                                     </div>
                                 </div>
-                                <!-- Tombol Export -->
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
