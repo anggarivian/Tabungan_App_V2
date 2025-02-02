@@ -151,7 +151,7 @@
                     </div>
                     <div class="tab-pane fade" id="pengajuan" role="tabpanel" aria-labelledby="pengajuan-tab">
                         <div class="mt-3">
-                            <form id="exportPengajuanForm" action="" method="POST">
+                            <form id="exportPengajuanForm" action="{{ route('bendahara.export.pengajuan') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12 mb-3">

@@ -20,6 +20,8 @@ class TransaksiExport implements FromCollection, WithHeadings
     {
         return $this->transaksi->map(function($transaksi) {
                 $data = [
+                    'no' => $index + 1,
+                    'id' => $transaksi->user->username,
                     'nama' => $transaksi->user->name,
                     'kelas' => $transaksi->user->kelas->name,
                     'saldo_awal' => $transaksi->saldo_awal,
@@ -38,6 +40,8 @@ class TransaksiExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'No',
+            'ID Tabungan',
             'Nama',
             'Kelas',
             'Saldo Awal',

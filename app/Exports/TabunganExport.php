@@ -20,6 +20,7 @@ class TabunganExport implements FromCollection, WithHeadings
     {
         return $this->siswas->map(function($siswas) {
                 $data = [
+                    'no' => $index + 1,
                     'id' => $siswas->id,
                     'nama' => $siswas->user->name,
                     'kelas' => $siswas->user->kelas->name,
@@ -40,6 +41,7 @@ class TabunganExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'No',
             'ID Tabungan',
             'Nama',
             'Kelas',
