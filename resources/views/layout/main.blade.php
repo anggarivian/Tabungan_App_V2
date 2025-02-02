@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/iconly.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
+
 </head>
 
 
@@ -198,6 +200,9 @@
                                             <li class="submenu-item {{ request()->routeIs('laporan.bendahara.pengajuan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.bendahara.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
                                             </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.export') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.bendahara.export') }}" class="submenu-link">Laporan Export</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -302,6 +307,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
     <script src="{{ asset('/dist/assets/static/js/components/dark.js') }}"></script>
     <script src="{{ asset('/dist/assets/static/js/pages/horizontal-layout.js') }}"></script>
     <script src="{{ asset('/dist/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>

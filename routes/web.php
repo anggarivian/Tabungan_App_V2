@@ -59,10 +59,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('isBendahara')->group(function () {
         // Menampilkan dashboard untuk Bendahara.
         Route::get('/bendahara/dashboard', [DashboardController::class, 'bendahara'])->name('bendahara.dashboard');
-        Route::get('/bendahara/laporan/export', [ExportController::class, 'export']);
-            Route::post('/export/tabungan', [LaporanController::class, 'exportTabungan'])->name('export.tabungan');
-            Route::post('/export/transaksi', [LaporanController::class, 'exportTransaksi'])->name('export.transaksi');
-            Route::post('/export/pengajuan', [LaporanController::class, 'exportPengajuan'])->name('export.pengajuan');
 
         // Menangani pengelolaan Walikelas.
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('bendahara.walikelas.index');
@@ -99,6 +95,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
         Route::get('/bendahara/laporan/transaksi', [LaporanController::class, 'lap_bendahara_transaksi'])->name('laporan.bendahara.transaksi');
         Route::get('/bendahara/laporan/pengajuan', [LaporanController::class, 'lap_bendahara_pengajuan'])->name('laporan.bendahara.pengajuan');
+        Route::get('/bendahara/laporan/export', [LaporanController::class, 'lap_bendahara_export'])->name('laporan.bendahara.export');
+            Route::post('/bendahara/laporan/export/tabungan', [ExportController::class, 'bendahara_exportTabungan'])->name('bendahara.export.tabungan');
+            Route::post('/bendahara/laporan/export/transaksi', [ExportController::class, 'bendahara_exportTransaksi'])->name('bendahara.export.transaksi');
+            Route::post('/bendahara/laporan/export/pengajuan', [ExportController::class, 'bendahara_exportPengajuan'])->name('bendahara.export.pengajuan');
     });
 
     // Grup middleware untuk pengguna dengan role Walikelas.

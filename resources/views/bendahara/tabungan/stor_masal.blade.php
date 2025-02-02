@@ -103,7 +103,7 @@
                                         <input type="text" class="form-control text-center" name="input[{{$no1++}}][username]" value="{{$siswas->username}}" style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
                                     </td>
                                     <td class="text-center col-md-3 col-9">
-                                        <input type="text" class="form-control text-center" name="input[{{$no4++}}][stor]" id="stor_{{$no4}}" oninput="updateCalculation(this)" />
+                                        <input type="text" class="form-control text-center" name="input[{{$no4++}}][stor]" id="stor_{{$no4}}" oninput="updateCalculation(this)" autocomplete="off" />
                                     </td>
                                 </tr>
                             @endforeach
@@ -119,7 +119,7 @@
                     </table>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ route ('bendahara.tabungan.index') }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Stor Tabungan</button>
                 </div>
             </form>
