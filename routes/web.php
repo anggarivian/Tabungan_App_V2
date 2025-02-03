@@ -53,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kepsek/laporan/tabungan', [LaporanController::class, 'lap_kepsek_tabungan'])->name('laporan.kepsek.tabungan');
         Route::get('/kepsek/laporan/transaksi', [LaporanController::class, 'lap_kepsek_transaksi'])->name('laporan.kepsek.transaksi');
         Route::get('/kepsek/laporan/pengajuan', [LaporanController::class, 'lap_kepsek_pengajuan'])->name('laporan.kepsek.pengajuan');
+        Route::get('/kepsek/laporan/export', [LaporanController::class, 'lap_kepsek_export'])->name('laporan.kepsek.export');
+            Route::post('/kepsek/laporan/export/tabungan', [ExportController::class, 'kepsek_exportTabungan'])->name('kepsek.export.tabungan');
+            Route::post('/kepsek/laporan/export/transaksi', [ExportController::class, 'kepsek_exportTransaksi'])->name('kepsek.export.transaksi');
+            Route::post('/kepsek/laporan/export/pengajuan', [ExportController::class, 'kepsek_exportPengajuan'])->name('kepsek.export.pengajuan');
     });
 
     // Grup middleware untuk pengguna dengan role Bendahara.

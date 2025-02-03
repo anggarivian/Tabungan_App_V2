@@ -179,6 +179,9 @@
                                             <li class="submenu-item {{ request()->routeIs('laporan.kepsek.pengajuan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.kepsek.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
                                             </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.export') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.kepsek.export') }}" class="submenu-link">Laporan Export</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>

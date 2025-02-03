@@ -18,7 +18,7 @@ class TransaksiExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return $this->transaksi->map(function($transaksi) {
+        return $this->transaksi->map(function($transaksi, $index) {
                 $data = [
                     'no' => $index + 1,
                     'id' => $transaksi->user->username,

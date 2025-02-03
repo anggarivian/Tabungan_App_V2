@@ -135,6 +135,13 @@ class LaporanController extends Controller
             $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
+    public function lap_kepsek_export(Request $request)
+    {
+        $siswas = User::where('roles_id', 4)->get();
+        $kelas = Kelas::all();
+
+        return view('kepsek.laporan.export', compact('siswas', 'kelas'));
+    }
 
     // Laporan Bendahara --------------------------------------------------------------------------------
     public function lap_bendahara_tabungan(Request $request){

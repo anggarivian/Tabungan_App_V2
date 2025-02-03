@@ -18,10 +18,10 @@ class TabunganExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return $this->siswas->map(function($siswas) {
+        return $this->siswas->map(function($siswas, $index) {
                 $data = [
                     'no' => $index + 1,
-                    'id' => $siswas->id,
+                    'id' => $siswas->user->username,
                     'nama' => $siswas->user->name,
                     'kelas' => $siswas->user->kelas->name,
                     'saldo_tunai' => \App\Models\Transaksi::where('user_id', $siswas->user_id)
