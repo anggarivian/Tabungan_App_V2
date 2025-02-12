@@ -352,6 +352,13 @@ class LaporanController extends Controller
 
         return view('walikelas.laporan.lap_transaksi', compact('transaksi', 'kelas'));
     }
+    public function lap_walikelas_export(Request $request)
+    {
+        $siswas = User::where('kelas_id', auth()->user()->kelas->id )->get();
+        $kelas = Kelas::all();
+
+        return view('walikelas.laporan.export', compact('siswas', 'kelas'));
+    }
 
     // Laporan Siswa ------------------------------------------------------------------------------------
     public function lap_siswa_tabungan(Request $request){

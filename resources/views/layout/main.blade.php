@@ -210,13 +210,6 @@
                                     </div>
                                 </div>
                             </li>
-
-                            @elseif( auth()->user()->roles_id == 2)
-                            <li class="menu-item {{ request()->is('bendahara/laporan*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.laporan.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-book-fill"></i> Laporan</span>
-                                </a>
-                            </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }} has-sub">
                                 <a href="#" class="menu-link" style="margin-top: -3px">
@@ -230,6 +223,9 @@
                                             </li>
                                             <li class="submenu-item {{ request()->routeIs('laporan.walikelas.transaksi') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.walikelas.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.export') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.walikelas.export') }}" class="submenu-link">Laporan Export</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -251,6 +247,9 @@
                                             </li>
                                             <li class="submenu-item {{ request()->routeIs('laporan.siswa.pengajuan') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.siswa.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.export') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.siswa.export') }}" class="submenu-link">Laporan Export</a>
                                             </li>
                                         </ul>
                                     </div>

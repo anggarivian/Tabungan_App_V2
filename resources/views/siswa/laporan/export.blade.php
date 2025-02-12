@@ -68,7 +68,7 @@
                                     <div class="col-md-12">
                                         <label for="siswaTabungan" class="form-label">Pilih Siswa</label>
                                         <select class="form-select" id="siswaTabungan" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
+                                            <option value="">Semua Siswa</option>
                                             @foreach($siswas as $siswa)
                                                 <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
                                             @endforeach
@@ -79,7 +79,7 @@
                                     <div class="col-md-12">
                                         <label for="kelasTabungan" class="form-label">Pilih Kelas</label>
                                         <select class="form-select" id="kelasTabungan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
+                                            <option value="">Semua Kelas</option>
                                             @foreach($kelas as $k)
                                                 <option value="{{ $k->id }}">{{ $k->name }}</option>
                                             @endforeach
@@ -120,7 +120,7 @@
                                     <div class="col-md-6" id="transaksiSiswaSelect">
                                         <label for="siswaTransaksi" class="form-label">Pilih Siswa</label>
                                         <select class="form-select" id="siswaTransaksi" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
+                                            <option value="">Semua Siswa</option>
                                             @foreach($siswas as $siswa)
                                                 <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
                                             @endforeach
@@ -129,7 +129,7 @@
                                     <div class="col-md-6" id="transaksiKelasSelect">
                                         <label for="kelasTransaksi" class="form-label">Pilih Kelas</label>
                                         <select class="form-select" id="kelasTransaksi" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
+                                            <option value="">Semua Kelas</option>
                                             @foreach($kelas as $kelasItem)
                                                 <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
                                             @endforeach
@@ -172,7 +172,7 @@
                                     <div class="col-md-6" id="pengajuanSiswaSelect">
                                         <label for="siswaPengajuan" class="form-label">Pilih Siswa</label>
                                         <select class="form-select" id="siswaPengajuan" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
+                                            <option value="">Semua Siswa</option>
                                             @foreach($siswas as $siswa)
                                                 <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
                                             @endforeach
@@ -181,7 +181,7 @@
                                     <div class="col-md-6" id="pengajuanKelasSelect">
                                         <label for="kelasPengajuan" class="form-label">Pilih Kelas</label>
                                         <select class="form-select" id="kelasPengajuan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
+                                            <option value="">Semua Kelas</option>
                                             @foreach($kelas as $kelasItem)
                                                 <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
                                             @endforeach

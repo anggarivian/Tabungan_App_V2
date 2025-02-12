@@ -121,6 +121,9 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Laporan.
         Route::get('/walikelas/laporan/tabungan', [LaporanController::class, 'lap_walikelas_tabungan'])->name('laporan.walikelas.tabungan');
         Route::get('/walikelas/laporan/transaksi', [LaporanController::class, 'lap_walikelas_transaksi'])->name('laporan.walikelas.transaksi');
+        Route::get('/walikelas/laporan/export', [LaporanController::class, 'lap_walikelas_export'])->name('laporan.walikelas.export');
+            Route::post('/walikelas/laporan/export/tabungan', [ExportController::class, 'walikelas_exportTabungan'])->name('walikelas.export.tabungan');
+            Route::post('/walikelas/laporan/export/transaksi', [ExportController::class, 'walikelas_exportTransaksi'])->name('walikelas.export.transaksi');
     });
 
     // Grup middleware untuk pengguna dengan role Siswa.

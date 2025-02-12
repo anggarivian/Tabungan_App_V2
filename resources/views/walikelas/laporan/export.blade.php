@@ -5,11 +5,11 @@
 @section('content')
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between ">
-        <h3 class="mt-3">Laporan Pengajuan</h3>
+        <h3 class="mt-3">Laporan Pengajuan Kelas {{auth()->user()->kelas->id}}</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
-                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 2)
                     <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                 @elseif(auth()->user()->roles_id == 3)
@@ -38,14 +38,11 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="transaksi-tab" data-bs-toggle="tab" data-bs-target="#transaksi" type="button" role="tab" aria-controls="transaksi" aria-selected="false">Transaksi</button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pengajuan-tab" data-bs-toggle="tab" data-bs-target="#pengajuan" type="button" role="tab" aria-controls="pengajuan" aria-selected="false">Pengajuan</button>
-                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="tabungan" role="tabpanel" aria-labelledby="tabungan-tab">
                         <div class="mt-3">
-                            <form id="exportTabunganForm" action="{{ route('kepsek.export.tabungan') }}" method="POST">
+                            <form id="exportTabunganForm" action="{{ route('walikelas.export.tabungan') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
@@ -55,12 +52,8 @@
                                             <label class="form-check-label" for="tabunganSiswa">Per Siswa</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganKelas" value="kelas">
-                                            <label class="form-check-label" for="tabunganKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSemua" value="semua">
-                                            <label class="form-check-label" for="tabunganSemua">Semua Kelas</label>
+                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSemua" value="kelas">
+                                            <label class="form-check-label" for="tabunganSemua">Satu Kelas</label>
                                         </div>
                                     </div>
                                 </div>
@@ -71,17 +64,6 @@
                                             <option value="">Pilih Siswa</option>
                                             @foreach($siswas as $siswa)
                                                 <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mt-3" id="kelasSection" style="display: none;">
-                                    <div class="col-md-12">
-                                        <label for="kelasTabungan" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasTabungan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $k)
-                                                <option value="{{ $k->id }}">{{ $k->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -99,7 +81,7 @@
                     </div>
                     <div class="tab-pane fade" id="transaksi" role="tabpanel" aria-labelledby="transaksi-tab">
                         <div class="mt-3">
-                            <form id="exportTransaksiForm" action="{{ route('kepsek.export.transaksi') }}" method="POST">
+                            <form id="exportTransaksiForm" action="{{ route('walikelas.export.transaksi') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12 mb-3">
@@ -109,12 +91,8 @@
                                             <label class="form-check-label" for="transaksiSiswa">Per Siswa</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiKelas" value="kelas">
-                                            <label class="form-check-label" for="transaksiKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiSemua" value="semua">
-                                            <label class="form-check-label" for="transaksiSemua">Semua Kelas</label>
+                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiSemua" value="kelas">
+                                            <label class="form-check-label" for="transaksiSemua">Satu Kelas</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6" id="transaksiSiswaSelect">
@@ -126,70 +104,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-6" id="transaksiKelasSelect">
-                                        <label for="kelasTransaksi" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasTransaksi" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $kelasItem)
-                                                <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
                                     <div class="col-md-6">
                                         <label for="dateRangeTransaksi" class="form-label">Pilih Rentang Tanggal</label>
                                         <input type="text" class="form-control" id="dateRangeTransaksi" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="pengajuan" role="tabpanel" aria-labelledby="pengajuan-tab">
-                        <div class="mt-3">
-                            <form id="exportPengajuanForm" action="{{ route('kepsek.export.pengajuan') }}" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Pilih Opsi Export</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanSiswa" value="siswa" checked>
-                                            <label class="form-check-label" for="pengajuanSiswa">Per Siswa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanKelas" value="kelas">
-                                            <label class="form-check-label" for="pengajuanKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanSemua" value="semua">
-                                            <label class="form-check-label" for="pengajuanSemua">Semua Kelas</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="pengajuanSiswaSelect">
-                                        <label for="siswaPengajuan" class="form-label">Pilih Siswa</label>
-                                        <select class="form-select" id="siswaPengajuan" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
-                                            @foreach($siswas as $siswa)
-                                                <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6" id="pengajuanKelasSelect">
-                                        <label for="kelasPengajuan" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasPengajuan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $kelasItem)
-                                                <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="dateRangePengajuan" class="form-label">Pilih Rentang Tanggal</label>
-                                        <input type="text" class="form-control" id="dateRangePengajuan" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="row mt-3">
@@ -212,7 +129,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const tabunganSiswa = document.getElementById("tabunganSiswa");
-        const tabunganKelas = document.getElementById("tabunganKelas");
         const tabunganSemua = document.getElementById("tabunganSemua");
         const siswaSection = document.getElementById("siswaSection");
         const kelasSection = document.getElementById("kelasSection");
@@ -221,9 +137,6 @@
             if (tabunganSiswa.checked) {
                 siswaSection.style.display = "block";
                 kelasSection.style.display = "none";
-            } else if (tabunganKelas.checked) {
-                siswaSection.style.display = "none";
-                kelasSection.style.display = "block";
             } else {
                 siswaSection.style.display = "none";
                 kelasSection.style.display = "none";
@@ -231,7 +144,6 @@
         }
 
         tabunganSiswa.addEventListener("change", updateForm);
-        tabunganKelas.addEventListener("change", updateForm);
         tabunganSemua.addEventListener("change", updateForm);
     });
 </script>
@@ -239,7 +151,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const siswaOption = document.getElementById("transaksiSiswa");
-        const kelasOption = document.getElementById("transaksiKelas");
         const semuaOption = document.getElementById("transaksiSemua");
 
         const siswaContainer = document.getElementById("transaksiSiswaSelect");
@@ -249,9 +160,6 @@
             if (siswaOption.checked) {
                 siswaContainer.style.display = "block";
                 kelasContainer.style.display = "none";
-            } else if (kelasOption.checked) {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "block";
             } else {
                 siswaContainer.style.display = "none";
                 kelasContainer.style.display = "none";
@@ -259,37 +167,6 @@
         }
 
         siswaOption.addEventListener("change", toggleFields);
-        kelasOption.addEventListener("change", toggleFields);
-        semuaOption.addEventListener("change", toggleFields);
-
-        toggleFields();
-    });
-    </script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const siswaOption = document.getElementById("pengajuanSiswa");
-        const kelasOption = document.getElementById("pengajuanKelas");
-        const semuaOption = document.getElementById("pengajuanSemua");
-
-        const siswaContainer = document.getElementById("pengajuanSiswaSelect");
-        const kelasContainer = document.getElementById("pengajuanKelasSelect");
-
-        function toggleFields() {
-            if (siswaOption.checked) {
-                siswaContainer.style.display = "block";
-                kelasContainer.style.display = "none";
-            } else if (kelasOption.checked) {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "block";
-            } else {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "none";
-            }
-        }
-
-        siswaOption.addEventListener("change", toggleFields);
-        kelasOption.addEventListener("change", toggleFields);
         semuaOption.addEventListener("change", toggleFields);
 
         toggleFields();

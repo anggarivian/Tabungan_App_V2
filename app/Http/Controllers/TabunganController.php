@@ -280,7 +280,8 @@ class TabunganController extends Controller
 
         $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
-        })->paginate($perPage);
+        })->whereDate('created_at', Carbon::today())
+        ->paginate($perPage);
 
 
         return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas'));
