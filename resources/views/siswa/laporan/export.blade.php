@@ -45,9 +45,9 @@
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="tabungan" role="tabpanel" aria-labelledby="tabungan-tab">
                         <div class="mt-3">
-                            <form id="exportTabunganForm" action="{{ route('kepsek.export.tabungan') }}" method="POST">
+                            <form id="exportTabunganForm" action="{{ route('siswa.export.tabungan') }}" method="POST">
                                 @csrf
-                                <div class="row">
+                                {{-- <div class="row">
                                     <div class="col-md-12">
                                         <label class="form-label">Pilih Jenis Export</label>
                                         <div class="form-check">
@@ -87,7 +87,9 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="startDate" name="start_date">
-                                <input type="hidden" id="endDate" name="end_date">
+                                <input type="hidden" id="endDate" name="end_date"> --}}
+                                <input type="hidden" name="siswa_id" value="{{ auth()->user()->id }}">
+                                <label class="form-label mb-0">Pilih Opsi Export</label>
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
@@ -99,10 +101,10 @@
                     </div>
                     <div class="tab-pane fade" id="transaksi" role="tabpanel" aria-labelledby="transaksi-tab">
                         <div class="mt-3">
-                            <form id="exportTransaksiForm" action="{{ route('kepsek.export.transaksi') }}" method="POST">
+                            <form id="exportTransaksiForm" action="{{ route('siswa.export.transaksi') }}" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                    {{-- <div class="col-md-12 mb-3">
                                         <label class="form-label">Pilih Opsi Export</label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="export_option" id="transaksiSiswa" value="siswa" checked>
@@ -134,12 +136,13 @@
                                                 <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-md-6">
                                         <label for="dateRangeTransaksi" class="form-label">Pilih Rentang Tanggal</label>
                                         <input type="text" class="form-control" id="dateRangeTransaksi" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
                                     </div>
                                 </div>
+                                <input type="hidden" name="siswa_id" value="{{ auth()->user()->id }}">
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
@@ -151,10 +154,10 @@
                     </div>
                     <div class="tab-pane fade" id="pengajuan" role="tabpanel" aria-labelledby="pengajuan-tab">
                         <div class="mt-3">
-                            <form id="exportPengajuanForm" action="{{ route('kepsek.export.pengajuan') }}" method="POST">
+                            <form id="exportPengajuanForm" action="{{ route('siswa.export.pengajuan') }}" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                    {{-- <div class="col-md-12 mb-3">
                                         <label class="form-label">Pilih Opsi Export</label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="export_option" id="pengajuanSiswa" value="siswa" checked>
@@ -186,12 +189,13 @@
                                                 <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-md-6">
                                         <label for="dateRangePengajuan" class="form-label">Pilih Rentang Tanggal</label>
                                         <input type="text" class="form-control" id="dateRangePengajuan" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
                                     </div>
                                 </div>
+                                <input type="hidden" name="siswa_id" value="{{ auth()->user()->id }}">
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>

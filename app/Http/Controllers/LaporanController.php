@@ -417,4 +417,11 @@ class LaporanController extends Controller
 
         return view('siswa.laporan.lap_pengajuan', compact('pengajuan'));
     }
+    public function lap_siswa_export(Request $request)
+    {
+        $siswas = auth()->user();
+        $kelas = Kelas::all();
+
+        return view('siswa.laporan.export', compact('siswas', 'kelas'));
+    }
 }

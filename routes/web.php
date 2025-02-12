@@ -140,6 +140,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/siswa/laporan/tabungan', [LaporanController::class, 'lap_siswa_tabungan'])->name('laporan.siswa.tabungan');
         Route::get('/siswa/laporan/transaksi', [LaporanController::class, 'lap_siswa_transaksi'])->name('laporan.siswa.transaksi');
         Route::get('/siswa/laporan/pengajuan', [LaporanController::class, 'lap_siswa_pengajuan'])->name('laporan.siswa.pengajuan');
+        Route::get('/siswa/laporan/export', [LaporanController::class, 'lap_siswa_export'])->name('laporan.siswa.export');
+            Route::post('/siswa/laporan/export/tabungan', [ExportController::class, 'siswa_exportTabungan'])->name('siswa.export.tabungan');
+            Route::post('/siswa/laporan/export/transaksi', [ExportController::class, 'siswa_exportTransaksi'])->name('siswa.export.transaksi');
+            Route::post('/siswa/laporan/export/pengajuan', [ExportController::class, 'siswa_exportPengajuan'])->name('siswa.export.pengajuan');
     });
 });
 
