@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Midtrans\Snap;
 use App\Models\User;
-use Midtrans\Config;
 use App\Models\Kelas;
 use App\Models\Tabungan;
 use App\Models\Transaksi;
@@ -22,10 +21,10 @@ class TabunganController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
+        // Config::$serverKey = config('midtrans.server_key');
+        // Config::$isProduction = config('midtrans.is_production');
+        // Config::$isSanitized = true;
+        // Config::$is3ds = true;
     }
     // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
     public function bendahara_index()
@@ -76,9 +75,10 @@ class TabunganController extends Controller
 
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
-        $jumlah_saldo = Tabungan::whereDate('updated_at', Carbon::today())->sum('saldo');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
 
-        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas1','kelas2','kelas3','kelas4','kelas5','kelas6'));
+        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas1','kelas2','kelas3','kelas4','kelas5','kelas6'));
     }
 
     public function bendahara_stor()
@@ -89,7 +89,7 @@ class TabunganController extends Controller
     public function bendahara_storMasal($id)
     {
         $kelas = Kelas::find($id);
-        $siswa = User::where('kelas_id', $id)->get();
+        $siswa = User::where('kelas_id', $id)->where('roles_id', 4)->get();
         $walikelas = User::where('kelas_id', $id)->where('roles_id', 3)->first();
         $kemarin = Carbon::yesterday()->toDateString();
 
@@ -290,10 +290,33 @@ class TabunganController extends Controller
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
-        $jumlah_saldo = Tabungan::whereHas('user', function ($query) use ($kelas_id) {
+        $jumlah_saldo_tunai = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
-        })->whereDate('updated_at', Carbon::today())
-        ->sum('saldo');
+        })->where('tipe_transaksi', 'Stor')
+        ->where('status', 'success')
+        ->where('pembayaran', 'Tunai')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->where('tipe_transaksi', 'Tarik')
+        ->where('status', 'success')
+        ->where('pembayaran', 'Tunai')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi');
+
+        $jumlah_saldo_digital = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->where('tipe_transaksi', 'Stor')
+        ->where('status', 'success')
+        ->where('pembayaran', 'Digital')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            $query->where('kelas_id', $kelas_id);
+        })->where('tipe_transaksi', 'Tarik')
+        ->where('status', 'success')
+        ->where('pembayaran', 'Digital')
+        ->whereDate('created_at', Carbon::today())
+        ->sum('jumlah_transaksi');
 
         $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
@@ -302,7 +325,7 @@ class TabunganController extends Controller
         ->paginate($perPage);
 
 
-        return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo', 'kelas'));
+        return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas'));
     }
 
     public function walikelas_stor()
@@ -313,7 +336,7 @@ class TabunganController extends Controller
     public function walikelas_storMasal()
     {
         $kelas = auth()->user()->kelas;
-        $siswa = User::where('kelas_id', $kelas->id)->get();
+        $siswa = User::where('kelas_id', $kelas->id)->where('roles_id', 4)->get();
         $walikelas = User::where('kelas_id', $kelas->id)->where('roles_id', 3)->first();
         $kemarin = Carbon::yesterday()->toDateString();
 
@@ -446,108 +469,108 @@ class TabunganController extends Controller
         return view('siswa.tabungan.stor', compact('nominal', 'terbilang'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'jumlah_stor' => 'required|integer|min:1000',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'jumlah_stor' => 'required|integer|min:1000',
+    //     ]);
 
-        $user = Auth::user();
-        $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+    //     $user = Auth::user();
+    //     $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
 
-        $saldo_awal = $tabungan->saldo;
-        $jumlah_stor = $request->jumlah_stor;
-        $saldo_akhir = $saldo_awal + $jumlah_stor;
+    //     $saldo_awal = $tabungan->saldo;
+    //     $jumlah_stor = $request->jumlah_stor;
+    //     $saldo_akhir = $saldo_awal + $jumlah_stor;
 
-        // Buat transaksi dengan status pending
-        $transaksi = new Transaksi();
-        $transaksi->jumlah_transaksi = $jumlah_stor;
-        $transaksi->saldo_awal = $saldo_awal;
-        $transaksi->saldo_akhir = $saldo_akhir;
-        $transaksi->tipe_transaksi = 'Stor';
-        $transaksi->pembayaran = 'Digital';
-        $transaksi->pembuat = $user->name;
-        // $transaksi->token_stor = Str::random(10);
-        $transaksi->user_id = $user->id;
-        $transaksi->tabungan_id = $tabungan->id;
-        $transaksi->status = 'pending';
-        $transaksi->save();
+    //     // Buat transaksi dengan status pending
+    //     $transaksi = new Transaksi();
+    //     $transaksi->jumlah_transaksi = $jumlah_stor;
+    //     $transaksi->saldo_awal = $saldo_awal;
+    //     $transaksi->saldo_akhir = $saldo_akhir;
+    //     $transaksi->tipe_transaksi = 'Stor';
+    //     $transaksi->pembayaran = 'Digital';
+    //     $transaksi->pembuat = $user->name;
+    //     // $transaksi->token_stor = Str::random(10);
+    //     $transaksi->user_id = $user->id;
+    //     $transaksi->tabungan_id = $tabungan->id;
+    //     $transaksi->status = 'pending';
+    //     $transaksi->save();
 
-        // Midtrans Payment Request
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = false; // Set true jika sudah live
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
+    //     // Midtrans Payment Request
+    //     Config::$serverKey = config('midtrans.server_key');
+    //     Config::$isProduction = false; // Set true jika sudah live
+    //     Config::$isSanitized = true;
+    //     Config::$is3ds = true;
 
-        $transaction_details = [
-            'order_id' => "TAB-".$transaksi->id . "-" . time(),
-            'gross_amount' => $jumlah_stor,
-        ];
+    //     $transaction_details = [
+    //         'order_id' => "TAB-".$transaksi->id . "-" . time(),
+    //         'gross_amount' => $jumlah_stor,
+    //     ];
 
-        $customer_details = [
-            'first_name' => $user->name,
-            'email' => $user->email,
-        ];
+    //     $customer_details = [
+    //         'first_name' => $user->name,
+    //         'email' => $user->email,
+    //     ];
 
-        $payload = [
-            'transaction_details' => $transaction_details,
-            'customer_details' => $customer_details,
-        ];
+    //     $payload = [
+    //         'transaction_details' => $transaction_details,
+    //         'customer_details' => $customer_details,
+    //     ];
 
-        $snapToken = Snap::getSnapToken($payload);
+    //     $snapToken = Snap::getSnapToken($payload);
 
-        // Simpan snap token ke database
-        $transaksi->token_stor = $snapToken;
-        $transaksi->save();
+    //     // Simpan snap token ke database
+    //     $transaksi->token_stor = $snapToken;
+    //     $transaksi->save();
 
-        return view('siswa.tabungan.payment', compact('snapToken', 'transaksi'));
-    }
+    //     return view('siswa.tabungan.payment', compact('snapToken', 'transaksi'));
+    // }
 
-    public function callback(Request $request)
-    {
-        // Konfigurasi Midtrans
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = false;
+    // public function callback(Request $request)
+    // {
+    //     // Konfigurasi Midtrans
+    //     Config::$serverKey = config('midtrans.server_key');
+    //     Config::$isProduction = false;
 
-        // Notifikasi dari Midtrans
-        $notification = new Notification();
+    //     // Notifikasi dari Midtrans
+    //     $notification = new Notification();
 
-        $order_id = $notification->order_id;
-        $status = $notification->transaction_status;
-        $gross_amount = $notification->gross_amount;
+    //     $order_id = $notification->order_id;
+    //     $status = $notification->transaction_status;
+    //     $gross_amount = $notification->gross_amount;
 
-        Log::info('Midtrans Callback Data: ', $request->all());
+    //     Log::info('Midtrans Callback Data: ', $request->all());
 
-        $transaksi = Transaksi::where('id', explode("-", $order_id)[1])->first();
+    //     $transaksi = Transaksi::where('id', explode("-", $order_id)[1])->first();
 
-        if (!$transaksi) {
-            return response()->json(['message' => 'Transaksi tidak ditemukan!'], 404);
-        }
+    //     if (!$transaksi) {
+    //         return response()->json(['message' => 'Transaksi tidak ditemukan!'], 404);
+    //     }
 
-        if (in_array($status, ['settlement', 'capture'])) {
-            $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
-            if (!$tabungan) {
-                return response()->json(['message' => 'Tabungan tidak ditemukan!'], 404);
-            }
+    //     if (in_array($status, ['settlement', 'capture'])) {
+    //         $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
+    //         if (!$tabungan) {
+    //             return response()->json(['message' => 'Tabungan tidak ditemukan!'], 404);
+    //         }
 
-            // Update saldo tabungan
-            $tabungan->saldo += $transaksi->jumlah_transaksi;
-            $tabungan->premi = $tabungan->saldo * 2.5 / 100;
-            $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
-            $tabungan->save();
+    //         // Update saldo tabungan
+    //         $tabungan->saldo += $transaksi->jumlah_transaksi;
+    //         $tabungan->premi = $tabungan->saldo * 2.5 / 100;
+    //         $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
+    //         $tabungan->save();
 
-            // Update status transaksi
-            $transaksi->status = 'success';
-            $transaksi->save();
+    //         // Update status transaksi
+    //         $transaksi->status = 'success';
+    //         $transaksi->save();
 
-            return response()->json(['message' => 'Pembayaran berhasil dan saldo diperbarui!']);
-        } elseif (in_array($status, ['cancel', 'deny', 'expire'])) {
-            $transaksi->status = 'failed';
-            $transaksi->save();
-        }
+    //         return response()->json(['message' => 'Pembayaran berhasil dan saldo diperbarui!']);
+    //     } elseif (in_array($status, ['cancel', 'deny', 'expire'])) {
+    //         $transaksi->status = 'failed';
+    //         $transaksi->save();
+    //     }
 
-        return response()->json(['message' => 'Status pembayaran diperbarui!']);
-    }
+    //     return response()->json(['message' => 'Status pembayaran diperbarui!']);
+    // }
 
     public function siswa_tarik()
     {

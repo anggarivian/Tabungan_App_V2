@@ -38,8 +38,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Saldo Offline</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo)}}</h6>
+                                    <h6 class="text-muted font-semibold">Saldo Tunai</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -55,8 +55,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Saldo Online</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 0</h6>
+                                    <h6 class="text-muted font-semibold">Saldo Digital</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_digital)}}</h6>
                                 </div>
                             </div>
                         </div>

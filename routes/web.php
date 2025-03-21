@@ -135,8 +135,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
 
-        Route::post('/tabungan/store', [TabunganController::class, 'store'])->name('tabungan.store');
-        Route::post('/midtrans/callback', [TabunganController::class, 'callback'])->name('midtrans.callback');
+        // Route::post('/tabungan/store', [TabunganController::class, 'store'])->name('tabungan.store');
+        // Route::post('/midtrans/callback', [TabunganController::class, 'callback'])->name('midtrans.callback');
 
         Route::post('/siswa/tabungan/tarik/add', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
 

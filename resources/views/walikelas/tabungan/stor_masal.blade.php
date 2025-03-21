@@ -75,7 +75,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form method="post" action="{{ route('bendahara.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
+            <form method="post" action="{{ route('walikelas.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="table-responsive-lg">
                     <table id="table-data" class="table table-stripped">

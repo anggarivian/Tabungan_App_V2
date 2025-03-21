@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                 </div>
                                 <div class="col-6 col-md-9 col-sm-6">
                                     <h6 class="text-muted font-semibold">Jumlah Digital</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. 0</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_digital)}}</h6>
                                 </div>
                             </div>
                         </div>
