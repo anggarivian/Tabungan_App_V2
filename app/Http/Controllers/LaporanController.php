@@ -43,24 +43,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
-    public function lap_kepsek_transaksi(Request $request){
+    public function lap_kepsek_transaksi(Request $request) {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
         $tipeTransaksi = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
-        $sortPenarikan = $request->input('sort_penarikan');
+        $sortTanggal = $request->input('sort_tanggal');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-
-        $request->validate([
-            'search' => 'nullable|string|max:255',
-            'kelas' => 'nullable',
-            'tipe_transaksi' => 'nullable|in:stor,tarik',
-            'tipe_pembayaran' => 'nullable|in:digital,tunai',
-            'sort_penarikan' => 'nullable|in:asc,desc',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
 
         $perPage = request('perPage', 10);
 
@@ -88,7 +78,9 @@ class LaporanController extends Controller
             ->when($endDate, function ($query) use ($endDate) {
                 $query->whereDate('created_at', '<=', $endDate);
             })
-            ->orderBy('created_at', 'desc')
+            ->when($sortTanggal, function ($query) use ($sortTanggal) {
+                $query->orderBy('created_at', $sortTanggal);
+            })
             ->paginate($perPage)
             ->appends($request->all());
 
@@ -100,6 +92,7 @@ class LaporanController extends Controller
         $kelas = $request->input('kelas');
         $status = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
+        $sortDate = $request->input('sort_date'); // Tambahkan ini
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -126,15 +119,19 @@ class LaporanController extends Controller
             ->when($endDate, function ($query) use ($endDate) {
                 $query->whereDate('created_at', '<=', $endDate);
             })
-            ->when(in_array($sortPenarikan, ['asc', 'desc']), function ($query) use ($sortPenarikan) {
+            ->when($sortPenarikan, function ($query) use ($sortPenarikan) {
                 $query->orderBy('jumlah_penarikan', $sortPenarikan);
+            })
+            ->when($sortDate, function ($query) use ($sortDate) {
+                $query->orderBy('created_at', $sortDate);
             })
             ->paginate($perPage)
             ->withQueryString();
 
-            $kelasList = Kelas::orderBy('name')->get();
+        $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
+
     public function lap_kepsek_export(Request $request)
     {
         $siswas = User::where('roles_id', 4)->get();
@@ -176,24 +173,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('bendahara.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
-    public function lap_bendahara_transaksi(Request $request){
+    public function lap_bendahara_transaksi(Request $request) {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
         $tipeTransaksi = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
-        $sortPenarikan = $request->input('sort_penarikan');
+        $sortTanggal = $request->input('sort_tanggal');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-
-        $request->validate([
-            'search' => 'nullable|string|max:255',
-            'kelas' => 'nullable',
-            'tipe_transaksi' => 'nullable|in:stor,tarik',
-            'tipe_pembayaran' => 'nullable|in:digital,tunai',
-            'sort_penarikan' => 'nullable|in:asc,desc',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
 
         $perPage = request('perPage', 10);
 
@@ -221,7 +208,9 @@ class LaporanController extends Controller
             ->when($endDate, function ($query) use ($endDate) {
                 $query->whereDate('created_at', '<=', $endDate);
             })
-            ->orderBy('created_at', 'desc')
+            ->when($sortTanggal, function ($query) use ($sortTanggal) {
+                $query->orderBy('created_at', $sortTanggal);
+            })
             ->paginate($perPage)
             ->appends($request->all());
 
@@ -233,6 +222,7 @@ class LaporanController extends Controller
         $kelas = $request->input('kelas');
         $status = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
+        $sortDate = $request->input('sort_date'); // Tambahkan ini
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -259,8 +249,11 @@ class LaporanController extends Controller
             ->when($endDate, function ($query) use ($endDate) {
                 $query->whereDate('created_at', '<=', $endDate);
             })
-            ->when(in_array($sortPenarikan, ['asc', 'desc']), function ($query) use ($sortPenarikan) {
+            ->when($sortPenarikan, function ($query) use ($sortPenarikan) {
                 $query->orderBy('jumlah_penarikan', $sortPenarikan);
+            })
+            ->when($sortDate, function ($query) use ($sortDate) {
+                $query->orderBy('created_at', $sortDate);
             })
             ->paginate($perPage)
             ->withQueryString();
@@ -326,12 +319,13 @@ class LaporanController extends Controller
         $tipePembayaran = $request->input('tipe_pembayaran');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $sortDate = $request->input('sort_date'); // Tambahkan untuk sorting tanggal transaksi
 
         $transaksi = Transaksi::with(['user.kelas'])
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('username', 'like', '%' . $search . '%');
+                      ->orWhere('username', 'like', '%' . $search . '%');
                 });
             })
             ->when($kelas, function ($query) use ($kelas) {
@@ -345,13 +339,21 @@ class LaporanController extends Controller
             ->when($tipePembayaran, function ($query) use ($tipePembayaran) {
                 $query->where('pembayaran', $tipePembayaran);
             })
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->whereDate('created_at', '>=', $startDate);
             })
-            ->paginate($perPage);
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->whereDate('created_at', '<=', $endDate);
+            })
+            ->when($sortDate, function ($query) use ($sortDate) {
+                $query->orderBy('created_at', $sortDate);
+            })
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('walikelas.laporan.lap_transaksi', compact('transaksi', 'kelas'));
     }
+
     public function lap_walikelas_export(Request $request)
     {
         $siswas = User::where('kelas_id', auth()->user()->kelas->id )->get();
@@ -387,6 +389,7 @@ class LaporanController extends Controller
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
+            ->orderBy('created_at', 'asc')
             ->paginate($perPage);
 
         return view('siswa.laporan.lap_transaksi', compact('transaksi'));

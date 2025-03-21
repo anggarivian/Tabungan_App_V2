@@ -30,6 +30,7 @@ class TransaksiExport implements FromCollection, WithHeadings
                     'tipe_transaksi' => $transaksi->tipe_transaksi,
                     'pembayaran' => $transaksi->pembayaran,
                     'pembuat' => $transaksi->pembuat,
+                    'status' => $transaksi->status,
                     'created_at' => $transaksi->created_at->format('Y-m-d H:i:s'),
                 ];
 
@@ -50,6 +51,7 @@ class TransaksiExport implements FromCollection, WithHeadings
             'Tipe Transaksi',
             'Pembayaran',
             'Pembuat',
+            'Status',
             'Tanggal Dibuat',
         ];
     }

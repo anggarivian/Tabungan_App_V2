@@ -18,14 +18,15 @@ class DashboardController extends Controller
     // Kepsek Dasboard -----------------------------------------------------------------------------------------------
     public function kepsek(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
         $jumlah_saldo = Tabungan::sum('saldo');
 
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -37,6 +38,7 @@ class DashboardController extends Controller
             });
 
         $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -65,13 +67,14 @@ class DashboardController extends Controller
     // Bendahara Dasboard -----------------------------------------------------------------------------------------------
     public function bendahara(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
         $jumlah_saldo = Tabungan::sum('saldo');
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -83,6 +86,7 @@ class DashboardController extends Controller
             });
 
         $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -120,17 +124,19 @@ class DashboardController extends Controller
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
             })
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
             })
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
         $jumlah_saldo = Tabungan::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
-        })->sum('saldo');
+        })->where('status', 'success')->sum('saldo');
 
         // Chart -----------------------------------------------------------------------------------------------
         $walikelas = auth()->user();
@@ -143,12 +149,14 @@ class DashboardController extends Controller
                     $query->where('kelas_id', $walikelas->kelas_id);
                 })
                 ->where('tipe_transaksi', 'Stor')
+                ->where('status', 'success')
                 ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::whereHas('user', function($query) use ($walikelas) {
                     $query->where('kelas_id', $walikelas->kelas_id);
                 })
                 ->where('tipe_transaksi', 'Tarik')
+                ->where('status', 'success')
                 ->sum('jumlah_transaksi');
 
         $jumlah_saldo = Tabungan::whereHas('user', function($query) use ($walikelas) {
@@ -161,6 +169,7 @@ class DashboardController extends Controller
                     $query->where('kelas_id', $walikelas->kelas_id);
                 })
                 ->where('tipe_transaksi', 'stor')
+                ->where('status', 'success')
                 ->groupBy('date')
                 ->orderBy('date', 'asc')
                 ->get()
@@ -175,6 +184,7 @@ class DashboardController extends Controller
                 ->whereHas('user', function($query) use ($walikelas) {
                     $query->where('kelas_id', $walikelas->kelas_id);
                 })
+                ->where('status', 'success')
                 ->groupBy('date')
                 ->orderBy('date', 'asc')
                 ->get()
@@ -210,10 +220,12 @@ class DashboardController extends Controller
 
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
             ->where('user_id', $userId)
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
             ->where('user_id', $userId)
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
         $jumlah_saldo = Tabungan::where('user_id', $userId)
@@ -228,10 +240,12 @@ class DashboardController extends Controller
 
         $transaksi_masuk = Transaksi::where('user_id', $siswa->id)
                 ->where('tipe_transaksi', 'Stor')
+                ->where('status', 'success')
                 ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::where('user_id', $siswa->id)
                 ->where('tipe_transaksi', 'Tarik')
+                ->where('status', 'success')
                 ->sum('jumlah_transaksi');
 
         $jumlah_saldo = Tabungan::where('user_id', $siswa->id)
@@ -240,6 +254,7 @@ class DashboardController extends Controller
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
             ->where('user_id', $siswa->id)
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -252,6 +267,7 @@ class DashboardController extends Controller
 
         $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
             ->where('user_id', $siswa->id)
+            ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()

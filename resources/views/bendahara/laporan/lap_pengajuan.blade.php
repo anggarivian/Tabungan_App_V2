@@ -31,7 +31,7 @@
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <p class="card-title" style="margin-bottom: 20px" >Filter :</p>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-4 mb-2 mb-lg-0">
+                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <input type="text" class="form-control" style="margin-bottom: 20px"  name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama / ID Tabungan...">
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
@@ -54,8 +54,15 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
+                            <select class="form-select" style="margin-bottom: 20px" name="sort_date" id="sort_date">
+                                <option value="">Urutkan Tanggal</option>
+                                <option value="desc" {{ request('sort_date') == 'desc' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="asc" {{ request('sort_date') == 'asc' ? 'selected' : '' }}>Terlama</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
                             <select class="form-select" style="margin-bottom: 20px" name="sort_penarikan" id="sort_penarikan">
-                                <option value="">Urutkan</option>
+                                <option value="">Urutkan Besaran</option>
                                 <option value="desc" {{ request('sort_penarikan') == 'desc' ? 'selected' : '' }}>Banyak ke Kecil</option>
                                 <option value="asc" {{ request('sort_penarikan') == 'asc' ? 'selected' : '' }}>Kecil ke Banyak</option>
                             </select>

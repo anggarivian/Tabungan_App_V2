@@ -81,36 +81,40 @@
                     <table id="table-data" class="table table-stripped">
                         <thead>
                             <tr class="text-center">
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Saldo Awal</th>
+                                <th class="d-none d-md-table-cell">No</th>
+                                <th class="d-none d-md-table-cell">Nama</th>
+                                <th class="d-none d-md-table-cell">Saldo Awal</th>
                                 <th>Kode</th>
                                 <th>Stor</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php $no=1; $no1=0; $no2=0; $no3=0; $no4=0; $no5=0; $no6=0; $no7=0; $no8=0; $no9=0; @endphp
+                            @php $no=1; $no1=0; $no2=0; $no3=0; $no4=0; @endphp
                             @foreach($siswa as $siswas)
                                 <tr>
-                                    <td class="text-center col-md-1">{{$no++}}</td>
-                                    <td class="text-center col-md-3">
-                                        <input type="text" class="form-control" name="input[{{$no2++}}][nama]" value="{{$siswas->name}}" style="border: none; outline: none; background: transparent;" readonly tabindex="-1" />
+                                    <td class="text-center d-none d-md-table-cell">{{$no++}}</td>
+                                    <td class="text-center d-none d-md-table-cell">
+                                        <input type="text" class="form-control" name="input[{{$no2++}}][nama]" value="{{$siswas->name}}"
+                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1" />
                                     </td>
-                                    <td class="text-center col-md-3">
-                                        <input type="text" class="form-control text-center" name="input[{{$no3++}}][saldo]" value="{{$siswas->tabungan->saldo ?? 0}}" style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
+                                    <td class="text-center d-none d-md-table-cell">
+                                        <input type="text" class="form-control text-center" name="input[{{$no3++}}][saldo]" value="{{$siswas->tabungan->saldo ?? 0}}"
+                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
                                     </td>
                                     <td class="text-center col-md-2">
-                                        <input type="text" class="form-control text-center" name="input[{{$no1++}}][username]" value="{{$siswas->username}}" style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
+                                        <input type="text" class="form-control text-center" name="input[{{$no1++}}][username]" value="{{$siswas->username}}"
+                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
                                     </td>
                                     <td class="text-center col-md-3 col-9">
-                                        <input type="text" class="form-control text-center" name="input[{{$no4++}}][stor]" id="stor_{{$no4}}" oninput="updateCalculation(this)" autocomplete="off" />
+                                        <input type="text" class="form-control text-center" name="input[{{$no4++}}][stor]" id="stor_{{$no4}}"
+                                               oninput="updateCalculation(this)" autocomplete="off" />
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5" class="text-end ">
+                                <td colspan="5" class="text-end">
                                     <strong>Jumlah Stor: </strong><span id="total-stor">0</span><br>
                                     <strong>Jumlah Nabung: </strong><span id="filled-count">0</span> dari <span id="total-count">{{ count($siswa) }}</span>
                                 </td>
@@ -119,10 +123,11 @@
                     </table>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route ('bendahara.tabungan.index') }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ route('bendahara.tabungan.index') }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Stor Tabungan</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
@@ -216,6 +221,5 @@
     }
 
 </script>
-
 
 @endsection

@@ -40,6 +40,9 @@
                             </div>
                         @endif
                         @if(session()->has('logoutSuccess'))
+                            <script>
+                                localStorage.removeItem("pwaPopupShown"); // Reset agar popup muncul lagi setelah login
+                            </script>
                             <div class="alert alert-success" role="alert">
                                 <i class="bi bi-check-circle"></i>
                                 <span>Berhasil Logout !</span>

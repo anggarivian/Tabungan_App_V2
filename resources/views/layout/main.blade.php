@@ -360,13 +360,112 @@
     }
     </script> --}}
 
-    <script src="{{ asset('/sw.js') }}"></script>
     <script>
-        if (!navigator.serviceWorker.controller) {
-            navigator.serviceWorker.register("/sw.js").then(function (reg) {
-            console.log("Service worker registered for scope: " + reg.scope);
-            });
+        let deferredPrompt;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault();
+            deferredPrompt = event;
+            localStorage.setItem("pwaPromptAvailable", "true");
+        });
+
+        function showInstallPopup() {
+            if (!localStorage.getItem("pwaPopupShown")) {
+                let overlay = document.createElement("div");
+                overlay.id = "installOverlay";
+                overlay.style = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;
+                    z-index: 9999; opacity: 0; transition: opacity 0.3s ease-in-out;
+                `;
+
+                let installPopup = document.createElement("div");
+                installPopup.id = "installBanner";
+                installPopup.style = `
+                    background: white; padding: 20px; border-radius: 12px; text-align: center;
+                    width: 90%; max-width: 350px; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+                    transform: translateY(30px); opacity: 0; transition: all 0.3s ease-out;
+                `;
+
+                if (isSafari) {
+                    // Tampilkan instruksi manual untuk Safari
+                    installPopup.innerHTML = `
+                        <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Pasang Aplikasi SakuRame</p>
+                        <p style="font-size: 14px; color: #555;">
+                            Untuk menginstal aplikasi, tekan tombol <strong>Bagikan</strong> (ikon kotak dengan panah) di bawah, lalu pilih <strong>Tambahkan ke Layar Utama</strong>.
+                        </p>
+                        <button id="closeBtn" style="
+                            width: 100%; padding: 10px; margin-top: 10px; background: #ccc; color: black;
+                            border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            Tutup
+                        </button>
+                    `;
+                } else {
+                    // Popup normal untuk Chrome, Edge, dll.
+                    installPopup.innerHTML = `
+                        <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Pasang Aplikasi SakuRame</p>
+                        <p style="font-size: 14px; color: #555;">Instal aplikasi untuk kemudahan akses tanpa perlu browser.</p>
+                        <button id="installBtn" style="
+                            width: 100%; padding: 10px; margin-top: 10px; background: #007bff; color: white;
+                            border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            Pasang Aplikasi
+                        </button>
+                        <button id="closeBtn" style="
+                            width: 100%; padding: 10px; margin-top: 5px; background: #ccc; color: black;
+                            border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            Tutup
+                        </button>
+                    `;
+                }
+
+                overlay.appendChild(installPopup);
+                document.body.appendChild(overlay);
+
+                // Animasi Fade In
+                setTimeout(() => {
+                    overlay.style.opacity = "1";
+                    installPopup.style.transform = "translateY(0)";
+                    installPopup.style.opacity = "1";
+                }, 50);
+
+                if (!isSafari) {
+                    document.getElementById("installBtn").addEventListener("click", () => {
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            deferredPrompt.userChoice.then((choice) => {
+                                if (choice.outcome === "accepted") {
+                                    console.log("User accepted PWA installation");
+                                    localStorage.setItem("pwaPromptAvailable", "false");
+                                } else {
+                                    console.log("User dismissed PWA installation");
+                                }
+                                deferredPrompt = null;
+                            });
+                        }
+                    });
+                }
+
+                document.getElementById("closeBtn").addEventListener("click", () => {
+                    overlay.style.opacity = "0";
+                    installPopup.style.transform = "translateY(30px)";
+                    installPopup.style.opacity = "0";
+
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 300);
+                });
+
+                localStorage.setItem("pwaPopupShown", "true");
+            }
         }
+
+        window.addEventListener("load", () => {
+            if (isSafari || (localStorage.getItem("pwaPromptAvailable") === "true" && !localStorage.getItem("pwaPopupShown"))) {
+                showInstallPopup();
+            }
+        });
+
     </script>
 
 

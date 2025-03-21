@@ -62,7 +62,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <form action="{{ route('siswa.tabungan.ajukan') }}" method="POST">
+                    <form action="{{ route('tabungan.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <div class="row">
@@ -111,12 +111,12 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="jumlah_tarik">Jumlah Stor</label>
+                                    <label for="jumlah_stor">Jumlah Stor</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Stor">
+                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor">
                                     </div>
                                 </div>
                             </div>

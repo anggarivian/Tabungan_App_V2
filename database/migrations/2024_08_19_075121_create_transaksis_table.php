@@ -21,6 +21,7 @@ class CreateTransaksisTable extends Migration
             $table->string('tipe_transaksi');
             $table->string('pembayaran');
             $table->string('pembuat');
+            $table->string('status');
             $table->string('token_stor');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('tabungan_id')->constrained('tabungans');

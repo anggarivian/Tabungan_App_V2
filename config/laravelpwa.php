@@ -8,9 +8,10 @@ return [
 
         'name' => env('APP_NAME', 'SakuRame'),
         'short_name' => 'SakuRame',
-        'start_url' => '/',
-        'background_color' => '#00be9c',
-        'theme_color' => '#1c3c50',
+        'start_url' => '/index.php',
+        'scope' => '/', // Menyesuaikan akses dengan root aplikasi
+        'background_color' => '#6777ef', // Disamakan dengan manifest.json
+        'theme_color' => '#6777ef', // Disamakan dengan manifest.json
         'display' => 'standalone',
         'orientation'=> 'any',
 
@@ -50,8 +51,6 @@ return [
             ],
         ],
 
-
-        // Konfigurasi Splash Screen
         'splash' => [
             '640x1136'   => '/images/icons/splash-640x1136.png',
             '750x1334'   => '/images/icons/splash-750x1334.png',
@@ -65,8 +64,7 @@ return [
             '2048x2732'  => '/images/icons/splash-2048x2732.png',
         ],
 
-        // Custom fields, jika kamu ingin menambahkan hal lain
         'custom' => []
     ]
-
 ];
+
