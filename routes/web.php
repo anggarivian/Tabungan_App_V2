@@ -135,10 +135,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
 
-        // Route::post('/tabungan/store', [TabunganController::class, 'store'])->name('tabungan.store');
-        // Route::post('/midtrans/callback', [TabunganController::class, 'callback'])->name('midtrans.callback');
-
-        Route::post('/siswa/tabungan/tarik/add', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
 
         // Menangani pengelolaan Laporan.
         Route::get('/siswa/laporan/tabungan', [LaporanController::class, 'lap_siswa_tabungan'])->name('laporan.siswa.tabungan');
@@ -150,6 +146,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/siswa/laporan/export/pengajuan', [ExportController::class, 'siswa_exportPengajuan'])->name('siswa.export.pengajuan');
     });
 });
+Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
+
+Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
 
 route::get('/offline', function () {
     return view('modules/laravelpwa/offline');

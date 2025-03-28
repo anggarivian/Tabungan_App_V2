@@ -62,7 +62,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <form action="{{ route('tabungan.store') }}" method="POST">
+                    <form action="{{ route('siswa.tabungan.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <div class="row">
@@ -70,14 +70,15 @@
                                     <label for="id">ID Tabungan</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" class="form-control" id="id" name="id" value="{{ auth()->user()->username }}" readonly>
+                                    <input type="text" id="id" name="id" value="{{ auth()->user()->id }}" hidden>
+                                    <input type="text" class="form-control" id="tabungan_id" name="tabungan_id" value="{{ auth()->user()->username }}" readonly>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="nama">Nama</label>
+                                    <label for="name">Nama</label>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" readonly>
@@ -102,7 +103,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ number_format(auth()->user()->tabungan->saldo, 0, ',', '.') }}" readonly>
+                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
                                     </div>
                                     <p class="fst-italic fw-lighter text-center mb-0">{{$terbilang}}</p>
                                 </div>
@@ -116,11 +117,24 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor">
+                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" required min="1000" placeholder="Masukkan Jumlah Stor">
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {{-- <div class="form-group">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                    <label for="pembayaran">Metode Pembayaran</label>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                    <select class="form-control" id="pembayaran" name="pembayaran">
+                                        <option value="Tunai" selected>Tunai</option>
+                                        <option value="Digital">Digital</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div> --}}
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
@@ -132,7 +146,6 @@
                             </div>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -141,5 +154,4 @@
 @endsection
 
 @section('js')
-
 @endsection

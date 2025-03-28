@@ -3,28 +3,33 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Midtrans\Snap;
+use Xendit\Xendit;
+use Xendit\Invoice;
 use App\Models\User;
+use Xendit\Invoices;
 use App\Models\Kelas;
 use App\Models\Tabungan;
+use Xendit\Configuration;
 use App\Models\Transaksi;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Helpers\RupiahHelper;
+use Xendit\Invoice\InvoiceApi;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Xendit\Invoice\CreateInvoiceRequest;
 
 
 class TabunganController extends Controller
 {
+    private $invoiceClient;
+
     public function __construct()
     {
-        // Config::$serverKey = config('midtrans.server_key');
-        // Config::$isProduction = config('midtrans.is_production');
-        // Config::$isSanitized = true;
-        // Config::$is3ds = true;
+        Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
+        // $this->invoiceClient = new InvoiceApi();
     }
     // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
     public function bendahara_index()
@@ -469,113 +474,91 @@ class TabunganController extends Controller
         return view('siswa.tabungan.stor', compact('nominal', 'terbilang'));
     }
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'jumlah_stor' => 'required|integer|min:1000',
-    //     ]);
-
-    //     $user = Auth::user();
-    //     $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
-
-    //     $saldo_awal = $tabungan->saldo;
-    //     $jumlah_stor = $request->jumlah_stor;
-    //     $saldo_akhir = $saldo_awal + $jumlah_stor;
-
-    //     // Buat transaksi dengan status pending
-    //     $transaksi = new Transaksi();
-    //     $transaksi->jumlah_transaksi = $jumlah_stor;
-    //     $transaksi->saldo_awal = $saldo_awal;
-    //     $transaksi->saldo_akhir = $saldo_akhir;
-    //     $transaksi->tipe_transaksi = 'Stor';
-    //     $transaksi->pembayaran = 'Digital';
-    //     $transaksi->pembuat = $user->name;
-    //     // $transaksi->token_stor = Str::random(10);
-    //     $transaksi->user_id = $user->id;
-    //     $transaksi->tabungan_id = $tabungan->id;
-    //     $transaksi->status = 'pending';
-    //     $transaksi->save();
-
-    //     // Midtrans Payment Request
-    //     Config::$serverKey = config('midtrans.server_key');
-    //     Config::$isProduction = false; // Set true jika sudah live
-    //     Config::$isSanitized = true;
-    //     Config::$is3ds = true;
-
-    //     $transaction_details = [
-    //         'order_id' => "TAB-".$transaksi->id . "-" . time(),
-    //         'gross_amount' => $jumlah_stor,
-    //     ];
-
-    //     $customer_details = [
-    //         'first_name' => $user->name,
-    //         'email' => $user->email,
-    //     ];
-
-    //     $payload = [
-    //         'transaction_details' => $transaction_details,
-    //         'customer_details' => $customer_details,
-    //     ];
-
-    //     $snapToken = Snap::getSnapToken($payload);
-
-    //     // Simpan snap token ke database
-    //     $transaksi->token_stor = $snapToken;
-    //     $transaksi->save();
-
-    //     return view('siswa.tabungan.payment', compact('snapToken', 'transaksi'));
-    // }
-
-    // public function callback(Request $request)
-    // {
-    //     // Konfigurasi Midtrans
-    //     Config::$serverKey = config('midtrans.server_key');
-    //     Config::$isProduction = false;
-
-    //     // Notifikasi dari Midtrans
-    //     $notification = new Notification();
-
-    //     $order_id = $notification->order_id;
-    //     $status = $notification->transaction_status;
-    //     $gross_amount = $notification->gross_amount;
-
-    //     Log::info('Midtrans Callback Data: ', $request->all());
-
-    //     $transaksi = Transaksi::where('id', explode("-", $order_id)[1])->first();
-
-    //     if (!$transaksi) {
-    //         return response()->json(['message' => 'Transaksi tidak ditemukan!'], 404);
-    //     }
-
-    //     if (in_array($status, ['settlement', 'capture'])) {
-    //         $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
-    //         if (!$tabungan) {
-    //             return response()->json(['message' => 'Tabungan tidak ditemukan!'], 404);
-    //         }
-
-    //         // Update saldo tabungan
-    //         $tabungan->saldo += $transaksi->jumlah_transaksi;
-    //         $tabungan->premi = $tabungan->saldo * 2.5 / 100;
-    //         $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
-    //         $tabungan->save();
-
-    //         // Update status transaksi
-    //         $transaksi->status = 'success';
-    //         $transaksi->save();
-
-    //         return response()->json(['message' => 'Pembayaran berhasil dan saldo diperbarui!']);
-    //     } elseif (in_array($status, ['cancel', 'deny', 'expire'])) {
-    //         $transaksi->status = 'failed';
-    //         $transaksi->save();
-    //     }
-
-    //     return response()->json(['message' => 'Status pembayaran diperbarui!']);
-    // }
-
     public function siswa_tarik()
     {
         $nominal = auth()->user()->tabungan->saldo ;
         $terbilang = RupiahHelper::terbilangRupiah($nominal);
         return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
     }
+
+    public function createInvoice(Request $request)
+    {
+        $user = Auth::user();
+        $jumlahStor = $request->jumlah_stor;
+
+        // Inisialisasi Xendit
+        Configuration::setXenditKey(config('xendit.api_key'));
+        $apiInstance = new InvoiceApi();
+
+        // Generate External ID unik untuk transaksi
+        $externalId = 'stor-' . $user->id . '-' . time();
+
+        // Buat invoice dengan Xendit
+        $invoiceRequest = new CreateInvoiceRequest([
+            'external_id' => $externalId,
+            'payer_email' => $user->email,
+            'description' => 'Stor Tabungan untuk ' . $user->name,
+            'amount' => (int) $jumlahStor,
+            'invoice_duration' => 86400, // Berlaku 24 jam
+        ]);
+
+        try {
+            $invoice = $apiInstance->createInvoice($invoiceRequest);
+
+            // Simpan transaksi ke database
+            $transaksi = new Transaksi();
+            $transaksi->jumlah_transaksi = $jumlahStor;
+            $transaksi->saldo_awal = $user->tabungan->saldo;
+            $transaksi->saldo_akhir = $user->tabungan->saldo + $jumlahStor;
+            $transaksi->tipe_transaksi = 'Stor';
+            $transaksi->pembayaran = 'Digital';
+            $transaksi->status = 'pending';
+            $transaksi->pembuat = $user->name;
+            $transaksi->checkout_link = $invoice['invoice_url'];
+            $transaksi->external_id = $externalId;
+            $transaksi->token_stor = \Illuminate\Support\Str::random(10);;
+            $transaksi->user_id = $user->id;
+            $transaksi->tabungan_id = $user->tabungan->id;
+            $transaksi->save();
+
+            return redirect($invoice['invoice_url']);
+        } catch (\Exception $e) {
+            dd($e);
+            return back()->with('error', 'Gagal membuat pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    public function handleWebhook(Request $request)
+    {
+        $data = $request->all();
+
+        if (!isset($data['external_id']) || !isset($data['status'])) {
+            return response()->json(['message' => 'Invalid request'], 400);
+        }
+
+        $transaksi = Transaksi::where('external_id', $data['external_id'])->first();
+
+        if (!$transaksi) {
+            return response()->json(['message' => 'Transaction not found'], 404);
+        }
+
+        if ($data['status'] === 'PAID') {
+            // Update transaksi
+            $transaksi->status = 'success';
+            $transaksi->save();
+
+            // Update saldo tabungan
+            $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
+            $tabungan->saldo = $transaksi->saldo_akhir;
+            $tabungan->premi = $tabungan->saldo * 2.5 / 100;
+            $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
+            $tabungan->save();
+        } else {
+            $transaksi->status = 'failed';
+            $transaksi->save();
+        }
+
+        return response()->json(['message' => 'Webhook received successfully']);
+    }
+
 }

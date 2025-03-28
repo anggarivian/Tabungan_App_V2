@@ -19,14 +19,17 @@ class CreateTransaksisTable extends Migration
             $table->integer('saldo_awal');
             $table->integer('saldo_akhir');
             $table->string('tipe_transaksi');
-            $table->string('pembayaran');
+            $table->string('pembayaran'); // Tunai/Digital
             $table->string('pembuat');
-            $table->string('status');
-            $table->string('token_stor');
+            $table->string('checkout_link')->nullable(); // URL dari Xendit
+            $table->string('external_id')->nullable(); // ID unik dari sistem untuk Xendit
+            $table->string('status')->default('pending'); // Status pembayaran
+            $table->string('token_stor')->nullable(); // Token transaksi
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('tabungan_id')->constrained('tabungans');
             $table->timestamps();
         });
+
     }
 
     /**

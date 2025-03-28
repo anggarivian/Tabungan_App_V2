@@ -238,4 +238,5 @@ return [
 
     ],
 
+    config('xendit.api_key')
 ];
