@@ -133,7 +133,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Menangani pengelolaan Tabungan.
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
+
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
+        Route::post('/siswa/tabungan/tarik/ajukan', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
 
 
         // Menangani pengelolaan Laporan.
@@ -146,8 +148,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/siswa/laporan/export/pengajuan', [ExportController::class, 'siswa_exportPengajuan'])->name('siswa.export.pengajuan');
     });
 });
-Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
 
+Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
+Route::get('/payout-channels', [PengajuanController::class, 'getPayoutChannels'])->name('payout.channels');
 Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
 
 route::get('/offline', function () {

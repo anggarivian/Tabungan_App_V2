@@ -69,7 +69,7 @@
                         $pengajuan = \App\Models\Pengajuan::where('user_id', $userId)->latest()->first();
                     @endphp
 
-                    @if($pengajuan && $pengajuan->status == 'Pending')
+                    @if($pengajuan && $pengajuan->status == 'pending')
                         <div class="container">
                             <p class="mt-2">Pengajuan kamu sedang diproses oleh bendahara !!!</p>
                         </div>
@@ -114,7 +114,7 @@
                                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                         <div class="input-group">
                                             <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                            <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ number_format(auth()->user()->tabungan->saldo, 0, ',', '.') }}" readonly>
+                                            <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
                                         </div>
                                         <p class="fst-italic fw-lighter text-center mb-0">{{$terbilang}}</p>
                                     </div>
@@ -149,7 +149,7 @@
                                         <label for="jenis_pembayaran">Jenis Pembayaran</label>
                                     </div>
                                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                        <select id="gender-horizontal" class="form-select" name="jenis_pembayaran" required>
+                                        <select id="jenis_pembayaran" class="form-select" name="jenis_pembayaran" required>
                                             <option value="">Pilih Jenis Pembayaran</option>
                                             <option value="Tunai">Tunai</option>
                                             <option value="Digital">Digital</option>
@@ -157,6 +157,85 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Conditional Digital Payment Details -->
+                            <div id="digital-payment-details" style="display: none;">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                            <label for="metode_digital">Metode Digital</label>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                            <select id="metode_digital" class="form-select" name="metode_digital">
+                                                <option value="">Pilih Metode Digital</option>
+                                                <option value="bank_transfer">Transfer Bank</option>
+                                                <option value="ewallet">E-Wallet</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bank Transfer Details -->
+                                <div id="bank-transfer-details" style="display: none;">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="bank_code">Bank</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <select id="bank_code" class="form-select" name="bank_code">
+                                                    <option value="">Pilih Bank</option>
+                                                    <!-- Populate with Xendit bank codes -->
+                                                    <option value="ID_BCA">BCA</option>
+                                                    <option value="ID_MANDIRI">Mandiri</option>
+                                                    <!-- Add more banks -->
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="nomor_rekening">Nomor Rekening</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening" placeholder="Masukkan Nomor Rekening">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- E-Wallet Details -->
+                                <div id="ewallet-details" style="display: none;">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="ewallet_type">E-Wallet</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <select id="ewallet_type" class="form-select" name="ewallet_type">
+                                                    <option value="">Pilih E-Wallet</option>
+                                                    <option value="DANA">DANA</option>
+                                                    <option value="OVO">OVO</option>
+                                                    <option value="GOPAY">GoPay</option>
+                                                    <!-- Add more e-wallets -->
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="ewallet_number">Nomor E-Wallet</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <input type="text" class="form-control" id="ewallet_number" name="ewallet_number" placeholder="Masukkan Nomor E-Wallet">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
@@ -168,15 +247,85 @@
                                 </div>
                             </div>
                         </form>
-                    @endif
 
+                        @endif
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jenisPembayaran = document.getElementById('jenis_pembayaran');
+        const digitalPaymentDetails = document.getElementById('digital-payment-details');
+        const metodeDigital = document.getElementById('metode_digital');
+        const bankTransferDetails = document.getElementById('bank-transfer-details');
+        const ewalletDetails = document.getElementById('ewallet-details');
+
+        // Menampilkan atau menyembunyikan detail pembayaran digital
+        jenisPembayaran.addEventListener('change', function() {
+            digitalPaymentDetails.style.display = this.value === 'Digital' ? 'block' : 'none';
+        });
+
+        // Menampilkan atau menyembunyikan metode pembayaran digital
+        metodeDigital.addEventListener('change', function() {
+            bankTransferDetails.style.display = this.value === 'bank_transfer' ? 'block' : 'none';
+            ewalletDetails.style.display = this.value === 'ewallet' ? 'block' : 'none';
+        });
+
+        // Ambil data dari API untuk mengisi opsi pembayaran
+        fetch("/payout-channels") // Ganti dengan endpoint backend yang memanggil Xendit API
+            .then(response => response.json())
+            .then(data => {
+                populatePaymentOptions(data);
+            })
+            .catch(error => console.error("Error fetching payout channels:", error));
+    });
+
+    function populatePaymentOptions(channels) {
+        let bankSelect = document.getElementById("bank_code");
+        let ewalletSelect = document.getElementById("ewallet_type");
+        let metodeDigitalSelect = document.getElementById("metode_digital");
+
+        // Kosongkan select sebelum diisi ulang
+        bankSelect.innerHTML = '<option value="">Pilih Bank</option>';
+        ewalletSelect.innerHTML = '<option value="">Pilih E-Wallet</option>';
+        metodeDigitalSelect.innerHTML = '<option value="">Pilih Metode Digital</option>';
+
+        let addedCategories = { "BANK": false, "EWALLET": false }; // Hanya menyimpan BANK dan EWALLET
+
+        channels.forEach(channel => {
+            let option = document.createElement("option");
+            option.value = channel.channel_code;
+            option.textContent = channel.channel_name; // Menampilkan nama channel
+
+            if (channel.channel_category === "BANK") {
+                bankSelect.appendChild(option);
+                addedCategories["BANK"] = true;
+            } else if (channel.channel_category === "EWALLET") {
+                ewalletSelect.appendChild(option);
+                addedCategories["EWALLET"] = true;
+            }
+        });
+
+        // Tambahkan kategori ke metode digital jika ada bank atau ewallet yang tersedia
+        if (addedCategories["BANK"]) {
+            let bankOption = document.createElement("option");
+            bankOption.value = "bank_transfer";
+            bankOption.textContent = "Transfer Bank";
+            metodeDigitalSelect.appendChild(bankOption);
+        }
+        if (addedCategories["EWALLET"]) {
+            let ewalletOption = document.createElement("option");
+            ewalletOption.value = "ewallet";
+            ewalletOption.textContent = "E-Wallet";
+            metodeDigitalSelect.appendChild(ewalletOption);
+        }
+    }
+</script>
 
 @endsection

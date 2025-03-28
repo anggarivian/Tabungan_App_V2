@@ -222,7 +222,9 @@
                         $('#edit-jumlah_tarik').val(response.jumlah_tarik);
                         $('#edit-tabungan').val(response.tabungan);
                         $('#edit-pembayaran').val(response.pembayaran);
+                        $('#edit-status').val(response.status);
                         $('#edit-alasan').val(response.alasan);
+                        $('#edit-created_at').val(response.created_at);
 
                         $('#tolakButton').attr('href', '/bendahara/kelola-pengajuan/tolak/' + response.id);
 
