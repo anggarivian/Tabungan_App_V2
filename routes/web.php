@@ -153,3 +153,13 @@ Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
 route::get('/offline', function () {
     return view('modules/laravelpwa/offline');
 });
+
+Route::get('/clear-cache', function() {
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('route:clear');
+    \Artisan::call('view:clear');
+    \Artisan::call('optimize:clear');
+    return 'Cache Cleared!';
+});
+

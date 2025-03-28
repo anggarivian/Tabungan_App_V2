@@ -542,6 +542,10 @@ class TabunganController extends Controller
             return response()->json(['message' => 'Transaction not found'], 404);
         }
 
+        if ($transaksi->status === 'success') {
+            return response()->json(['message' => 'Payment telah diproses']);
+        }
+
         if ($data['status'] === 'PAID') {
             // Update transaksi
             $transaksi->status = 'success';
@@ -549,16 +553,17 @@ class TabunganController extends Controller
 
             // Update saldo tabungan
             $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
-            $tabungan->saldo = $transaksi->saldo_akhir;
-            $tabungan->premi = $tabungan->saldo * 2.5 / 100;
-            $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
-            $tabungan->save();
+            if ($tabungan) {
+                $tabungan->saldo = $transaksi->saldo_akhir;
+                $tabungan->premi = $tabungan->saldo * 2.5 / 100;
+                $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
+                $tabungan->save();
+            }
         } else {
             $transaksi->status = 'failed';
             $transaksi->save();
         }
 
-        return response()->json(['message' => 'Webhook received successfully']);
+        return response()->json(['message' => 'Success']);
     }
-
 }
