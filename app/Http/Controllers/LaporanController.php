@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 class LaporanController extends Controller
 {
     // Laporan Kepsek ----------------------------------------------------------------------------------
+    /**
+    * Menampilkan Data Laporan Tabungan oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_kepsek_tabungan(Request $request){
         $search = $request->input('search');
         $kelas = $request->input('kelas');
@@ -43,6 +50,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
+
+    /**
+    * Menampilkan Data Laporan Transaksi oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_kepsek_transaksi(Request $request) {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
@@ -87,6 +102,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('kepsek.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
     }
+
+    /**
+    * Menampilkan Data Laporan Pengajuan oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_kepsek_pengajuan(Request $request){
         $search = $request->input('search');
         $kelas = $request->input('kelas');
@@ -132,6 +155,13 @@ class LaporanController extends Controller
         return view('kepsek.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
 
+    /**
+    * Menampilkan Halaman Export Laporan Transaksi, Tabungan, dan Pengajuan oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_kepsek_export(Request $request)
     {
         $siswas = User::where('roles_id', 4)->get();
@@ -141,6 +171,13 @@ class LaporanController extends Controller
     }
 
     // Laporan Bendahara --------------------------------------------------------------------------------
+    /**
+    * Menampilkan Data Laporan Tabungan oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_bendahara_tabungan(Request $request){
         $search = $request->input('search');
         $kelas = $request->input('kelas');
@@ -173,6 +210,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('bendahara.laporan.lap_tabungan', compact('user', 'kelasList'));
     }
+
+    /**
+    * Menampilkan Data Laporan Transaksi oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_bendahara_transaksi(Request $request) {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
@@ -217,12 +262,20 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('bendahara.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
     }
+
+    /**
+    * Menampilkan Data Laporan Pengajuan oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_bendahara_pengajuan(Request $request){
         $search = $request->input('search');
         $kelas = $request->input('kelas');
         $status = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
-        $sortDate = $request->input('sort_date'); // Tambahkan ini
+        $sortDate = $request->input('sort_date');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -261,6 +314,14 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
         return view('bendahara.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
     }
+
+    /**
+    * Menampilkan Halaman Export Laporan Transaksi, Tabungan, dan Pengajuan oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_bendahara_export(Request $request)
     {
         $siswas = User::where('roles_id', 4)->get();
@@ -270,6 +331,13 @@ class LaporanController extends Controller
     }
 
     // Laporan Walikelas --------------------------------------------------------------------------------
+    /**
+    * Menampilkan Data Laporan Tabungan oleh Walikelas.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_walikelas_tabungan(Request $request){
         $kelasId = auth()->user()->kelas->id;
         $kelas = auth()->user()->kelas->name;
@@ -309,6 +377,14 @@ class LaporanController extends Controller
 
         return view('walikelas.laporan.lap_tabungan', compact('user', 'kelas'));
     }
+
+    /**
+    * Menampilkan Data Laporan Transaksi oleh Walikelas.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_walikelas_transaksi(Request $request){
         $kelasId = auth()->user()->kelas->id;
         $kelas = auth()->user()->kelas->name;
@@ -354,6 +430,13 @@ class LaporanController extends Controller
         return view('walikelas.laporan.lap_transaksi', compact('transaksi', 'kelas'));
     }
 
+    /**
+    * Menampilkan Halaman Export Laporan Transaksi dan Tabungan oleh Walikelas.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_walikelas_export(Request $request)
     {
         $siswas = User::where('kelas_id', auth()->user()->kelas->id )->get();
@@ -363,12 +446,27 @@ class LaporanController extends Controller
     }
 
     // Laporan Siswa ------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Data Laporan Tabungan oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_siswa_tabungan(Request $request){
         $kelasId = auth()->user()->kelas->id;
         $perPage = request('perPage', 10);
         $user = User::where('roles_id', 4)->where('kelas_id', $kelasId)->paginate($perPage);
         return view('siswa.laporan.lap_tabungan', compact('user'));
     }
+
+    /**
+    * Menampilkan Data Laporan Transaksi oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_siswa_transaksi(Request $request){
         $tipeTransaksi = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
@@ -378,7 +476,7 @@ class LaporanController extends Controller
 
         $transaksi = Transaksi::with(['user.kelas'])
             ->whereHas('user', function ($query) {
-                $query->where('id', auth()->id());  // Filter data berdasarkan user yang login
+                $query->where('id', auth()->id());
             })
             ->when($tipeTransaksi, function ($query) use ($tipeTransaksi) {
                 $query->where('tipe_transaksi', $tipeTransaksi);
@@ -394,6 +492,13 @@ class LaporanController extends Controller
 
         return view('siswa.laporan.lap_transaksi', compact('transaksi'));
     }
+
+    /**
+    * Menampilkan Data Laporan Pengajuan oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function lap_siswa_pengajuan(Request $request){
         $status = $request->input('status');
@@ -420,6 +525,14 @@ class LaporanController extends Controller
 
         return view('siswa.laporan.lap_pengajuan', compact('pengajuan'));
     }
+
+    /**
+    * Menampilkan Halaman Export Laporan Transaksi, Tabungan, dan Pengajuan oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function lap_siswa_export(Request $request)
     {
         $siswas = auth()->user();

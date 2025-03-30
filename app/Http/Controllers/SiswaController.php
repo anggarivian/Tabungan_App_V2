@@ -17,6 +17,7 @@ class SiswaController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
+
     public function index(Request $request){
         $kelas = Kelas::all();
         $perPage = request('perPage', 10);
@@ -49,6 +50,7 @@ class SiswaController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function add(Request $request)
     {
         $validatedData = $request->validate([
@@ -116,6 +118,7 @@ class SiswaController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function getSiswaData($id)
     {
         $siswa = User::findOrFail($id);
@@ -128,6 +131,7 @@ class SiswaController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function edit(Request $request)
     {
         $validatedData = $request->validate([
@@ -160,7 +164,7 @@ class SiswaController extends Controller
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
 
-        $kelasMap = [1, 2, 3, 4, 5, 6]; // Hanya angka
+        $kelasMap = [1, 2, 3, 4, 5, 6];
 
         $existingUser = User::where('username', 'like', $kelasMap[$request->kelas - 1] . '%')
             ->orderBy('username', 'desc')
@@ -184,6 +188,7 @@ class SiswaController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function delete($id)
     {
         $siswa = User::findOrFail($id);

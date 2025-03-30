@@ -16,6 +16,12 @@ class DashboardController extends Controller
 {
 
     // Kepsek Dasboard -----------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Role Kepala Sekolah.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function kepsek(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
@@ -67,6 +73,12 @@ class DashboardController extends Controller
     }
 
     // Bendahara Dasboard -----------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Role Bendahara.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
@@ -117,6 +129,12 @@ class DashboardController extends Controller
     }
 
     // Walikelas Dasboard -----------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Role Walikelas.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas(){
         $kelas_id = auth()->user()->kelas_id;
 
@@ -235,6 +253,12 @@ class DashboardController extends Controller
     }
 
     // Siswa Dasboard -----------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Role Siswa.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function siswa(){
         $userId = Auth::id();
 

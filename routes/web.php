@@ -131,12 +131,16 @@ Route::middleware(['auth'])->group(function () {
         // Menampilkan dashboard untuk Siswa.
         Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('siswa.dashboard');
 
-        // Menangani pengelolaan Tabungan.
+        // Menangani siswa stor tabungan Digital.
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
+        Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
 
+        // Menangani pengajuan penarikan tabungan Tunai / Digital.
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
         Route::post('/siswa/tabungan/tarik/ajukan', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
 
+        // Menangani pengambilan data Bank dan E - Wallet.
+        Route::get('/payout-channels', [PengajuanController::class, 'getPayoutChannels'])->name('payout.channels');
 
         // Menangani pengelolaan Laporan.
         Route::get('/siswa/laporan/tabungan', [LaporanController::class, 'lap_siswa_tabungan'])->name('laporan.siswa.tabungan');
@@ -149,20 +153,13 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
-Route::get('/payout-channels', [PengajuanController::class, 'getPayoutChannels'])->name('payout.channels');
+// Menangani webhook dari Xendit dan CreateInvoice.
 Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
 
+// Menangani webhook dari Xendit dan CreatePayout.
+Route::post('/webhook/payout', [PengajuanController::class, 'handlePayoutWebhook']);
+
+// Menangani halaman offline untuk aplikasi PWA.
 route::get('/offline', function () {
     return view('modules/laravelpwa/offline');
 });
-
-Route::get('/clear-cache', function() {
-    \Artisan::call('cache:clear');
-    \Artisan::call('config:clear');
-    \Artisan::call('route:clear');
-    \Artisan::call('view:clear');
-    \Artisan::call('optimize:clear');
-    return 'Cache Cleared!';
-});
-

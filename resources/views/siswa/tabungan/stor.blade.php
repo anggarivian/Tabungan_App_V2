@@ -27,10 +27,8 @@
         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    {{-- <div class="container "> --}}
                         <h5>Informasi Penting</h5>
                         <p>Penabung dapat melakukan stor secara mandiri menggunakan fitur QRIS, transfer bank dan e-wallet, perhatikan bahwa terdapat potongan atau penambahan jumlah transaksi (biaya admin) tergantung dari fitur apa yang digunakan</p>
-                    {{-- </div> --}}
                 </div>
             </div>
         </div>
@@ -122,19 +120,6 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="pembayaran">Metode Pembayaran</label>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <select class="form-control" id="pembayaran" name="pembayaran">
-                                        <option value="Tunai" selected>Tunai</option>
-                                        <option value="Digital">Digital</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>

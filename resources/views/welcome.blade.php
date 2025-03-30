@@ -15,15 +15,15 @@
         <!-- Bootstrap icons-->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{{ asset ('css/styles.css')}}" rel="stylesheet" />
+        <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
     </head>
     <body class="d-flex flex-column h-100">
         <main class="flex-shrink-0">
             <!-- Navigation-->
             <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
                 <div class="container px-5">
-                    <a class="navbar-brand" href="index.html">
-                        <img src="{{ asset ('/dist/assets/compiled/svg/Logo Dark.svg')}}" alt="Logo" height="40px" width="180px">
+                    <a class="navbar-brand" href="/">
+                        <img src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" alt="Logo" height="40" width="180">
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -32,12 +32,12 @@
                             <li class="nav-item"><a class="nav-link" href="/">Informasi</a></li>
                             <li class="nav-item" style="margin-left: 10px">
                                 @if (Route::has('login'))
-                                    <div class="hidden fixed sm:block">
+                                    <div class="sm:block">
                                         @auth
                                             @switch(auth()->user()->roles_id)
                                                 @case(1)
                                                     <a href="{{ route('kepsek.dashboard') }}" class="btn btn-dark">Dashboard</a>
-                                                @break
+                                                    @break
                                                 @case(2)
                                                     <a href="{{ route('bendahara.dashboard') }}" class="btn btn-dark">Dashboard</a>
                                                     @break
@@ -52,10 +52,6 @@
                                             @endswitch
                                         @else
                                             <a href="{{ route('login') }}" class="btn btn-primary">Log in</a>
-
-                                            {{-- @if (Route::has('register'))
-                                            <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                                        @endif --}}
                                         @endauth
                                     </div>
                                 @endif
@@ -76,12 +72,12 @@
                                 <h1 class="display-3 fw-bolder mb-5"><span class="text-gradient d-inline">Sistem Informasi Tabungan Siswa</span></h1>
                                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xxl-start mb-3">
                                     @if (Route::has('login'))
-                                        <div class="hidden fixed sm:block">
+                                        <div class="sm:block">
                                             @auth
                                                 @switch(auth()->user()->roles_id)
                                                     @case(1)
                                                         <a href="{{ route('kepsek.dashboard') }}" class="btn btn-dark btn-lg px-5 py-3 me-sm-3 fs-6 fw-bolder">Dashboard</a>
-                                                    @break
+                                                        @break
                                                     @case(2)
                                                         <a href="{{ route('bendahara.dashboard') }}" class="btn btn-dark btn-lg px-5 py-3 me-sm-3 fs-6 fw-bolder">Dashboard</a>
                                                         @break
@@ -96,10 +92,6 @@
                                                 @endswitch
                                             @else
                                                 <a class="btn btn-primary btn-lg px-5 py-3 me-sm-3 fs-6 fw-bolder" href="{{ route('login') }}">Log in</a>
-
-                                                {{-- @if (Route::has('register'))
-                                                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                                                @endif --}}
                                             @endauth
                                         </div>
                                     @endif
@@ -111,7 +103,7 @@
                             <div class="d-flex justify-content-center mt-5 mt-xxl-0">
                                 <div class="profile bg-gradient-primary-to-secondary">
                                     <div class="mt-5">
-                                        <img class="profile-img p-5" src="{{ asset ('/asset/profile2.png')}}" alt="Logo">
+                                        <img class="profile-img p-5" src="{{ asset('/asset/profile2.png') }}" alt="Profile">
                                     </div>
                                 </div>
                             </div>
@@ -145,8 +137,7 @@
                 <div class="row align-items-center justify-content-between flex-column flex-sm-row">
                     <div class="col-auto"><div class="small m-0">Copyright &copy; SDN Sukarame 2024</div></div>
                     <div class="col-auto">
-                        <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
-                            href="https://github.com/anggarivian">Angga</a></p>
+                        <p class="m-0">Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a href="https://github.com/anggarivian">Angga</a></p>
                     </div>
                 </div>
             </div>
@@ -154,6 +145,6 @@
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
-        <script src="{{ asset ('js/scripts.js')}}"></script>
+        <script src="{{ asset('js/scripts.js') }}"></script>
     </body>
 </html>

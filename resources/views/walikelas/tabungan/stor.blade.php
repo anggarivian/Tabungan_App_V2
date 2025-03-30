@@ -197,14 +197,12 @@
         });
     });
 
-    // Fungsi untuk format angka
     function formatNumber(number) {
         return new Intl.NumberFormat('id-ID', {
             style: 'decimal',
             maximumFractionDigits: 0
         }).format(number);
     }
-
 
     $('#username').on('change', function() {
         $('#username2').val($(this).val());
@@ -213,11 +211,7 @@
     $(document).ready(function(){
         setTimeout(function(){
             $('#username').focus();
-        }, 500);  // menunda fokus selama 500ms
+        }, 500);
     });
-
-
 </script>
-
-
 @endsection

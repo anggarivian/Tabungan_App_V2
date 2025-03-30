@@ -25,7 +25,6 @@
 <div class="page-content">
     <div class="card">
         <div class="card-body">
-            <!-- Tabs Navigation -->
             <ul class="nav nav-tabs" id="tabunganTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="buku-tab" data-bs-toggle="tab" data-bs-target="#bukuTabungan" type="button" role="tab" aria-controls="bukuTabungan" aria-selected="true">Buku Tabungan</button>
@@ -36,7 +35,6 @@
             </ul>
 
             <div class="tab-content mt-3" id="tabunganTabsContent">
-                <!-- Buku Tabungan -->
                 <div class="tab-pane fade show active" id="bukuTabungan" role="tabpanel" aria-labelledby="buku-tab">
                     <div class="table-responsive">
                         <table class="table table-hover" style="width: 100%">
@@ -80,7 +78,6 @@
                         </table>
                     </div>
                 </div>
-                <!-- Data Awal -->
                 <div class="tab-pane fade" id="dataTabungan" role="tabpanel" aria-labelledby="data-tab">
                     <div class="card-body pb-1 pt-3">
                         {{-- <form action="/siswa/laporan/transaksi" method="GET">

@@ -41,7 +41,7 @@
                         @endif
                         @if(session()->has('logoutSuccess'))
                             <script>
-                                localStorage.removeItem("pwaPopupShown"); // Reset agar popup muncul lagi setelah login
+                                localStorage.removeItem("pwaPopupShown");
                             </script>
                             <div class="alert alert-success" role="alert">
                                 <i class="bi bi-check-circle"></i>
@@ -51,7 +51,7 @@
                         <form action="/login" method="POST">
                             @csrf
                             <div class="form-group position-relative has-icon-left mb-2">
-                                <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username" autofocus required>
+                                <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username / ID Tabungan" autofocus required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-person" style="margin-left: 5px"></i>
                                 </div>

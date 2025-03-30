@@ -345,6 +345,5 @@
         $('#deleteForm').attr('action', '/bendahara/kelola-walikelas/hapus/' + id);
         $('#deleteModal').modal('show');
     }
-
 </script>
 @endsection

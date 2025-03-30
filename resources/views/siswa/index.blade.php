@@ -100,10 +100,9 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
-    const chartDataFrekuensi = @json($chart_frekuensi); // Data untuk grafik pertama
-    const chartDataTotal = @json($chart_total); // Data untuk grafik kedua
+    const chartDataFrekuensi = @json($chart_frekuensi);
+    const chartDataTotal = @json($chart_total);
 
-    // Grafik untuk frekuensi
     var optionsFrekuensi = {
         series: [{
             name: 'Data Frekuensi',
@@ -155,7 +154,7 @@
         xaxis: {
             type: 'datetime',
             labels: {
-                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+                format: 'dd MMM yyyy'
             }
         },
         tooltip: {
@@ -171,7 +170,6 @@
     var chartFrekuensi = new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi);
     chartFrekuensi.render();
 
-    // Grafik untuk total
     var optionsTotal = {
         series: [{
             name: 'Data Total',
@@ -223,7 +221,7 @@
         xaxis: {
             type: 'datetime',
             labels: {
-                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+                format: 'dd MMM yyyy'
             }
         },
         tooltip: {

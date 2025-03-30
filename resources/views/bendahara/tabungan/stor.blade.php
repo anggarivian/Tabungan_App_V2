@@ -201,11 +201,7 @@
     $(document).ready(function(){
         setTimeout(function(){
             $('#username').focus();
-        }, 500);  // menunda fokus selama 500ms
+        }, 500);
     });
-
-
 </script>
-
-
 @endsection

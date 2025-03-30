@@ -24,14 +24,23 @@ use Xendit\Invoice\CreateInvoiceRequest;
 
 class TabunganController extends Controller
 {
+    /**
+    * Konstruktor untuk menginisialisasi konfigurasi API Xendit.
+    */
     private $invoiceClient;
 
     public function __construct()
     {
         Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
-        // $this->invoiceClient = new InvoiceApi();
     }
+
     // Bendahara ------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Tabungan oleh Bendahara.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_index()
     {
         $perPage = request('perPage', 10);
@@ -86,10 +95,23 @@ class TabunganController extends Controller
         return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas1','kelas2','kelas3','kelas4','kelas5','kelas6'));
     }
 
+    /**
+    * Menampilkan Dashboard Stor Tabungan oleh Bendahara.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_stor()
     {
         return view('bendahara.tabungan.stor');
     }
+
+    /**
+    * Menampilkan Dashboard Stor Tabungan Massal / Per Kelas oleh Bendahara.
+    *
+    * @param $id ID Kelas
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function bendahara_storMasal($id)
     {
@@ -108,10 +130,23 @@ class TabunganController extends Controller
         return view('bendahara.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
     }
 
+    /**
+    * Menampilkan Dashboard Tarik Tabungan oleh Bendahara.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_tarik()
     {
         return view('bendahara.tabungan.tarik');
     }
+
+    /**
+    * Mencari data tabungan siswa berdasarkan username yang diberikan.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\JsonResponse
+    */
 
     public function bendahara_search(Request $request)
     {
@@ -138,6 +173,13 @@ class TabunganController extends Controller
             ]);
         }
     }
+
+    /**
+    * Menyimpan stor tabungan siswa oleh Bendahara.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function bendahara_storTabungan(Request $request)
     {
@@ -184,6 +226,13 @@ class TabunganController extends Controller
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
     }
 
+    /**
+    * Menyimpan stor tabungan siswa secara masal / perkelas oleh Bendahara.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_storMasalTabungan(Request $request)
     {
         foreach ($request->input('input') as $data) {
@@ -224,6 +273,13 @@ class TabunganController extends Controller
 
         return redirect()->back()->with('success', 'Data stor tabungan berhasil disimpan.')->with('alert-type', 'success')->with('alert-message', 'Data stor tabungan berhasil disimpan.')->with('alert-duration', 3000);
     }
+
+    /**
+    * Menyimpan tarik tabungan siswa oleh Bendahara.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function bendahara_tarikTabungan(Request $request)
     {
@@ -276,6 +332,12 @@ class TabunganController extends Controller
 
 
     // Walikelas ------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Tabungan oleh Walikelas.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas_index()
     {
         $kelas_id = Auth::user()->kelas_id;
@@ -333,10 +395,22 @@ class TabunganController extends Controller
         return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas'));
     }
 
+    /**
+    * Menampilkan Dashboard Stor Tabungan oleh Walikelas.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas_stor()
     {
         return view('walikelas.tabungan.stor');
     }
+
+    /**
+    * Menampilkan Dashboard Stor Tabungan Masal / Perkelas oleh Walikelas.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function walikelas_storMasal()
     {
@@ -353,6 +427,13 @@ class TabunganController extends Controller
 
         return view('walikelas.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
     }
+
+    /**
+    * Mencari data tabungan siswa berdasarkan username yang diberikan.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\JsonResponse
+    */
 
     public function walikelas_search(Request $request)
     {
@@ -379,6 +460,13 @@ class TabunganController extends Controller
             ]);
         }
     }
+
+    /**
+    * Menyimpan stor tabungan siswa oleh Walikelas.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function walikelas_storTabungan(Request $request)
     {
@@ -425,6 +513,13 @@ class TabunganController extends Controller
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
     }
 
+    /**
+    * Menyimpan stor tabungan siswa secara masal / perkelas oleh Walikelas.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas_storMasalTabungan(Request $request)
     {
         foreach ($request->input('input') as $data) {
@@ -467,12 +562,24 @@ class TabunganController extends Controller
     }
 
     // Siswa ------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
+    * Menampilkan Dashboard Stor Tabungan oleh Siswa.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function siswa_stor()
     {
         $nominal = auth()->user()->tabungan->saldo ;
         $terbilang = RupiahHelper::terbilangRupiah($nominal);
         return view('siswa.tabungan.stor', compact('nominal', 'terbilang'));
     }
+
+    /**
+    * Menampilkan Dashboard Tarik Tabungan oleh Siswa.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
 
     public function siswa_tarik()
     {
@@ -481,32 +588,34 @@ class TabunganController extends Controller
         return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
     }
 
-    // Siswa Stor Xendit -----------------------------------------------------------------------------
+    /**
+    * Menangani Pengajuan Penarikan Tabungan Siswa oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function createInvoice(Request $request)
     {
         $user = Auth::user();
         $jumlahStor = $request->jumlah_stor;
 
-        // Inisialisasi Xendit
         Configuration::setXenditKey(config('xendit.api_key'));
         $apiInstance = new InvoiceApi();
 
-        // Generate External ID unik untuk transaksi
         $externalId = 'stor-' . $user->id . '-' . time();
 
-        // Buat invoice dengan Xendit
         $invoiceRequest = new CreateInvoiceRequest([
             'external_id' => $externalId,
             'payer_email' => $user->email,
             'description' => 'Stor Tabungan untuk ' . $user->name,
             'amount' => (int) $jumlahStor,
-            'invoice_duration' => 86400, // Berlaku 24 jam
+            'invoice_duration' => 86400,
         ]);
 
         try {
             $invoice = $apiInstance->createInvoice($invoiceRequest);
 
-            // Simpan transaksi ke database
             $transaksi = new Transaksi();
             $transaksi->jumlah_transaksi = $jumlahStor;
             $transaksi->saldo_awal = $user->tabungan->saldo;
@@ -529,6 +638,13 @@ class TabunganController extends Controller
         }
     }
 
+    /**
+    * Menangani webhook dari Xendit untuk paument yang berhasil.
+    *
+    * @param Request $request Data yang dikirimkan oleh Xendit melalui webhook.
+    * @return \Illuminate\Http\JsonResponse Respon JSON dengan status sukses atau error.
+    */
+
     public function handleWebhook(Request $request)
     {
         $data = $request->all();
@@ -548,11 +664,9 @@ class TabunganController extends Controller
         }
 
         if ($data['status'] === 'PAID') {
-            // Update transaksi
             $transaksi->status = 'success';
             $transaksi->save();
 
-            // Update saldo tabungan
             $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
             if ($tabungan) {
                 $tabungan->saldo = $transaksi->saldo_akhir;
@@ -567,5 +681,4 @@ class TabunganController extends Controller
 
         return response()->json(['message' => 'Success']);
     }
-
 }

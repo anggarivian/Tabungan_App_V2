@@ -136,7 +136,7 @@
     </div>
 </div>
 
-{{-- Modal Edit --}}
+{{-- Modal --}}
 <div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -242,6 +242,5 @@
         $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
         $('#deleteModal').modal('show');
     }
-
 </script>
 @endsection

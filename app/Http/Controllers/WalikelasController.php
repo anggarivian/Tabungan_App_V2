@@ -14,6 +14,7 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
+
     public function index(Request $request){
         $kelas = Kelas::all();
         $perPage = request('perPage', 10);
@@ -46,6 +47,7 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function add(Request $request)
     {
         $validatedData = $request->validate([
@@ -92,6 +94,7 @@ class WalikelasController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function getWalikelasData($id)
     {
         $walikelas = User::findOrFail($id);
@@ -104,6 +107,7 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function edit(Request $request)
     {
         $validatedData = $request->validate([
@@ -149,6 +153,7 @@ class WalikelasController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
+
     public function delete($id)
     {
         $walikelas = User::findOrFail($id);

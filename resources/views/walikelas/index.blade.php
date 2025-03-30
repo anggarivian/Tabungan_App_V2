@@ -10,7 +10,6 @@
     <section class="row">
         <div class="col-12 col-lg-12">
             <div class="row">
-                <!-- Row pertama -->
                 <div class="col-6 col-lg-4 col-md-6">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
@@ -64,7 +63,6 @@
                 </div>
             </div>
             <div class="row">
-                <!-- Row kedua -->
                 <div class="col-6 col-lg-6 col-md-6">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
@@ -121,10 +119,9 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
-    const chartDataFrekuensi = @json($chart_frekuensi); // Data untuk grafik pertama
-    const chartDataTotal = @json($chart_total); // Data untuk grafik kedua
+    const chartDataFrekuensi = @json($chart_frekuensi);
+    const chartDataTotal = @json($chart_total);
 
-    // Grafik untuk frekuensi
     var optionsFrekuensi = {
         series: [{
             name: 'Data Frekuensi',
@@ -176,7 +173,7 @@
         xaxis: {
             type: 'datetime',
             labels: {
-                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+                format: 'dd MMM yyyy'
             }
         },
         tooltip: {
@@ -192,7 +189,6 @@
     var chartFrekuensi = new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi);
     chartFrekuensi.render();
 
-    // Grafik untuk total
     var optionsTotal = {
         series: [{
             name: 'Data Total',
@@ -244,7 +240,7 @@
         xaxis: {
             type: 'datetime',
             labels: {
-                format: 'dd MMM yyyy' // Format tanggal pada sumbu X
+                format: 'dd MMM yyyy'
             }
         },
         tooltip: {
@@ -259,5 +255,5 @@
 
     var chartTotal = new ApexCharts(document.querySelector("#total"), optionsTotal);
     chartTotal.render();
-    </script>
+</script>
 @endsection

@@ -42,9 +42,7 @@ class LoginController extends Controller
         if (Auth::attempt($validatedData)) {
             $request->session()->regenerate();
 
-            // Cek password pengguna setelah login
             if ($validatedData['password'] === '12345') {
-                // Arahkan ke halaman ganti password
                 return redirect('/change-password');
             }
 

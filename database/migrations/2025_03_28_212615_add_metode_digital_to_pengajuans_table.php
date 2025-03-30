@@ -23,6 +23,7 @@ class AddMetodeDigitalToPengajuansTable extends Migration
 
             // Kolom untuk Xendit Payout
             $table->string('xendit_payout_id')->nullable()->after('ewallet_number');
+            $table->string('reference_id')->nullable()->after('xendit_payout_id');
         });
     }
 
@@ -40,7 +41,8 @@ class AddMetodeDigitalToPengajuansTable extends Migration
                 'nomor_rekening',
                 'ewallet_type',
                 'ewallet_number',
-                'xendit_payout_id'
+                'xendit_payout_id',
+                'reference_id'
             ]);
         });
     }

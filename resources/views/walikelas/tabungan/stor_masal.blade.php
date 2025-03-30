@@ -181,41 +181,32 @@
             if (firstStorInput) {
                 firstStorInput.focus();
             }
-        }, 1000); // Delay 100ms untuk memastikan elemen sepenuhnya dimuat
+        }, 1000);
     });
 
-    // Fungsi untuk menghapus pemisah ribuan dan mengembalikan angka
     function removeThousandsSeparator(value) {
-        return value.replace(/[^0-9.-]+/g, ''); // Menghapus semua karakter selain angka dan tanda minus
+        return value.replace(/[^0-9.-]+/g, '');
     }
 
-    // Fungsi untuk memperbarui perhitungan
     function updateCalculation(inputElement) {
         let totalStor = 0;
         let filledCount = 0;
-        const numberFormat = new Intl.NumberFormat(); // Format angka dengan pemisah ribuan
+        const numberFormat = new Intl.NumberFormat();
 
-        // Ambil semua input dengan id yang diawali 'stor_'
         document.querySelectorAll('input[id^="stor_"]').forEach(function(input) {
-            let value = removeThousandsSeparator(input.value); // Menghapus pemisah ribuan
-            value = parseFloat(value) || 0; // Jika tidak ada angka, anggap 0
+            let value = removeThousandsSeparator(input.value);
+            value = parseFloat(value) || 0;
             if (value > 0) {
-                filledCount++; // Hitung input yang diisi
+                filledCount++;
             }
             totalStor += value;
         });
 
-        // Update tampilan total stor dengan format angka
         document.getElementById('total-stor').textContent = numberFormat.format(totalStor);
 
-        // Update jumlah data yang diisi
         document.getElementById('filled-count').textContent = filledCount;
 
-        // Setelah input selesai, tambahkan pemisah ribuan
         inputElement.value = numberFormat.format(removeThousandsSeparator(inputElement.value));
     }
-
 </script>
-
-
 @endsection

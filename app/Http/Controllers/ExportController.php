@@ -17,6 +17,13 @@ use App\Exports\TransaksiExport;
 class ExportController extends Controller
 {
     // Export Kepsek --------------------------------------------------------------------------------------------------
+    /**
+    * Menangani Export Data Tabungan oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function kepsek_exportTabungan(Request $request)
     {
         $validated = $request->validate([
@@ -25,7 +32,7 @@ class ExportController extends Controller
             'siswa_id' => 'nullable|exists:users,id',
             'kelas_id' => 'nullable|exists:kelas,id',
         ]);
-        // dd($validated);
+
         $exportType = $validated['export_type'];
         $exportOption = $validated['export_option'];
         $siswaId = $validated['siswa_id'];
@@ -44,7 +51,6 @@ class ExportController extends Controller
 
         $siswas = $query->get();
         $user = User::find($siswaId);
-        // dd($siswas);
 
         $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
@@ -74,6 +80,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Transaksi oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function kepsek_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
@@ -145,6 +159,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Pengajuan oleh Kepala Sekolah.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function kepsek_exportPengajuan(Request $request)
     {
         $validated = $request->validate([
@@ -218,6 +240,13 @@ class ExportController extends Controller
     }
 
     // Export Bendahara -----------------------------------------------------------------------------------------------
+    /**
+    * Menangani Export Data Tabungan oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_exportTabungan(Request $request)
     {
         $validated = $request->validate([
@@ -245,7 +274,6 @@ class ExportController extends Controller
 
         $siswas = $query->get();
         $user = User::find($siswaId);
-        // dd($siswas);
 
         $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
@@ -275,6 +303,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Transaksi oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
@@ -346,6 +382,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Pengajuan oleh Bendahara.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function bendahara_exportPengajuan(Request $request)
     {
         $validated = $request->validate([
@@ -419,6 +463,13 @@ class ExportController extends Controller
     }
 
     // Export Walikelas -----------------------------------------------------------------------------------------------
+    /**
+    * Menangani Export Data Tabungan oleh Walikelas.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas_exportTabungan(Request $request)
     {
         $validated = $request->validate([
@@ -473,6 +524,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Transaksi oleh Walikelas.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function walikelas_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
@@ -544,6 +603,13 @@ class ExportController extends Controller
     }
 
     // Export Siswa -----------------------------------------------------------------------------------------------
+    /**
+    * Menangani Export Data Tabungan oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function siswa_exportTabungan(Request $request)
     {
         $validated = $request->validate([
@@ -587,6 +653,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Transaksi oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function siswa_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
@@ -648,6 +722,14 @@ class ExportController extends Controller
 
         return back()->with('error', 'Invalid export type');
     }
+
+    /**
+    * Menangani Export Data Pengajuan oleh Siswa.
+    *
+    * @param Request $request
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
     public function siswa_exportPengajuan(Request $request)
     {
         $validated = $request->validate([

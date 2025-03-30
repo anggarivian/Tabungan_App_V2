@@ -89,7 +89,6 @@
 
         </div>
 
-        {{-- Table Tabungan --}}
         <div class="card-body pb-1 pt-3">
             <div class="table-responsive">
                 <table class="table table-hover" style="width: 100%">

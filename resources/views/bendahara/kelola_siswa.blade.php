@@ -377,6 +377,5 @@
         $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
         $('#deleteModal').modal('show');
     }
-
 </script>
 @endsection

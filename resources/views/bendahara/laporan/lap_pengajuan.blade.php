@@ -123,7 +123,7 @@
                                     @elseif ($pengajuans->status == 'Tolak')
                                         <span class="badge bg-danger">Tolak</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
-                                    @elseif ($pengajuans->status == 'Terima')
+                                    @elseif ($pengajuans->status == 'Terima' || $pengajuans->status == 'SUCCEEDED')
                                         <span class="badge bg-success">Terima</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @else
