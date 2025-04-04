@@ -27,7 +27,8 @@
     },
     "autoload": {
         "files": [
-            "app/Helpers/RupiahHelper.php"
+            "app/Helpers/RupiahHelper.php",
+            "app/Helpers/Paralax.php"
         ],
         "psr-4": {
             "App\\": "app/",

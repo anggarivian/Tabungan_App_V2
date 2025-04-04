@@ -11,77 +11,331 @@
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/iconly.css') }}">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-300-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-800-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <style>
+        :root {
+            --primary-color: #485cbc;
+            --light-bg: #f8faff;
+            --shadow-color: rgba(72, 92, 188, 0.2);
+            --text-color: #333;
+        }
+
+        body {
+            user-select: none;
+            overflow-y: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-color);
+            background-image: linear-gradient(135deg, #485cbc 0%, #3a4ba3 100%);
+            height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .screen-1 {
+            background: var(--light-bg);
+            padding: 35px 30px 30px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 330px;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 120px;
+            height: auto;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .email, .password {
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border: 1px solid #e1e5f2;
+        }
+
+        .email:focus-within, .password:focus-within {
+            box-shadow: 0 4px 12px rgba(72, 92, 188, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #485cbc;
+            margin-bottom: 6px;
+        }
+
+        .sec-2 {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        ion-icon {
+            color: var(--primary-color);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .email input, .password input {
+            outline: none;
+            border: none;
+            width: 100%;
+            font-size: 0.95rem;
+            padding: 6px 0;
+            color: #333;
+        }
+
+        .email input::placeholder, .password input::placeholder {
+            color: #aab;
+            font-size: 0.9rem;
+        }
+
+        .show-hide {
+            position: absolute;
+            right: 5px;
+            cursor: pointer;
+            margin-right: 0;
+        }
+
+        .login {
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(72, 92, 188, 0.3);
+        }
+
+        .login:hover {
+            background: #3a4ba3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 92, 188, 0.4);
+        }
+
+        .login:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            display: flex;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            justify-content: space-between;
+            padding-top: 20px;
+            margin-top: 10px;
+            border-top: 1px solid #e1e5f2;
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            background-color: #fff2f2;
+            color: #d32f2f;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .alert-success {
+            background-color: #f0fff0;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .text-danger {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding-left: 30px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .remember-me label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(72, 92, 188, 0.1);
+            color: var(--primary-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .back-button:hover {
+            background: rgba(72, 92, 188, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .back-button ion-icon {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+    </style>
 </head>
-
 <body>
-    <script src="{{ asset('/dist/assets/static/js/initTheme.js') }}"></script>
-    <div id="auth">
-        <div class="row h-100">
-            <div class="col-lg-5 d-none d-lg-block">
-                <div id="auth-right">
+    <div class="screen-1">
+        <button class="back-button" onclick="goBack()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
 
-                </div>
-            </div>
-            <div class="col-lg-7 col-12">
-                <div id="auth-left">
-                    <div class="p-1">
-                        <div class="auth-logo mb-5">
-                            <a href="/">
-                                <i class="bi bi-arrow-left"></i>
-                            </a>
-                        </div>
-                        <h1 class="auth-title" style="font-size: 47px">Log in.</h1>
-                        <p class="auth-subtitle mb-3" style="font-size: 24px">Log in dengan akun anda.</p>
-
-                        @if(session()->has('LoginError'))
-                            <div class="alert alert-danger" role="alert">
-                                <i class="bi bi-file-excel"></i>
-                                {{ session('LoginError') }}
-                            </div>
-                        @endif
-                        @if(session()->has('logoutSuccess'))
-                            <script>
-                                localStorage.removeItem("pwaPopupShown");
-                            </script>
-                            <div class="alert alert-success" role="alert">
-                                <i class="bi bi-check-circle"></i>
-                                <span>Berhasil Logout !</span>
-                            </div>
-                        @endif
-                        <form action="/login" method="POST">
-                            @csrf
-                            <div class="form-group position-relative has-icon-left mb-2">
-                                <input type="text" class="form-control form-control-xl @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" placeholder="Username / ID Tabungan" autofocus required>
-                                <div class="form-control-icon">
-                                    <i class="bi bi-person" style="margin-left: 5px"></i>
-                                </div>
-                                @error('username')
-                                    <div class="invalid-feedback">
-                                        {{$message}}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="form-group position-relative has-icon-left mb-2">
-                                <input type="password" class="form-control form-control-xl" name="password" placeholder="Password" required>
-                                <div class="form-control-icon">
-                                    <i class="bi bi-shield-lock" style="margin-left: 5px"></i>
-                                </div>
-                                @error('password')
-                                    <div class="invalid-feedback">
-                                        {{$message}}
-                                    </div>
-                                @enderror
-                            </div>
-                            <button class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Log in</button>
-                        </form>
-                        <div class="text-center mt-5 text-lg fs-4">
-                            <h6 class="fst-italic fw-lighter">Jika Lupa Password Silahkan ke Bendahara</h6>
-                        </div>
-                    </div>
-                </div>
+        <div class="logo-container">
+            <div class="logo">
+                <img src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" alt="Logo">
             </div>
         </div>
-    </div>
-</body>
 
+        <h3 class="form-title">Selamat Datang</h3>
+
+        <p style="text-align: center;">Silahkan login dengan akun anda.</p>
+
+        @if(session()->has('LoginError'))
+            <div class="alert alert-danger">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span style="margin-left: 8px;">{{ session('LoginError') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('logoutSuccess'))
+            <script>
+                localStorage.removeItem("pwaPopupShown");
+            </script>
+            <div class="alert alert-success">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <span style="margin-left: 8px;">Berhasil Logout!</span>
+            </div>
+        @endif
+
+        <form action="/login" method="POST">
+            @csrf
+            <div class="form-group">
+                <div class="email">
+                    <label for="username">Username / ID Tabungan</label>
+                    <div class="sec-2">
+                        <ion-icon name="person-outline"></ion-icon>
+                        <input type="text" name="username" id="username" placeholder="Masukkan username atau ID" value="{{ old('username') }}" required autofocus>
+                    </div>
+                </div>
+                @error('username')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <div class="password">
+                    <label for="password">Password</label>
+                    <div class="sec-2">
+                        <ion-icon name="lock-closed-outline"></ion-icon>
+                        <input class="pas" type="password" name="password" id="password" placeholder="••••••••" required>
+                        <ion-icon class="show-hide" name="eye-outline" onclick="togglePassword()"></ion-icon>
+                    </div>
+                </div>
+                @error('password')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="remember-me">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Ingat saya</label>
+            </div>
+
+            <button class="login">Masuk</button>
+        </form>
+
+        <div class="footer">
+            Lupa Password? Segera Hubungi Bendahara.
+        </div>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.querySelector('.pas');
+            const passwordIcon = document.querySelector('.show-hide');
+
+            if (passwordInput.getAttribute('type') === 'password') {
+                passwordInput.setAttribute('type', 'text');
+                passwordIcon.setAttribute('name', 'eye-off-outline');
+            } else {
+                passwordInput.setAttribute('type', 'password');
+                passwordIcon.setAttribute('name', 'eye-outline');
+            }
+        }
+
+        function goBack() {
+            // You can replace this with your specific navigation logic
+            window.history.back();
+            // Alternative: window.location.href = '/your-previous-page';
+        }
+    </script>
+</body>
 </html>

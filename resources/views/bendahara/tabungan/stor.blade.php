@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="col-md-8 mb-1">
                                     <div class="input-group mb-3">
-                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan">
+                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan"autocomplete="off">
                                         <button class="btn btn-primary" type="submit">Cari</button>
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" >
+                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
