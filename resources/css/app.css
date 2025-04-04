@@ -24,3 +24,44 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('/dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') format('woff2'),
+         url('/dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('/dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') format('woff2'),
+         url('/dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('/dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') format('woff2'),
+         url('/dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('{{ asset("dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2") }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+

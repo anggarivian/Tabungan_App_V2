@@ -25,12 +25,23 @@
 <div class="page-content">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="card mb-3">
-                <div class="card-body">
-                        <h5>Informasi Penting</h5>
-                        <p>Penabung dapat melakukan pengajuaan penarikan tabungan ke bendahara</p>
-                        <p>- Tunai untuk pengambilan uang cash langsung ke sekolah</p>
-                        <p>- Digital untuk pengambilan yang langsung di transfer ke wallet yang anda pilih</p>
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-primary">
+                        Informasi Penting
+                    </h5>
+                    <p class="mb-2">Penabung dapat mengajukan penarikan tabungan melalui bendahara dengan dua metode:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0">
+                            <i class="bi bi-cash-coin text-success"></i> <strong>Tunai</strong> Pengambilan uang langsung di sekolah.
+                        </li>
+                        <li class="list-group-item border-0">
+                            <i class="bi bi-wallet2 text-info"></i> <strong>Digital</strong> Dana ditransfer langsung ke e-wallet/bank yang Anda pilih.
+                        </li>
+                    </ul>
+                    <p class="mt-3 text-muted">
+                        * Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi yang berbeda.
+                    </p>
                 </div>
             </div>
         </div>
@@ -68,86 +79,193 @@
                     @endphp
 
                     @if($pengajuan && $pengajuan->status == 'Pending')
-                        <div class="container">
-                            <p class="mt-2">Pengajuan kamu sedang diproses oleh bendahara !!!</p>
-                        </div>
+                        <h5 class="fw-bold mb-3 text-primary">Menunggu Proses Bendahara</h5>
+                        <p>Detail Pengajuan Penarikan Tabungan :</p>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>ID Tabungan</th>
+                                <td>{{ $pengajuan->tabungan_id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Jumlah Penarikan</th>
+                                <td>Rp{{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Pembayaran</th>
+                                <td>{{ $pengajuan->pembayaran }}</td>
+                            </tr>
+                            <tr>
+                                <th>Metode Digital</th>
+                                <td>{{ $pengajuan->metode_digital }}</td>
+                            </tr>
+                            <tr>
+                                <th>E-Wallet</th>
+                                <td>{{ $pengajuan->ewallet_type }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nomor E-Wallet</th>
+                                <td>{{ $pengajuan->ewallet_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Alasan</th>
+                                <td>{{ $pengajuan->alasan }}</td>
+                            </tr>
+                            <tr>
+                                <th>Dibuat Pada</th>
+                                <td>{{ \Carbon\Carbon::parse($pengajuan->created_at)->format('d M Y H:i') }}</td>
+                            </tr>
+                        </table>
                     @else
                         <form action="{{ route('siswa.tabungan.ajukan') }}" method="POST">
                             @csrf
-                            <div class="form-group mb-3">
-                                <label for="id">ID Tabungan</label>
-                                <input type="text" class="form-control" id="id" name="id" value="{{ auth()->user()->username }}" readonly>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="nama">Nama</label>
-                                <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" readonly>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="kelas">Kelas</label>
-                                <input type="text" class="form-control" id="kelas" name="kelas" value="{{ auth()->user()->kelas->name }}" readonly>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="jumlah_tabungan">Tabungan Saat Ini</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp.</span>
-                                    <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
-                                </div>
-                                <p class="fst-italic fw-lighter text-center mb-0">{{ $terbilang ?? '' }}</p>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="jumlah_tarik">Jumlah Pengajuan Penarikan</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp.</span>
-                                    <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Penarikan" required>
+                            <h5 class="fw-bold text-primary mb-3">
+                                Tarik Tabungan Tunai/Digital
+                            </h5>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="id">ID Tabungan</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <input type="text" class="form-control" id="id" name="id" value="{{ auth()->user()->username }}" readonly>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="alasan">Alasan</label>
-                                <textarea class="form-control" name="alasan" id="alasan" rows="2" placeholder="Mengapa ingin melakukan penarikan tabungan ..." required></textarea>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="nama">Nama</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" readonly>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="jenis_pembayaran">Jenis Pembayaran</label>
-                                <select id="jenis_pembayaran" class="form-select" name="jenis_pembayaran" required>
-                                    <option value="">Pilih Jenis Pembayaran</option>
-                                    <option value="Tunai">Tunai</option>
-                                    <option value="Digital">Digital</option>
-                                </select>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="kelas">Kelas</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <input type="text" class="form-control" id="kelas" name="kelas" value="{{ auth()->user()->kelas->name }}" readonly>
+                                    </div>
+                                </div>
                             </div>
-
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="jumlah_tabungan">Tabungan Saat Ini</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp.</span>
+                                            <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
+                                        </div>
+                                        <p class="fst-italic fw-lighter text-start mb-0">*{{$terbilang}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="jumlah_tarik">Jumlah Pengajuan Penarikan</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp.</span>
+                                            <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Penarikan" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="alasan">Alasan</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <textarea class="form-control" name="alasan" id="alasan" rows="2" placeholder="Mengapa ingin melakukan penarikan tabungan ..." required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                        <label for="jenis_pembayaran">Jenis Pembayaran</label>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                        <select id="jenis_pembayaran" class="form-select" name="jenis_pembayaran" required>
+                                            <option value="">Pilih Jenis Pembayaran</option>
+                                            <option value="Tunai">Tunai</option>
+                                            <option value="Digital">Digital</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Detail Pembayaran Digital (ditampilkan kondisional) -->
                             <div id="digital-payment-details" style="display: none;">
-                                <div class="form-group mb-3">
-                                    <label for="metode_digital">Metode Digital</label>
-                                    <select id="metode_digital" class="form-select" name="metode_digital">
-                                        <option value="">Pilih Metode Digital</option>
-                                    </select>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                            <label for="metode_digital">Metode Digital</label>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                            <select id="metode_digital" class="form-select" name="metode_digital">
+                                                <option value="">Pilih Metode Digital</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Detail Transfer Bank -->
                                 <div id="bank-transfer-details" style="display: none;">
-                                    <div class="form-group mb-3">
-                                        <label for="bank_code">Bank</label>
-                                        <select id="bank_code" class="form-select" name="bank_code">
-                                            <option value="">Pilih Bank</option>
-                                        </select>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="bank_code">Bank</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <select id="bank_code" class="form-select" name="bank_code">
+                                                    <option value="">Pilih Bank</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group mb-3">
-                                        <label for="nomor_rekening">Nomor Rekening</label>
-                                        <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening" placeholder="Masukkan Nomor Rekening">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="nomor_rekening">Nomor Rekening</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening" placeholder="Masukkan Nomor Rekening">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Detail E-Wallet -->
                                 <div id="ewallet-details" style="display: none;">
-                                    <div class="form-group mb-3">
-                                        <label for="ewallet_type">E-Wallet</label>
-                                        <select id="ewallet_type" class="form-select" name="ewallet_type">
-                                            <option value="">Pilih E-Wallet</option>
-                                        </select>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="ewallet_type">E-Wallet</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <select id="ewallet_type" class="form-select" name="ewallet_type">
+                                                    <option value="">Pilih E-Wallet</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group mb-3">
-                                        <label for="ewallet_number">Nomor E-Wallet</label>
-                                        <input type="text" class="form-control" id="ewallet_number" name="ewallet_number" placeholder="Masukkan Nomor E-Wallet">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                                <label for="ewallet_number">Nomor E-Wallet</label>
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                                <input type="text" class="form-control" id="ewallet_number" name="ewallet_number" placeholder="Masukkan Nomor E-Wallet">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

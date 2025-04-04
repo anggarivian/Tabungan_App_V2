@@ -13,6 +13,13 @@
     {{-- @laravelPWA --}}
     @yield('style')
 
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-300-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-500-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-800-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+
     <link rel="shortcut icon" href="{{ asset('/dist/assets/compiled/svg/Logo.svg') }}" type="image/x-icon">
     <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAiCAYAAADRcLDBAAAEs2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIgogICAgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIKICAgZXhpZjpQaXhlbFhEaW1lbnNpb249IjMzIgogICBleGlmOlBpeGVsWURpbWVuc2lvbj0iMzQiCiAgIGV4aWY6Q29sb3JTcGFjZT0iMSIKICAgdGlmZjpJbWFnZVdpZHRoPSIzMyIKICAgdGlmZjpJbWFnZUxlbmd0aD0iMzQiCiAgIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiCiAgIHRpZmY6WFJlc29sdXRpb249Ijk2LjAiCiAgIHRpZmY6WVJlc29sdXRpb249Ijk2LjAiCiAgIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiCiAgIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIKICAgeG1wOk1vZGlmeURhdGU9IjIwMjItMDMtMzFUMTA6NTA6MjMrMDI6MDAiCiAgIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDMtMzFUMTA6NTA6MjMrMDI6MDAiPgogICA8eG1wTU06SGlzdG9yeT4KICAgIDxyZGY6U2VxPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJwcm9kdWNlZCIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWZmaW5pdHkgRGVzaWduZXIgMS4xMC4xIgogICAgICBzdEV2dDp3aGVuPSIyMDIyLTAzLTMxVDEwOjUwOjIzKzAyOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICA8L3JkZjpEZXNjcmlwdGlvbj4KIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+Cjw/eHBhY2tldCBlbmQ9InIiPz5V57uAAAABgmlDQ1BzUkdCIElFQzYxOTY2LTIuMQAAKJF1kc8rRFEUxz9maORHo1hYKC9hISNGTWwsRn4VFmOUX5uZZ36oeTOv954kW2WrKLHxa8FfwFZZK0WkZClrYoOe87ypmWTO7dzzud97z+nec8ETzaiaWd4NWtYyIiNhZWZ2TvE946WZSjqoj6mmPjE1HKWkfdxR5sSbgFOr9Ll/rXoxYapQVik8oOqGJTwqPL5i6Q5vCzeo6dii8KlwpyEXFL519LjLLw6nXP5y2IhGBsFTJ6ykijhexGra0ITl5bRqmWU1fx/nJTWJ7PSUxBbxJkwijBBGYYwhBgnRQ7/MIQIE6ZIVJfK7f/MnyUmuKrPOKgZLpEhj0SnqslRPSEyKnpCRYdXp/9++msneoFu9JgwVT7b91ga+LfjetO3PQ9v+PgLvI1xkC/m5A+h7F32zoLXug38dzi4LWnwHzjeg8UGPGbFfySvuSSbh9QRqZ6H+Gqrm3Z7l9zm+h+iafNUV7O5Bu5z3L/wAdthn7QIme0YAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAJTSURBVFiF7Zi9axRBGIefEw2IdxFBRQsLWUTBaywSK4ubdSGVIY1Y6HZql8ZKCGIqwX/AYLmCgVQKfiDn7jZeEQMWfsSAHAiKqPiB5mIgELWYOW5vzc3O7niHhT/YZvY37/swM/vOzJbIqVq9uQ04CYwCI8AhYAlYAB4Dc7HnrOSJWcoJcBS4ARzQ2F4BZ2LPmTeNuykHwEWgkQGAet9QfiMZjUSt3hwD7psGTWgs9pwH1hC1enMYeA7sKwDxBqjGnvNdZzKZjqmCAKh+U1kmEwi3IEBbIsugnY5avTkEtIAtFhBrQCX2nLVehqyRqFoCAAwBh3WGLAhbgCRIYYinwLolwLqKUwwi9pxV4KUlxKKKUwxC6ZElRCPLYAJxGfhSEOCz6m8HEXvOB2CyIMSk6m8HoXQTmMkJcA2YNTHm3congOvATo3tE3A29pxbpnFzQSiQPcB55IFmFNgFfEQeahaAGZMpsIJIAZWAHcDX2HN+2cT6r39GxmvC9aPNwH5gO1BOPFuBVWAZue0vA9+A12EgjPadnhCuH1WAE8ivYAQ4ohKaagV4gvxi5oG7YSA2vApsCOH60WngKrA3R9IsvQUuhIGY00K4flQG7gHH/mLytB4C42EgfrQb0mV7us8AAMeBS8mGNMR4nwHamtBB7B4QRNdaS0M8GxDEog7iyoAguvJ0QYSBuAOcAt71Kfl7wA8DcTvZ2KtOlJEr+ByyQtqqhTyHTIeB+ONeqi3brh+VgIN0fohUgWGggizZFTplu12yW8iy/YLOGWMpDMTPXnl+Az9vj2HERYqPAAAAAElFTkSuQmCC" type="image/png">
 
@@ -30,9 +37,9 @@
 
 <body>
     <script src="{{ asset('/dist/assets/static/js/initTheme.js') }}"></script>
-    <div id="loading-screen">
+    {{-- <div id="loading-screen">
         <div class="spinner"></div>
-    </div>
+    </div> --}}
     <div id="app">
         <div id="main" class="layout-horizontal">
             <header class="mb-5">
@@ -64,7 +71,13 @@
                                                 ];
                                             @endphp
                                             <p class="user-dropdown-status text-sm text-muted">
-                                                {{ $roles[auth()->user()->roles_id] ?? '' }}
+                                                {{ $roles[auth()->user()->roles_id] }}
+                                                @if(auth()->user()->roles_id == 3)
+                                                    {{ auth()->user()->kelas->name }}
+                                                @elseif(auth()->user()->roles_id == 4)
+                                                    Kelas
+                                                    {{ auth()->user()->kelas->name }}
+                                                @endif
                                             </p>
                                         </div>
                                     </div>
@@ -104,68 +117,68 @@
                             {{-- Dasdhboard -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1 )
                             <li class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-house-fill"></i> Dashboard</span>
+                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-speedometer2"></i> <span>Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 2)
                             <li class="menu-item {{ request()->routeIs('bendahara.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-house-fill"></i> Dashboard</span>
+                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-house-fill"></i> Dashboard</span>
+                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-house-fill"></i> Dashboard</span>
+                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-speedometer2"></i><span>Dashboard</span>
                                 </a>
                             </li>
                             @endif
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('tabungan.index') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-bank2"></i> Tabungan </span>
+                            <li class="menu-item {{ request()->routeIs('bendahara.tabungan*') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
+                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-cash-stack"></i><span> Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
-                            <li class="menu-item {{ request()->routeIs('walikelas.tabungan.index') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-bank2"></i> Stor Tabungan </span>
+                            <li class="menu-item {{ request()->routeIs('walikelas.tabungan*') ? 'active' : '' }}">
+                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.stor') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-bank2"></i> Stor </span>
+                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan</span>
                                 </a>
                             </li>
                             @endif
                             {{-- Pengajuan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('pengajuan.index*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-hourglass-split"></i> Pengajuan </span>
+                            <li class="menu-item {{ request()->routeIs('bendahara.pengajuan*') ? 'active' : '' }}">
+                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-journal-arrow-up"></i><span> Pengajuan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.tarik*') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="margin-top: -3px">
-                                    <span><i class="bi bi-bank2"></i> Tarik </span>
+                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-box-arrow-up"></i><span> Tarik Tabungan</span>
                                 </a>
                             </li>
                             @endif
                             {{-- Laporan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1)
                             <li class="menu-item {{ request()->is('kepsek/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="margin-top: -3px">
-                                    <span><i class="bi bi-book-fill"></i> Laporan</span>
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
@@ -188,8 +201,8 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="margin-top: -3px">
-                                    <span><i class="bi bi-book-fill"></i> Laporan</span>
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
@@ -212,8 +225,8 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="margin-top: -3px">
-                                    <span><i class="bi bi-book-fill"></i> Laporan</span>
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
@@ -233,8 +246,8 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="margin-top: -3px">
-                                    <span><i class="bi bi-book-fill"></i> Laporan</span>
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
@@ -259,8 +272,8 @@
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/kelola-*') ? 'active' : '' }} has-sub">
-                                    <a href="#" class="menu-link" style="margin-top: -3px">
-                                        <span><i class="bi bi-people-fill"></i> Data Pengguna</span>
+                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                        <i class="bi-person-lines-fill"></i><span> Data Pengguna</span>
                                     </a>
                                     <div class="submenu">
                                         <div class="submenu-group-wrapper">
@@ -279,7 +292,7 @@
                                 </li>
                             @endif
                             {{-- <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="margin-top: -3px">
+                                <a href="#" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
                                     <span><i class="bi bi-building-fill-gear"></i> Profil Sekolah</span>
                                 </a>
                             </li> --}}
@@ -289,7 +302,7 @@
 
             </header>
 
-            <div class="content-wrapper container" id="content" style="display: none;">
+            <div class="content-wrapper container">
                 @yield('content')
             </div>
 
@@ -318,47 +331,18 @@
 
     <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            }, 200);
-        });
-    </script>
-
     @yield('js')
 
     <script>
         document.getElementById('toggle-dark').addEventListener('change', function () {
             var logoImg = document.getElementById('logo-img');
             if (this.checked) {
-                // Jika checkbox on
                 logoImg.src = "{{ asset('/dist/assets/compiled/svg/Logo Light.svg') }}";
             } else {
-                // Jika checkbox off
                 logoImg.src = "{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}";
             }
         });
     </script>
-
-    {{-- <script src="{{ asset('/sw.js') }}"></script>
-    <script>
-    if ("serviceWorker" in navigator) {
-        // Register a service worker hosted at the root of the
-        // site using the default scope.
-        navigator.serviceWorker.register("/sw.js").then(
-        (registration) => {
-            console.log("Service worker registration succeeded:", registration);
-        },
-        (error) => {
-            console.error(`Service worker registration failed: ${error}`);
-        },
-        );
-    } else {
-        console.error("Service workers are not supported.");
-    }
-    </script> --}}
 
     <script>
         let deferredPrompt;

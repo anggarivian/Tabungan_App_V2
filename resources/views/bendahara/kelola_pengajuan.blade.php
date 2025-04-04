@@ -83,11 +83,11 @@
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">{{ $pengajuans->user->username }}</td>
-                                <td>{{ $pengajuans->user->name }}</td>
+                                <td>{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
                                 <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>
-                                <td class="text-center">{{ $pengajuans->alasan}}</td>
+                                <td class="text-center">{{ Str::limit($pengajuans->alasan, 20, '...')}}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
-                                <td class="text-center">{{ $pengajuans->created_at }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($pengajuans->created_at)->format('d M Y H:i') }}</td>
                                 <td class="text-center">
                                     @if ($pengajuans->status == 'Pending')
                                         <span class="badge bg-warning">Pending</span>
@@ -138,7 +138,7 @@
 
 {{-- Modal --}}
 <div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="editModalLabel">Proses Pengajuan</h1>
@@ -150,47 +150,65 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <label for="edit-id">ID</label>
+                            <label for="edit-id">ID Tabungan</label>
                         </div>
                         <div class="col-md-8 form-group">
                             <input type="text" id="edit-id" class="form-control" name="id"  required readonly hidden>
-                            <input type="text" id="edit-username" class="form-control" name="username"  required readonly>
+                            <input type="text" id="edit-username" class="form-control" name="username"  required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-name">Nama</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-name" class="form-control" name="name"  required readonly>
+                            <input type="text" id="edit-name" class="form-control" name="name"  required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-kelas">Kelas</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-kelas" class="form-control" name="kelas" required readonly>
+                            <input type="text" id="edit-kelas" class="form-control" name="kelas" required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-alasan">Alasan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <textarea id="edit-alasan" class="form-control" name="alasan"  rows="3" required readonly></textarea>
+                            <textarea id="edit-alasan" class="form-control" name="alasan"  rows="3" required readonly style="border: none; outline: none; background: transparent;"></textarea>
                         </div>
                         <div class="col-md-4">
                             <label for="edit-tabungan">Jumlah Tabungan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" required readonly>
+                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-jumlah_tarik">Jumlah Penarikan</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="number" id="edit-jumlah_tarik" class="form-control" name="jumlah_tarik" required readonly>
+                            <input type="number" id="edit-jumlah_tarik" class="form-control" name="jumlah_tarik" required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-pembayaran">Pembayaran</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="text" id="edit-pembayaran" class="form-control" name="pembayaran" required readonly>
+                            <input type="text" id="edit-pembayaran" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-metode_digital">Metode Penarikan</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-metode_digital" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-type_tujuan">Tujuan Penarikan</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-type_tujuan" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-nomor_tujuan">No. Rekening/E-Wallet</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-nomor_tujuan" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
                         </div>
                     </div>
                 </div>
@@ -225,6 +243,10 @@
                         $('#edit-status').val(response.status);
                         $('#edit-alasan').val(response.alasan);
                         $('#edit-created_at').val(response.created_at);
+                        // Tambahan untuk metode digital, bank atau e-wallet
+                        $('#edit-metode_digital').val(response.metode_digital);
+                        $('#edit-type_tujuan').val(response.type_tujuan);
+                        $('#edit-nomor_tujuan').val(response.nomor_tujuan);
 
                         $('#tolakButton').attr('href', '/bendahara/kelola-pengajuan/tolak/' + response.id);
 

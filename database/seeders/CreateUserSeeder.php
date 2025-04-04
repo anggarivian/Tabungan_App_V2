@@ -3,10 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Tabungan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Faker\Factory as Faker;
 
 class CreateUserSeeder extends Seeder
 {
@@ -17,6 +15,9 @@ class CreateUserSeeder extends Seeder
      */
     public function run()
     {
+        // Password default yang sudah di-hash
+        $defaultPassword = Hash::make('12345');
+
         // Data awal pengguna
         $users = [
             [
@@ -26,7 +27,7 @@ class CreateUserSeeder extends Seeder
                 'kontak' => '085712341234',
                 'alamat' => 'Cianjur',
                 'email' => 'kepsek@mail.com',
-                'password' => Hash::make('12345'),
+                'password' => $defaultPassword,
                 'kelas_id' => 1,
                 'roles_id' => 1
             ],
@@ -37,75 +38,81 @@ class CreateUserSeeder extends Seeder
                 'kontak' => '085712341234',
                 'alamat' => 'Cianjur',
                 'email' => 'bendahara@mail.com',
-                'password' => Hash::make('12345'),
+                'password' => $defaultPassword,
                 'kelas_id' => 1,
                 'roles_id' => 2
             ],
             [
-                'name' => 'isWalikelas',
-                'username' => 'isWalikelas',
-                'jenis_kelamin' => 'L',
-                'kontak' => '085712341234',
-                'alamat' => 'Cianjur',
-                'email' => 'walikelas@mail.com',
-                'password' => Hash::make('12345'),
+                'name' => 'Nia Marliana',
+                'username' => 'niamarliana',
+                'jenis_kelamin' => 'P',
+                'kontak' => '081234567890',
+                'alamat' => 'Jl. Merdeka No. 10, Cianjur',
+                'email' => 'niamarliana08@guru.sd.belajar.id',
+                'password' => $defaultPassword,
                 'kelas_id' => 1,
                 'roles_id' => 3
             ],
             [
-                'name' => 'isSiswa',
-                'username' => 'isSiswa',
+                'name' => 'Rika Mayasari',
+                'username' => 'rikamayasari',
+                'jenis_kelamin' => 'P',
+                'kontak' => '081789012345',
+                'alamat' => 'Jl. Raya Cianjur No. 50, Cianjur',
+                'email' => 'rikamayasari43264@gmail.com',
+                'password' => $defaultPassword,
+                'kelas_id' => 2,
+                'roles_id' => 3
+            ],
+            [
+                'name' => 'Mardi Alamsyah',
+                'username' => 'mardialamsyah',
                 'jenis_kelamin' => 'L',
-                'kontak' => '085712341234',
-                'alamat' => 'Cianjur',
-                'email' => 'siswa@mail.com',
-                'password' => Hash::make('12345'),
-                'kelas_id' => 1,
-                'roles_id' => 4
+                'kontak' => '081567890123',
+                'alamat' => 'Jl. Diponegoro No. 12, Cianjur',
+                'email' => 'mardialamsyah43264@gmail.com',
+                'password' => $defaultPassword,
+                'kelas_id' => 3,
+                'roles_id' => 3
+            ],
+            [
+                'name' => 'Ai Nurhayati',
+                'username' => 'ainurhayati',
+                'jenis_kelamin' => 'P',
+                'kontak' => '081456789012',
+                'alamat' => 'Jl. Sudirman No. 5, Cianjur',
+                'email' => 'ainurhayati61@guru.sd.belajar.id',
+                'password' => $defaultPassword,
+                'kelas_id' => 4,
+                'roles_id' => 3
+            ],
+            [
+                'name' => 'Rohmayati',
+                'username' => 'rohmayati',
+                'jenis_kelamin' => 'P',
+                'kontak' => '081890123456',
+                'alamat' => 'Jl. HOS Cokroaminoto No. 15, Cianjur',
+                'email' => 'rohmayati039@gmail.com',
+                'password' => $defaultPassword,
+                'kelas_id' => 5,
+                'roles_id' => 3
+            ],
+            [
+                'name' => 'Tresna Komala',
+                'username' => 'tresnakomala',
+                'jenis_kelamin' => 'P',
+                'kontak' => '081678901234',
+                'alamat' => 'Jl. Kartini No. 30, Cianjur',
+                'email' => 'ktresna82@gmail.com',
+                'password' => $defaultPassword,
+                'kelas_id' => 6,
+                'roles_id' => 3
             ]
         ];
 
+        // Loop untuk membuat pengguna
         foreach ($users as $userData) {
-            $user = User::create($userData);
-
-            // Buat tabungan untuk setiap user
-            if ($user->roles_id === 4) { // Hanya untuk siswa
-                Tabungan::create([
-                    'saldo' => 0,
-                    'premi' => 0,
-                    'sisa' => 0,
-                    'user_id' => $user->id
-                ]);
-            }
-        }
-
-        // Faker untuk membuat data siswa acak
-        $faker = Faker::create('id_ID');
-
-        // Generate 60 siswa, 10 siswa untuk setiap kelas
-        foreach (range(1, 6) as $kelas_id) {
-            foreach (range(1, 10) as $i) {
-                $user = User::create([
-                    'name' => $faker->firstName,
-                    'username' => $faker->unique()->numerify('1##'),
-                    'jenis_kelamin' => $faker->randomElement(['L', 'P']),
-                    'kontak' => $faker->unique()->phoneNumber,
-                    'orang_tua' => $faker->name,
-                    'alamat' => $faker->city,
-                    'email' => $faker->unique()->safeEmail,
-                    'password' => Hash::make('12345'),
-                    'kelas_id' => $kelas_id,
-                    'roles_id' => 4
-                ]);
-
-                // Buat tabungan untuk siswa
-                Tabungan::create([
-                    'saldo' => 0,
-                    'premi' => 0,
-                    'sisa' => 0,
-                    'user_id' => $user->id
-                ]);
-            }
+            User::create($userData);
         }
     }
 }

@@ -96,6 +96,7 @@ class LaporanController extends Controller
             ->when($sortTanggal, function ($query) use ($sortTanggal) {
                 $query->orderBy('created_at', $sortTanggal);
             })
+            ->where('status', 'success')
             ->paginate($perPage)
             ->appends($request->all());
 
@@ -256,6 +257,7 @@ class LaporanController extends Controller
             ->when($sortTanggal, function ($query) use ($sortTanggal) {
                 $query->orderBy('created_at', $sortTanggal);
             })
+            ->where('status', 'success')
             ->paginate($perPage)
             ->appends($request->all());
 
@@ -424,6 +426,7 @@ class LaporanController extends Controller
             ->when($sortDate, function ($query) use ($sortDate) {
                 $query->orderBy('created_at', $sortDate);
             })
+            ->where('status', 'success')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -487,6 +490,7 @@ class LaporanController extends Controller
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
+            ->where('status', 'success')
             ->orderBy('created_at', 'asc')
             ->paginate($perPage);
 

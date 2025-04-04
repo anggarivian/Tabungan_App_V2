@@ -11,8 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 class UsersImport implements ToModel, WithHeadingRow
 {
     protected $kelasMap = [
-        '1A' => 1, '1B' => 2, '2A' => 3, '2B' => 4,
-        '3A' => 5, '3B' => 6, '4' => 7, '5' => 8, '6' => 9
+        '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6
     ];
 
     public function model(array $row)

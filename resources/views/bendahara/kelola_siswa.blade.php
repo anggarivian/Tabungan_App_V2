@@ -89,15 +89,15 @@
                         @forelse ($user as $users)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>{{ $users->name }}</td>
+                                <td>{{ Str::limit($users->name, 25, '...') }}</td>
                                 <td class="text-center">{{ $users->username }}</td>
                                 {{-- <td>{{ $users->email }}</td> --}}
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
                                 <td class="text-center">{{ $users->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
-                                <td >{{ $users->orang_tua }}</td>
+                                <td >{{ Str::limit($users->orang_tua, 10, '...') }}</td>
                                 <td class="text-center">{{ $users->kontak }}</td>
-                                <td>{{ $users->alamat }}</td>
-                                <td class="text-center">{{ $users->created_at }}</td>
+                                <td>{{ Str::limit($users->alamat, 10, '...') }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-warning" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
@@ -126,6 +126,7 @@
                                 <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
                                 <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                                <option value="1000" {{ request('perPage') == 100 ? 'selected' : '' }}>Semua</option>
                             </select>
                         </div>
                     </form>

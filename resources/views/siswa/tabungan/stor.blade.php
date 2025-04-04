@@ -25,12 +25,29 @@
 <div class="page-content">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="card mb-3">
-                <div class="card-body">
-                        <h5>Informasi Penting</h5>
-                        <p>Penabung dapat melakukan stor secara mandiri menggunakan fitur QRIS, transfer bank dan e-wallet, perhatikan bahwa terdapat potongan atau penambahan jumlah transaksi (biaya admin) tergantung dari fitur apa yang digunakan</p>
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-3">
+                        Informasi Penting
+                    </h5>
+                    <p>Penabung dapat melakukan penyetoran secara mandiri menggunakan:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0">
+                            <i class="bi bi-qr-code text-success"></i> <strong>QRIS</strong> – Pembayaran cepat dengan kode QR.
+                        </li>
+                        <li class="list-group-item border-0">
+                            <i class="bi bi-bank text-warning"></i> <strong>Transfer Bank</strong> – Kirim dana langsung ke rekening sekolah.
+                        </li>
+                        <li class="list-group-item border-0">
+                            <i class="bi bi-wallet2 text-info"></i> <strong>E-Wallet</strong> – Gunakan dompet digital pilihan Anda.
+                        </li>
+                    </ul>
+                    <p class="mt-3 text-muted">
+                        * Perhatikan bahwa setiap metode memiliki biaya administrasi yang berbeda.
+                    </p>
                 </div>
             </div>
+
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
             <div class="card">
@@ -62,6 +79,9 @@
                     @endif
                     <form action="{{ route('siswa.tabungan.store') }}" method="POST">
                         @csrf
+                        <h5 class="fw-bold text-primary mb-3">
+                            Stor Tabungan Digital
+                        </h5>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -103,7 +123,7 @@
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
                                         <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" value="{{ auth()->user()->tabungan->saldo }}" readonly>
                                     </div>
-                                    <p class="fst-italic fw-lighter text-center mb-0">{{$terbilang}}</p>
+                                    <p class="fst-italic fw-lighter text-start mb-0">*{{$terbilang}}</p>
                                 </div>
                             </div>
                         </div>

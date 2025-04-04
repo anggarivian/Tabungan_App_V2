@@ -84,13 +84,17 @@ class PengajuanController extends Controller
 
         return response()->json([
             'id' => $pengajuan->user->id ?? '-',
+            'jumlah_tarik' => $pengajuan->jumlah_penarikan ?? '-',
             'username' => $pengajuan->user->username ?? '-',
+            'status' => $pengajuan->status ?? '-',
+            'pembayaran' => $pengajuan->pembayaran ?? '-',
+            'metode_digital' => $pengajuan->metode_digital ?? '-',
+            'type_tujuan' => $pengajuan->bank_code ?? $pengajuan->ewallet_type ?? '-',
+            'nomor_tujuan' => $pengajuan->nomor_rekening ?? $pengajuan->ewallet_number ?? '-',
             'name' => $pengajuan->user->name ?? '-',
             'kelas' => $pengajuan->user->kelas->name ?? '-',
             'tabungan' => $pengajuan->user->tabungan->saldo ?? '-',
             'alasan' => $pengajuan->alasan ?? '-',
-            'jumlah_tarik' => $pengajuan->jumlah_penarikan ?? '-',
-            'pembayaran' => $pengajuan->pembayaran ?? '-',
         ]);
     }
 

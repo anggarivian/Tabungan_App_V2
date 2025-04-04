@@ -1,11 +1,11 @@
 @extends('layout.main')
 
-@section('title') Laporan Pengajuan - SakuRame @endsection
+@section('title') Export Data - SakuRame @endsection
 
 @section('content')
 <div class="page-heading mb-2">
     <div class="d-flex justify-content-between ">
-        <h3 class="mt-3">Laporan Pengajuan</h3>
+        <h3 class="mt-3">Export Data</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-right">
                 @if(auth()->user()->roles_id == 1)
@@ -17,7 +17,7 @@
                 @elseif(auth()->user()->roles_id == 4)
                     <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
                 @endif
-                <li class="breadcrumb-item active" aria-current="page">Laporan Pengajuan</li>
+                <li class="breadcrumb-item active" aria-current="page">Export Data</li>
             </ol>
         </nav>
     </div>

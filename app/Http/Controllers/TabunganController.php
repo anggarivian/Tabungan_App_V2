@@ -9,8 +9,9 @@ use App\Models\User;
 use Xendit\Invoices;
 use App\Models\Kelas;
 use App\Models\Tabungan;
-use Xendit\Configuration;
+use App\Models\Pengajuan;
 use App\Models\Transaksi;
+use Xendit\Configuration;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -124,6 +125,7 @@ class TabunganController extends Controller
             ->whereHas('user', function ($query) use ($id) {
                 $query->where('kelas_id', $id);
             })
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
 
@@ -423,6 +425,7 @@ class TabunganController extends Controller
             ->whereHas('user', function ($query) use ($kelas) {
                 $query->where('kelas_id', $kelas->id);
             })
+            ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
         return view('walikelas.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
@@ -583,6 +586,8 @@ class TabunganController extends Controller
 
     public function siswa_tarik()
     {
+        $pengajuans = Pengajuan::where('status', 'pending')->where('user_id', Auth::id())->first();
+
         $nominal = auth()->user()->tabungan->saldo ;
         $terbilang = RupiahHelper::terbilangRupiah($nominal);
         return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));

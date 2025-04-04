@@ -112,7 +112,7 @@
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td class="text-center">{{ $pengajuans->user->username }}</td>
-                                <td>{{ $pengajuans->user->name }}</td>
+                                <td>{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
                                 <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->tabungan->saldo ?? 0) }}</td>
                                 <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
@@ -131,8 +131,8 @@
                                         <span class="badge bg-light">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
-                                <td class="text-center">{{ $pengajuans->created_at ?? '-' }}</td>
+                                <td class="text-center">{{ Str::limit($pengajuans->alasan, 20, '...') }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($pengajuans->created_at)->format('d M Y H:i') }}</td>
                             </tr>
                         @empty
                             <tr>

@@ -84,13 +84,13 @@
                         @forelse ($user as $users)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>{{ $users->name }}</td>
+                                <td>{{ Str::limit($users->name, 20, '...') }}</td>
                                 <td>{{ $users->username }}</td>
-                                <td>{{ $users->email }}</td>
+                                <td>{{ Str::limit($users->email, 20, '...') }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
                                 <td class="text-center">{{ $users->kontak }}</td>
-                                <td>{{ $users->alamat }}</td>
-                                <td class="text-center">{{ $users->created_at }}</td>
+                                <td>{{ Str::limit($users->alamat, 20, '...') }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-warning" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
