@@ -95,4 +95,46 @@ class LoginController extends Controller
             ->with('alert-message', 'Password berhasil diubah (Tunggu 3 detik, Halaman ini akan beralih)')
             ->with('alert-duration', 3000);
         }
+
+        public function edit()
+        {
+            return view('auth.profile');
+        }
+
+        public function update(Request $request)
+{
+    $user = Auth::user();
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'kontak' => 'required|string|max:20',
+        'alamat' => 'nullable|string|max:255',
+        'orang_tua' => 'nullable|string|max:255',
+        'current_password' => 'nullable|required_with:password|string',
+        'password' => 'nullable|string|min:8|confirmed',
+        ], [
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+    ]);
+
+    // Cek jika user ingin mengubah password
+    if ($request->filled('password')) {
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'Password lama tidak sesuai.');
+        }
+
+        $user->password = Hash::make($request->password);
+    }
+
+    // Update data lain
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->kontak = $request->kontak;
+    $user->alamat = $request->alamat;
+    $user->orang_tua = $request->orang_tua;
+
+    $user->save();
+
+    return back()->with('success', 'Profil berhasil diperbarui.');
+}
 }

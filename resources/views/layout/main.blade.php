@@ -32,6 +32,64 @@
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/iconly.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
 
+    <style>
+        /* ========== DESKTOP (Default) ========== */
+        .main-navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    padding-top: 40px; /* Sesuaikan dengan tinggi navbar */
+}
+.main-navbar {
+    height: 40px; /* Sesuaikan tinggi navbar */
+    padding: 5px 0; /* Kurangi padding agar lebih kecil */
+    font-size: 14px; /* Sesuaikan ukuran font */
+}
+
+.main-navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-navbar a {
+    padding: 5px 10px; /* Kurangi padding link jika terlalu besar */
+}
+
+.main-navbar img {
+    height: 30px; /* Sesuaikan ukuran logo */
+    width: auto;
+}
+
+
+/* ========== PONSEL (Responsif) ========== */
+@media (max-width: 768px) {
+    /* Biarkan navbar kembali ke ukuran normal di ponsel */
+    .main-navbar {
+        height: auto;
+        padding: 10px 0;
+        margin-top: 70px;
+        font-size: 16px; /* Font lebih besar di ponsel */
+    }
+
+    /* Mengembalikan logo ke ukuran normal di ponsel */
+    .main-navbar img {
+        height: 40px;
+    }
+
+    /* Hapus padding body agar tidak ada gap di atas */
+    body {
+        padding-top: 0 !important;
+    }
+}
+
+    </style>
 </head>
 
 
@@ -88,7 +146,7 @@
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
-                                    <li><a class="dropdown-item" href="{{ route ('change.password') }}">Ganti Password</a></li>
+                                    <li><a class="dropdown-item" href="{{ route ('profil.edit') }}">Profil</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
@@ -117,25 +175,25 @@
                             {{-- Dasdhboard -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1 )
                             <li class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-speedometer2"></i> <span>Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 2)
                             <li class="menu-item {{ request()->routeIs('bendahara.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-speedometer2"></i><span>Dashboard</span>
                                 </a>
                             </li>
@@ -143,19 +201,19 @@
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.tabungan*') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-cash-stack"></i><span> Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.tabungan*') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.stor') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan</span>
                                 </a>
                             </li>
@@ -163,13 +221,13 @@
                             {{-- Pengajuan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.pengajuan*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-journal-arrow-up"></i><span> Pengajuan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.tarik*') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-box-arrow-up"></i><span> Tarik Tabungan</span>
                                 </a>
                             </li>
@@ -177,7 +235,7 @@
                             {{-- Laporan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1)
                             <li class="menu-item {{ request()->is('kepsek/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -201,7 +259,7 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -225,7 +283,7 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -246,7 +304,7 @@
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -272,7 +330,7 @@
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/kelola-*') ? 'active' : '' }} has-sub">
-                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                         <i class="bi-person-lines-fill"></i><span> Data Pengguna</span>
                                     </a>
                                     <div class="submenu">
@@ -292,7 +350,7 @@
                                 </li>
                             @endif
                             {{-- <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -5px">
+                                <a href="#" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
                                     <span><i class="bi bi-building-fill-gear"></i> Profil Sekolah</span>
                                 </a>
                             </li> --}}
@@ -302,7 +360,7 @@
 
             </header>
 
-            <div class="content-wrapper container">
+            <div class="content-wrapper container" style="font-size: 14px;">
                 @yield('content')
             </div>
 

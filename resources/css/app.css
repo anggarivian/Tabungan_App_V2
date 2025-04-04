@@ -65,3 +65,12 @@ body {
 }
 
 
+.main-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030; /* Lebih tinggi dari konten lain */
+    background-color: #fff; /* atau sesuai warna navbar */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* agar ada bayangan saat sticky */
+}
+
+

@@ -44,6 +44,10 @@ Route::get('/register', [RegisterController::class, 'index'])->name('register');
 
 // Grup middleware untuk pengguna yang telah terautentikasi.
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/profil', [LoginController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [LoginController::class, 'update'])->name('profil.update');
+
     // Grup middleware untuk pengguna dengan role Kepsek.
     Route::middleware('isKepsek')->group(function () {
         // Menampilkan dashboard untuk Kepsek.
