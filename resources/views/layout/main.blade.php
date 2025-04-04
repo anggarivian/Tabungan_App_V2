@@ -15,7 +15,6 @@
 
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-300-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-500-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-800-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
@@ -33,71 +32,133 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
 
     <style>
-        /* ========== DESKTOP (Default) ========== */
+        /* ======== DESKTOP DEFAULT (>=1201px) ======== */
         .main-navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: white;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            height: 40px;
+            padding: 5px 0;
+            font-size: 14px;
+        }
 
-body {
-    padding-top: 40px; /* Sesuaikan dengan tinggi navbar */
-}
-.main-navbar {
-    height: 40px; /* Sesuaikan tinggi navbar */
-    padding: 5px 0; /* Kurangi padding agar lebih kecil */
-    font-size: 14px; /* Sesuaikan ukuran font */
-}
+        body {
+            padding-top: 40px;
+        }
 
-.main-navbar .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+        .main-navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-.main-navbar a {
-    padding: 5px 10px; /* Kurangi padding link jika terlalu besar */
-}
+        .main-navbar a {
+            padding: 5px 10px;
+        }
 
-.main-navbar img {
-    height: 30px; /* Sesuaikan ukuran logo */
-    width: auto;
-}
+        .main-navbar img {
+            height: 30px;
+            width: auto;
+        }
 
+        @media (max-width: 1199.98px) {
+            .custom-margin-top-fix {
+                margin-top: 0px !important;
+            }
+            main-navbar {
+                position: absolute;
+                top: 70px; /* sesuaikan dengan tinggi header */
+                left: 0;
+                width: 100%;
+                background-color: white;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: max-height 0.4s ease, opacity 0.4s ease;
+                z-index: 999;
+            }
 
-/* ========== PONSEL (Responsif) ========== */
-@media (max-width: 768px) {
-    /* Biarkan navbar kembali ke ukuran normal di ponsel */
-    .main-navbar {
-        height: auto;
-        padding: 10px 0;
-        margin-top: 70px;
-        font-size: 16px; /* Font lebih besar di ponsel */
-    }
+            .main-navbar.show {
+                max-height: 500px; /* sesuaikan dengan tinggi konten nav */
+                opacity: 1;
+            }
+        }
 
-    /* Mengembalikan logo ke ukuran normal di ponsel */
-    .main-navbar img {
-        height: 40px;
-    }
+        /* ======== TABLET BESAR / LAPTOP KECIL (992px - 1200px) ======== */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            .main-navbar {
+                height: auto;
+                padding: 10px 0;
+                margin-top: 60px;
+                font-size: 15px;
+            }
 
-    /* Hapus padding body agar tidak ada gap di atas */
-    body {
-        padding-top: 0 !important;
-    }
-}
+            .main-navbar img {
+                height: 40px;
+            }
 
+            body {
+                padding-top: 0 !important;
+            }
+
+            .navbar-collapse,
+            .dropdown-menu {
+                background-color: white;
+                padding: 10px;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* ======== TABLET & PONSEL (<= 991px) ======== */
+        @media (max-width: 991.98px) {
+            .main-navbar {
+                height: auto;
+                padding: 10px 0;
+                margin-top: 60px;
+                font-size: 15px;
+            }
+
+            .main-navbar img {
+                height: 40px;
+            }
+
+            body {
+                padding-top: 0 !important;
+            }
+
+            .navbar-collapse,
+            .dropdown-menu {
+                background-color: white;
+                padding: 10px;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* ======== HP KECIL (<= 575px) ======== */
+        @media (max-width: 575.98px) {
+            .main-navbar {
+                font-size: 14px;
+                padding: 12px 0;
+            }
+
+            .main-navbar img {
+                height: 38px;
+            }
+
+            .dropdown-menu {
+                font-size: 14px;
+            }
+        }
     </style>
+
 </head>
 
 
 <body>
     <script src="{{ asset('/dist/assets/static/js/initTheme.js') }}"></script>
-    {{-- <div id="loading-screen">
-        <div class="spinner"></div>
-    </div> --}}
     <div id="app">
         <div id="main" class="layout-horizontal">
             <header class="mb-5">
@@ -107,59 +168,35 @@ body {
                             <img id="logo-img" src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" height="40px" width="190px" alt="Logo">
                         </a>
                         <div class="header-top-right">
-                            <div class="theme-toggle d-flex gap-2 align-items-center mt-2">
-                                <div class="form-check form-switch fs-6">
-                                    <input class="form-check-input me-0" type="checkbox" id="toggle-dark" style="cursor: pointer">
+                            <div class="d-none d-md-flex">
+                                <div class="text text-end">
+                                    <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6>
+                                    @php
+                                        $roles = [
+                                            1 => 'Kepala Sekolah',
+                                            2 => 'Bendahara',
+                                            3 => 'Walikelas',
+                                            4 => 'Siswa'
+                                        ];
+                                    @endphp
+                                    <p class="user-dropdown-status text-sm text-muted">
+                                        {{ $roles[auth()->user()->roles_id] }}
+                                        @if(auth()->user()->roles_id == 3)
+                                            {{ auth()->user()->kelas->name }}
+                                        @elseif(auth()->user()->roles_id == 4)
+                                            Kelas
+                                            {{ auth()->user()->kelas->name }}
+                                        @endif
+                                    </p>
+                                </div>
+                                <div class="avatar avatar-md2" style="margin-left: 20px">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
                                 </div>
                             </div>
-                            <div class="dropdown">
-                                <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div class="d-none d-md-flex">
-                                        <div class="avatar avatar-md2">
-                                            <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
-                                        </div>
-                                        <div class="text">
-                                            <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6>
-                                            @php
-                                                $roles = [
-                                                    1 => 'Kepala Sekolah',
-                                                    2 => 'Bendahara',
-                                                    3 => 'Walikelas',
-                                                    4 => 'Siswa'
-                                                ];
-                                            @endphp
-                                            <p class="user-dropdown-status text-sm text-muted">
-                                                {{ $roles[auth()->user()->roles_id] }}
-                                                @if(auth()->user()->roles_id == 3)
-                                                    {{ auth()->user()->kelas->name }}
-                                                @elseif(auth()->user()->roles_id == 4)
-                                                    Kelas
-                                                    {{ auth()->user()->kelas->name }}
-                                                @endif
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="d-md-none">
-                                        <div class="avatar avatar-md2">
-                                            <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
-                                        </div>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
-                                    <li><a class="dropdown-item" href="{{ route ('profil.edit') }}">Profil</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                                document.getElementById('logout-form').submit();">
-                                            {{ __('Logout') }}
-                                        </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                            @csrf
-                                        </form>
-                                    </li>
-                                </ul>
+                            <div class="d-md-none">
+                                <div class="avatar avatar-md2">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
+                                </div>
                             </div>
 
                             <!-- Burger button responsive -->
@@ -175,25 +212,25 @@ body {
                             {{-- Dasdhboard -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1 )
                             <li class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-speedometer2"></i> <span>Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 2)
                             <li class="menu-item {{ request()->routeIs('bendahara.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('bendahara.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('walikelas.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-speedometer2"></i><span> Dashboard</span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-speedometer2"></i><span>Dashboard</span>
                                 </a>
                             </li>
@@ -201,19 +238,19 @@ body {
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.tabungan*') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-cash-stack"></i><span> Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.tabungan*') ? 'active' : '' }}">
-                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('walikelas.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.stor') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('siswa.tabungan.stor')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan</span>
                                 </a>
                             </li>
@@ -221,13 +258,13 @@ body {
                             {{-- Pengajuan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.pengajuan*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-journal-arrow-up"></i><span> Pengajuan </span>
                                 </a>
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.tarik*') ? 'active' : '' }}">
-                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-box-arrow-up"></i><span> Tarik Tabungan</span>
                                 </a>
                             </li>
@@ -235,7 +272,7 @@ body {
                             {{-- Laporan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 1)
                             <li class="menu-item {{ request()->is('kepsek/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -259,7 +296,7 @@ body {
                             </li>
                             @elseif( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -283,7 +320,7 @@ body {
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->is('walikelas/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -304,7 +341,7 @@ body {
                             </li>
                             @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->is('siswa/laporan*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-bar-chart-line-fill"></i><span> Laporan</span>
                                 </a>
                                 <div class="submenu">
@@ -330,7 +367,7 @@ body {
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->is('bendahara/kelola-*') ? 'active' : '' }} has-sub">
-                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
+                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                         <i class="bi-person-lines-fill"></i><span> Data Pengguna</span>
                                     </a>
                                     <div class="submenu">
@@ -349,11 +386,37 @@ body {
                                     </div>
                                 </li>
                             @endif
-                            {{-- <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
-                                <a href="#" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -12px">
-                                    <span><i class="bi bi-building-fill-gear"></i> Profil Sekolah</span>
+                            <li class="menu-item {{ request()->routeIs('profil*') ? 'active' : '' }}">
+                                <a href="{{ route ('profil.edit')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-person-circle"></i><span>Profil</span>
                                 </a>
-                            </li> --}}
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('logout') }}" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="bi-box-arrow-right"></i><span>Logout</span>
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </li>
+                            <li class="menu-item ms-auto custom-margin-top-fix" style="margin-top: -13px;">
+                                <div class="d-flex align-items-center px-3 py-1 rounded-3 shadow-sm"
+                                    style="background-color: white; transition: background-color 0.3s ease; color: black;"
+                                    id="toggle-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        class="bi bi-sun" viewBox="0 0 16 16">
+                                        <path d="M8 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zM8 0a.5.5 0 0 1 .5.5V2A.5.5 0 0 1 8 2V.5A.5.5 0 0 1 8 0zM8 14a.5.5 0 0 1 .5.5V16a.5.5 0 0 1-1 0v-1.5A.5.5 0 0 1 8 14zM2.343 2.343a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 1 1-.707.708L2.343 3.05a.5.5 0 0 1 0-.707zm9.192 9.192a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 0 1-.707.708l-1.06-1.06a.5.5 0 0 1 0-.707zM0 8a.5.5 0 0 1 .5-.5H2a.5.5 0 0 1 0 1H.5A.5.5 0 0 1 0 8zm14 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H14.5a.5.5 0 0 1-.5-.5zM2.343 13.657a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708zm9.192-9.192a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708z"/>
+                                    </svg>
+                                    <div class="form-check form-switch mx-2 mb-0">
+                                        <input class="form-check-input" type="checkbox" id="toggle-dark" style="cursor: pointer;">
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        class="bi bi-moon" viewBox="0 0 16 16">
+                                        <path d="M6 0a7 7 0 0 0 0 14a7.001 7.001 0 0 0 6.938-6H13a6 6 0 0 1-11.855-1.156C.322 6.57 0 5.814 0 5a6 6 0 0 1 6-5z"/>
+                                    </svg>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </nav>
@@ -367,12 +430,14 @@ body {
             <footer>
                 <div class="container">
                     <div class="footer clearfix mb-0 text-muted">
-                        <div class="float-start">
-                            <p>2024 &copy; SDN Sukarame</p>
-                        </div>
-                        <div class="float-end">
-                            <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
-                                href="https://github.com/anggarivian">Angga</a></p>
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                            <div class="float-start">
+                                <p>2024 &copy; SDN Sukarame</p>
+                            </div>
+                            <div class="float-end">
+                                <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
+                                    href="https://github.com/anggarivian">Angga</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -390,6 +455,42 @@ body {
     <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     @yield('js')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerBtn = document.querySelector('.burger-btn');
+            const mainNavbar = document.querySelector('.main-navbar');
+
+            burgerBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                mainNavbar.classList.toggle('show');
+            });
+
+            // Optional: klik di luar buat nutup
+            document.addEventListener('click', function (e) {
+                if (!mainNavbar.contains(e.target) && !burgerBtn.contains(e.target)) {
+                    mainNavbar.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        const toggle = document.getElementById('toggle-dark');
+        const wrapper = document.getElementById('toggle-wrapper');
+
+        toggle.addEventListener('change', function () {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                wrapper.style.backgroundColor = '#2c2f33';
+                wrapper.style.color = '#ffffff';
+            } else {
+                document.body.classList.remove('dark-mode');
+                wrapper.style.backgroundColor = 'white';
+                wrapper.style.color = 'black';
+            }
+        });
+    </script>
 
     <script>
         document.getElementById('toggle-dark').addEventListener('change', function () {

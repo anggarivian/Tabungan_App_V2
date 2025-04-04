@@ -3,24 +3,28 @@
 @section('title') Stor Tabungan - SakuRame @endsection
 
 @section('content')
-<div class="page-heading mb-2">
-    <div class="d-flex justify-content-between">
-        <h3 class="mt-3">Stor Tabungan</h3>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb breadcrumb-right">
-                @if(auth()->user()->roles_id == 1)
-                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 2)
-                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 3)
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.bendahara')}}">Bendahara</a></li>
-                @elseif(auth()->user()->roles_id == 4)
-                    <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
-                @endif
-                <li class="breadcrumb-item"><a href="{{ route ('bendahara.tabungan.index')}}">Tabungan</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Stor</li>
-            </ol>
-        </nav>
+<div class="page-heading mb-3">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h3 class="mt-3">Stor Tabungan</h3>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
+                    @if(auth()->user()->roles_id == 1)
+                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 2)
+                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 3)
+                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.bendahara')}}">Bendahara</a></li>
+                    @elseif(auth()->user()->roles_id == 4)
+                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
+                    @endif
+                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.tabungan.index')}}">Tabungan</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Stor</li>
+                </ol>
+            </nav>
+        </div>
     </div>
 </div>
 <div class="page-content">
@@ -59,12 +63,16 @@
                         <tr>
                             <td><h6>Kelas</h6></td>
                             <td ><h6>{{$kelas->name}}</h6></td>
+                        </tr>
+                        <tr>
                             <td><h6>Jumlah Siswa</h6></td>
                             <td ><h6>{{count($siswa)}}</h6></td>
                         </tr>
                         <tr>
                             <td><h6>Walikelas</h6></td>
                             <td ><h6>{{$walikelas->name ?? '-'}}</h6></td>
+                        </tr>
+                        <tr>
                             <td><h6>Jumlah Stor Kemarin</h6></td>
                             <td ><h6>Rp. {{ number_format($jumlahTransaksiKemarin)}}</h6></td>
                         </tr>

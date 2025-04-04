@@ -18,23 +18,27 @@
         width: 200px;
     }
 </style>
-<div class="page-heading mb-2">
-    <div class="d-flex justify-content-between">
-        <h3 class="mt-3">Informasi Tabungan Hari Ini</h3>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb breadcrumb-right">
-                @if(auth()->user()->roles_id == 1)
-                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 2)
-                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 3)
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 4)
-                    <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
-                @endif
-                <li class="breadcrumb-item active" aria-current="page">Tabungan</li>
-            </ol>
-        </nav>
+<div class="page-heading mb-3">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h3 class="mt-3">Informasi Tabungan Hari Ini</h3>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
+                    @if(auth()->user()->roles_id == 1)
+                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 2)
+                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 3)
+                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 4)
+                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
+                    @endif
+                    <li class="breadcrumb-item active" aria-current="page">Tabungan</li>
+                </ol>
+            </nav>
+        </div>
     </div>
 </div>
 <div class="page-content">
@@ -153,19 +157,30 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="card-title">Transaksi Hari Ini</h5>
-                        <button type="button" class="btn btn-success">Print Mingguan</button>
+                        {{-- <button type="button" class="btn btn-success">Print Mingguan</button> --}}
                     </div>
                     <!-- Button Group -->
-                    <div class="row">
-                        <div class="btn-group d-flex flex-wrap flex-md-nowrap" role="group" aria-label="Button group for classes">
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(1)">Kelas 1</button>
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(2)">Kelas 2</button>
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(3)">Kelas 3</button>
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(4)">Kelas 4</button>
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(5)">Kelas 5</button>
-                            <button class="btn btn-sm btn-secondary flex-fill mb-2 mb-md-0" onclick="showTable(6)">Kelas 6</button>
+                    <div class="row justify-content-center g-2">
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(1)">Kelas 1</button>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(2)">Kelas 2</button>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(3)">Kelas 3</button>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(4)">Kelas 4</button>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(5)">Kelas 5</button>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(6)">Kelas 6</button>
                         </div>
                     </div>
+
 
                     <!-- Dropdown Table Section -->
                     <div class="dropdown-table mt-3 w-100">

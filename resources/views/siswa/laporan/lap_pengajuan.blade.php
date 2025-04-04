@@ -3,23 +3,27 @@
 @section('title') Laporan Pengajuan - SakuRame @endsection
 
 @section('content')
-<div class="page-heading mb-2">
-    <div class="d-flex justify-content-between ">
-        <h3 class="mt-3">Laporan Pengajuan</h3>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb breadcrumb-right">
-                @if(auth()->user()->roles_id == 1)
-                    <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 2)
-                    <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 3)
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                @elseif(auth()->user()->roles_id == 4)
-                    <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
-                @endif
-                <li class="breadcrumb-item active" aria-current="page">Laporan Pengajuan</li>
-            </ol>
-        </nav>
+<div class="page-heading mb-3">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h3 class="mt-3">Laporan Pengajuan</h3>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
+                    @if(auth()->user()->roles_id == 1)
+                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 2)
+                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 3)
+                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
+                    @elseif(auth()->user()->roles_id == 4)
+                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
+                    @endif
+                    <li class="breadcrumb-item active" aria-current="page">Laporan Pengajuan</li>
+                </ol>
+            </nav>
+        </div>
     </div>
 </div>
 <div class="page-content">
