@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TabunganStorNotification;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
@@ -166,4 +168,12 @@ Route::post('/webhook/payout', [PengajuanController::class, 'handlePayoutWebhook
 // Menangani halaman offline untuk aplikasi PWA.
 route::get('/offline', function () {
     return view('modules/laravelpwa/offline');
+});
+
+
+Route::get('/test-email', function () {
+    $user = \App\Models\User::first();
+    $transaksi = \App\Models\Transaksi::latest()->first(); // Ambil transaksi paling baru
+    Mail::to($user->email)->send(new TabunganStorNotification($transaksi));
+    return "Email dikirim (kalau berhasil)";
 });

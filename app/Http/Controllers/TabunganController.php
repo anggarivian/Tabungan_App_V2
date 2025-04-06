@@ -17,9 +17,11 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Helpers\RupiahHelper;
 use Xendit\Invoice\InvoiceApi;
+use App\Mail\TabunganStoredMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Xendit\Invoice\CreateInvoiceRequest;
 
 
@@ -224,6 +226,13 @@ class TabunganController extends Controller
         $transaksi->save();
 
         $tabungan->save();
+
+        try {
+            Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
+        } catch (\Exception $e) {
+            dd($e);
+            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
     }
@@ -594,7 +603,7 @@ class TabunganController extends Controller
     }
 
     /**
-    * Menangani Pengajuan Penarikan Tabungan Siswa oleh Siswa.
+    * Menangani Stor Tabungan Siswa oleh Siswa.
     *
     * @param Request $request
     * @return \Illuminate\Http\RedirectResponse
@@ -644,7 +653,7 @@ class TabunganController extends Controller
     }
 
     /**
-    * Menangani webhook dari Xendit untuk paument yang berhasil.
+    * Menangani webhook dari Xendit untuk payment yang berhasil.
     *
     * @param Request $request Data yang dikirimkan oleh Xendit melalui webhook.
     * @return \Illuminate\Http\JsonResponse Respon JSON dengan status sukses atau error.
@@ -669,19 +678,25 @@ class TabunganController extends Controller
         }
 
         if ($data['status'] === 'PAID') {
-            $transaksi->status = 'success';
-            $transaksi->save();
+            \DB::beginTransaction();
+            try {
+                $transaksi->status = 'success';
+                $transaksi->save();
 
-            $tabungan = Tabungan::where('user_id', $transaksi->user_id)->first();
-            if ($tabungan) {
-                $tabungan->saldo = $transaksi->saldo_akhir;
-                $tabungan->premi = $tabungan->saldo * 2.5 / 100;
-                $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
+                $tabungan = $transaksi->tabungan;
+                $tabungan->saldo += $transaksi->jumlah_transaksi;
                 $tabungan->save();
+
+                $user = $transaksi->user;
+                Mail::to($user->email)->send(new TabunganStorNotification($transaksi));
+
+                \DB::commit();
+                return response()->json(['message' => 'Payment success and email sent']);
+            } catch (\Exception $e) {
+                \DB::rollBack();
+                \Log::error('Handle Webhook Error: ' . $e->getMessage());
+                return response()->json(['message' => 'Server Error'], 500);
             }
-        } else {
-            $transaksi->status = 'failed';
-            $transaksi->save();
         }
 
         return response()->json(['message' => 'Success']);
