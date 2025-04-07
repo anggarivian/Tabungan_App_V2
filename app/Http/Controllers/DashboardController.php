@@ -26,8 +26,8 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
 
         // Chart -----------------------------------------------------------------------------------------------
@@ -83,8 +83,8 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
@@ -186,21 +186,11 @@ class DashboardController extends Controller
                 })->where('tipe_transaksi', 'Stor')
                 ->where('status', 'success')
                 ->where('pembayaran', 'Tunai')
-                ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-                    $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Tarik')
-                ->where('status', 'success')
-                ->where('pembayaran', 'Tunai')
                 ->sum('jumlah_transaksi');
 
         $jumlah_saldo_digital = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
                     $query->where('kelas_id', $kelas_id);
                 })->where('tipe_transaksi', 'Stor')
-                ->where('status', 'success')
-                ->where('pembayaran', 'Digital')
-                ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-                    $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Tarik')
                 ->where('status', 'success')
                 ->where('pembayaran', 'Digital')
                 ->sum('jumlah_transaksi');
@@ -276,8 +266,8 @@ class DashboardController extends Controller
             ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('user_id', $userId)->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->where('user_id', $userId)->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('user_id', $userId)->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->where('user_id', $userId)->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('user_id', $userId)->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('user_id', $userId)->sum('jumlah_transaksi');
 
         // Chart -----------------------------------------------------------------------------------------------
         $siswa = auth()->user();
