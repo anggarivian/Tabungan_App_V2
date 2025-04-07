@@ -164,19 +164,6 @@ class SiswaController extends Controller
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
 
-        $kelasMap = [1, 2, 3, 4, 5, 6];
-
-        $existingUser = User::where('username', 'like', $kelasMap[$request->kelas - 1] . '%')
-            ->orderBy('username', 'desc')
-            ->first();
-
-        if ($existingUser) {
-            $nextNumber = (int)substr($existingUser->username, -3) + 1;
-            $user->username = $kelasMap[$request->kelas - 1] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        } else {
-            $user->username = $kelasMap[$request->kelas - 1] . '001';
-        }
-
         $user->save();
 
         return redirect()->route('bendahara.siswa.index')->with('success', 'Data siswa berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data siswa berhasil diperbarui')->with('alert-duration', 3000);

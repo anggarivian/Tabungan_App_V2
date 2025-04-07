@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Xendit\Invoice\CreateInvoiceRequest;
 
 
@@ -232,6 +233,67 @@ class TabunganController extends Controller
         } catch (\Exception $e) {
             dd($e);
             \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+        }
+
+        // Kirim pesan WhatsApp pakai Fonnte
+        try {
+            // Device Tokens
+            $devices = [
+                [
+                    'token' => '9mF7bUeEeQ84gN21aWNF', // ganti dengan token device 1
+                ],
+                [
+                    'token' => 'vXxbkknjhdXJq3WtcXvs', // ganti dengan token device 2
+                ]
+            ];
+
+            $nomor = $user->kontak;
+            $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+            $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+            $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+            $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                        "*Stor Tabungan* Anda Berhasil :\n\n" .
+                        "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                        "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                        "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                        "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                        "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+            $pesanTerkirim = false;
+
+            foreach ($devices as $device) {
+                // Cek limit pesan device
+                $response = Http::withHeaders([
+                    'Authorization' => $device['token'],
+                ])->get('https://api.fonnte.com/me');
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $sisaLimit = $data['limit'] ?? 0;
+
+                    if ($sisaLimit > 0) {
+                        // Jika masih ada limit, langsung kirim pesan
+                        Http::withHeaders([
+                            'Authorization' => $device['token'],
+                        ])->asForm()->post('https://api.fonnte.com/send', [
+                            'target' => $nomor,
+                            'message' => $pesan,
+                            'countryCode' => '62',
+                        ]);
+
+                        $pesanTerkirim = true;
+                        break; // Setelah kirim, stop loop
+                    }
+                }
+            }
+
+            if (!$pesanTerkirim) {
+                \Log::error('Semua device kehabisan limit pesan.');
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
