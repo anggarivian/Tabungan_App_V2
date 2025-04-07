@@ -76,25 +76,50 @@ class LoginController extends Controller
 
     public function change_password()
     {
-        return view('auth.change_password');
+        $user = Auth::user();
+        return view('auth.change_password', compact('user'));
     }
     public function change_password_submit(Request $request)
     {
         $request->validate([
             'password' => 'required|min:8|confirmed',
+            'kontak' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
+            'email' => 'nullable|email',
+            'orang_tua' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:500',
         ]);
 
         $user = Auth::user();
 
+        // Update password
         $user->password = Hash::make($request->password);
+
+        // Update contact information
+        if ($request->filled('kontak')) {
+            $user->kontak = $request->kontak;
+        }
+
+        if ($request->filled('email')) {
+            $user->email = $request->email;
+        }
+
+        // Update personal information
+        if ($request->filled('orang_tua')) {
+            $user->orang_tua = $request->orang_tua;
+        }
+
+        if ($request->filled('address')) {
+            $user->address = $request->address;
+        }
+
         $user->save();
 
         return redirect()->back()
-            ->with('success', 'Password berhasil diubah (Tunggu 3 detik, Halaman ini akan beralih)')
+            ->with('success', true)
             ->with('alert-type', 'success')
-            ->with('alert-message', 'Password berhasil diubah (Tunggu 3 detik, Halaman ini akan beralih)')
-            ->with('alert-duration', 3000);
-        }
+            ->with('alert-message', 'Informasi akun berhasil diperbarui! (Tunggu 2 detik, Halaman ini akan beralih)')
+            ->with('alert-duration', 2000);
+    }
 
         public function edit()
         {
@@ -102,39 +127,39 @@ class LoginController extends Controller
         }
 
         public function update(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'kontak' => 'required|string|max:20',
-        'alamat' => 'nullable|string|max:255',
-        'orang_tua' => 'nullable|string|max:255',
-        'current_password' => 'nullable|required_with:password|string',
-        'password' => 'nullable|string|min:8|confirmed',
-        ], [
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'kontak' => 'required|string|max:20',
+            'alamat' => 'nullable|string|max:255',
+            'orang_tua' => 'nullable|string|max:255',
+            'current_password' => 'nullable|required_with:password|string',
+            'password' => 'nullable|string|min:8|confirmed',
+            ], [
+                'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
 
-    // Cek jika user ingin mengubah password
-    if ($request->filled('password')) {
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'Password lama tidak sesuai.');
+        // Cek jika user ingin mengubah password
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->with('error', 'Password lama tidak sesuai.');
+            }
+
+            $user->password = Hash::make($request->password);
         }
 
-        $user->password = Hash::make($request->password);
+        // Update data lain
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->kontak = $request->kontak;
+        $user->alamat = $request->alamat;
+        $user->orang_tua = $request->orang_tua;
+
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
     }
-
-    // Update data lain
-    $user->name = $request->name;
-    $user->email = $request->email;
-    $user->kontak = $request->kontak;
-    $user->alamat = $request->alamat;
-    $user->orang_tua = $request->orang_tua;
-
-    $user->save();
-
-    return back()->with('success', 'Profil berhasil diperbarui.');
-}
 }
