@@ -156,6 +156,23 @@ class PengajuanController extends Controller
             ->with('alert-duration', 30000);
     }
 
+    public function batal($id)
+    {
+        $pengajuan = Pengajuan::find($id);
+
+        if (!$pengajuan) {
+            return redirect()->back()->with('error', 'Pengajuan tidak ditemukan.');
+        }
+
+        $pengajuan->status = 'Batal';
+        $pengajuan->save();
+
+        return redirect()->back()->with('success', 'Pengajuan Penarikan Telah di Batalkan.')
+        ->with('alert-type', 'success')
+        ->with('alert-message', 'Pengajuan Penarikan Telah di Batalkan.')
+        ->with('alert-duration', 30000);
+    }
+
     // Bendahara Terima Pengajuan ----------------------------------------------------------------------------------
     /**
     * Menangani Keputusan Pengajuan Penarikan Tabungan Siswa oleh Bendahara.

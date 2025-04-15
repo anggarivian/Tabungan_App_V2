@@ -16,9 +16,9 @@
                     @elseif(auth()->user()->roles_id == 2)
                         <li class="breadcrumb-item"><a href="{{ route('bendahara.dashboard') }}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route('walikelas.bendahara') }}">Bendahara</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('walikelas.bendahara') }}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route('siswa.dashboard') }}">Siswa</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('siswa.dashboard') }}">Dashboard</a></li>
                     @endif
                     <li class="breadcrumb-item active" aria-current="page">Pengajuan Tarik Tabungan</li>
                 </ol>
@@ -67,6 +67,12 @@
                             }, {{ session('alert-duration') }});
                         @endif
                     </script>
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
                             <strong>Terjadi Kesalahan!</strong>
@@ -120,6 +126,9 @@
                                 <td>{{ \Carbon\Carbon::parse($pengajuan->created_at)->format('d M Y H:i') }}</td>
                             </tr>
                         </table>
+                        <button class="btn btn-danger w-100" onclick="openBatalModal({{ $pengajuan->id }})">
+                            Batalkan Pengajuan
+                        </button>
                     @else
                         <form action="{{ route('siswa.tabungan.ajukan') }}" method="POST">
                             @csrf
@@ -285,9 +294,43 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Konfirmasi Batal --}}
+<div class="modal fade modal-borderless" id="batalModal" tabindex="-1" aria-labelledby="batalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batalModalLabel">Konfirmasi Pembatalan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin membatalkan pengajuan ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form id="batalForm" method="POST" action="">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Batalkan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('js')
+<script>
+    function openBatalModal(id) {
+        var form = document.getElementById('batalForm');
+        form.action = '/siswa/tabungan/tarik/batal/' + id;
+
+        var myModal = new bootstrap.Modal(document.getElementById('batalModal'));
+        myModal.show();
+    }
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const jenisPembayaran = document.getElementById('jenis_pembayaran');

@@ -16,9 +16,9 @@
                     @elseif(auth()->user()->roles_id == 2)
                         <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.bendahara')}}">Bendahara</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.bendahara')}}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
                     @endif
                     <li class="breadcrumb-item active" aria-current="page">Stor Tabungan</li>
                 </ol>

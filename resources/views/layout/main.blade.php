@@ -152,6 +152,52 @@
                 font-size: 14px;
             }
         }
+
+        #loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f4f4f4; /* atau dark: #0b0c10 */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loader {
+            border: 6px solid #ddd;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sembunyikan content-wrapper dulu */
+        .content-wrapper {
+            display: none;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
     </style>
 
 </head>
@@ -165,7 +211,7 @@
                 <div class="header-top">
                     <div class="container">
                         <a class="d-flex" href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
-                            <img id="logo-img" src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" height="40px" width="190px" alt="Logo">
+                            <img id="logo-img" src="{{ asset('Logo Normal.svg') }}" height="40px" width="190px" alt="Logo">
                         </a>
                         <div class="header-top-right">
                             <div class="d-none d-md-flex">
@@ -423,7 +469,13 @@
 
             </header>
 
-            <div class="content-wrapper container" style="font-size: 14px;">
+            <!-- Loader Khusus Konten -->
+            <div id="content-loader" style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Konten Sebenarnya -->
+            <div class="main-content container" style="display: none; font-size: 14px;">
                 @yield('content')
             </div>
 
@@ -455,6 +507,24 @@
     <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     @yield('js')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loader = document.getElementById("content-loader");
+            const content = document.querySelector(".main-content");
+
+            // Delay biar kerasa loading-nya (misal 700ms)
+            setTimeout(() => {
+                loader.style.display = "none";
+                content.style.display = "block";
+
+                // Aktifkan AOS kalau ada
+                if (typeof AOS !== 'undefined') {
+                    AOS.init();
+                }
+            }, 700);
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

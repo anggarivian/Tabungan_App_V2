@@ -96,10 +96,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bendahara/tabungan/search', [TabunganController::class, 'bendahara_search'])->name('bendahara.search');
 
         // Menangani pengelolaan Pengajuan.
-        Route::get('/bendahara/kelola-pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
-        Route::get('/bendahara/kelola-pengajuan/get-data/{id}', [PengajuanController::class, 'getPengajuanData'])->name('bendahara.pengajuan.getData');
-        Route::put('/bendahara/kelola-pengajuan/terima', [PengajuanController::class, 'terima'])->name('bendahara.pengajuan.terima');
-        Route::get('/bendahara/kelola-pengajuan/tolak/{id}', [PengajuanController::class, 'tolak'])->name('bendahara.pengajuan.tolak');
+        Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
+        Route::get('/bendahara/pengajuan/get-data/{id}', [PengajuanController::class, 'getPengajuanData'])->name('bendahara.pengajuan.getData');
+        Route::put('/bendahara/pengajuan/terima', [PengajuanController::class, 'terima'])->name('bendahara.pengajuan.terima');
+        Route::get('/bendahara/pengajuan/tolak/{id}', [PengajuanController::class, 'tolak'])->name('bendahara.pengajuan.tolak');
 
         // Menangani pengelolaan Laporan.
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
@@ -144,6 +144,7 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengajuan penarikan tabungan Tunai / Digital.
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
         Route::post('/siswa/tabungan/tarik/ajukan', [PengajuanController::class, 'ajukan'])->name('siswa.tabungan.ajukan');
+        Route::delete('/siswa/tabungan/tarik/batal/{id}', [PengajuanController::class, 'batal'])->name('siswa.tabungan.batal');
 
         // Menangani pengambilan data Bank dan E - Wallet.
         Route::get('/payout-channels', [PengajuanController::class, 'getPayoutChannels'])->name('payout.channels');

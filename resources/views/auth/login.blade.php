@@ -238,13 +238,52 @@
             margin: 0;
             font-size: 1.4rem;
         }
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .screen-1 {
+            animation: fadeSlideIn 0.8s ease-out;
+        }
+
+        .logo-container {
+            animation: fadeSlideIn 1s ease-out;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .form-title {
+            animation: fadeSlideIn 1s ease-out;
+            animation-delay: 0.4s;
+            animation-fill-mode: both;
+        }
+
+        form {
+            animation: fadeSlideIn 1s ease-out;
+            animation-delay: 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .footer {
+            animation: fadeSlideIn 1s ease-out;
+            animation-delay: 0.8s;
+            animation-fill-mode: both;
+        }
+
     </style>
 </head>
 <body>
     <div class="screen-1">
-        <button class="back-button" onclick="goBack()">
+        <a href="/" class="back-button">
             <ion-icon name="arrow-back-outline"></ion-icon>
-        </button>
+        </a>
 
         <div class="logo-container">
             <div class="logo">
@@ -326,11 +365,6 @@
             }
         }
 
-        function goBack() {
-            // You can replace this with your specific navigation logic
-            window.history.back();
-            // Alternative: window.location.href = '/your-previous-page';
-        }
     </script>
 </body>
 </html>

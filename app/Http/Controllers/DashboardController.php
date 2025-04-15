@@ -85,6 +85,7 @@ class DashboardController extends Controller
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
         $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
         $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $premi = Tabungan::sum('premi');
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
@@ -119,7 +120,8 @@ class DashboardController extends Controller
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
-            'jumlah_saldo_digital'
+            'jumlah_saldo_digital',
+            'premi'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',

@@ -258,6 +258,7 @@ class LaporanController extends Controller
                 $query->orderBy('created_at', $sortTanggal);
             })
             ->where('status', 'success')
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->appends($request->all());
 
