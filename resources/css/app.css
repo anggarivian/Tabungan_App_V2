@@ -1,10 +1,8 @@
-/* public/css/app.css */
-
 #loading-screen {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Background hitam dengan transparansi 80% */
+    background: rgba(0, 0, 0, 0.8);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -12,8 +10,8 @@
 }
 
 .spinner {
-    border: 16px solid rgba(255, 255, 255, 0.2); /* Warna border spinner lebih terang */
-    border-top: 16px solid #ffffff; /* Warna border atas putih */
+    border: 16px solid rgba(255, 255, 255, 0.2);
+    border-top: 16px solid #ffffff;
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -27,8 +25,8 @@
 
 @font-face {
     font-family: 'Nunito';
-    src: url('/dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') format('woff2'),
-         url('/dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff') format('woff');
+    src: url('../font/nunito-latin-400-normal.woff2') format('woff2'),
+         url('../font/nunito-latin-400-normal.woff') format('woff');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -36,8 +34,8 @@
 
 @font-face {
     font-family: 'Nunito';
-    src: url('/dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') format('woff2'),
-         url('/dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff') format('woff');
+    src: url('../font/nunito-latin-600-normal.woff2') format('woff2'),
+         url('../font/nunito-latin-600-normal.woff') format('woff');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -45,8 +43,8 @@
 
 @font-face {
     font-family: 'Nunito';
-    src: url('/dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') format('woff2'),
-         url('/dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff') format('woff');
+    src: url('../font/nunito-latin-700-normal.woff2') format('woff2'),
+         url('../font/nunito-latin-700-normal.woff') format('woff');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -55,22 +53,3 @@
 body {
     font-family: 'Nunito', sans-serif;
 }
-
-@font-face {
-    font-family: 'Nunito';
-    src: url('{{ asset("dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2") }}') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-
-.main-navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1030; /* Lebih tinggi dari konten lain */
-    background-color: #fff; /* atau sesuai warna navbar */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* agar ada bayangan saat sticky */
-}
-
-

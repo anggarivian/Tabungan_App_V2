@@ -56,7 +56,7 @@ class SiswaController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            // 'password' => 'required|string|min:8',
             'jenis_kelamin' => 'required|in:L,P',
             'kontak' => 'required|string|max:15',
             'alamat' => 'required|string',
@@ -67,8 +67,8 @@ class SiswaController extends Controller
             'email.required' => 'Email harus diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
-            'password.required' => 'Password harus diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
+            // 'password.required' => 'Password harus diisi.',
+            // 'password.min' => 'Password minimal 8 karakter.',
             'kontak.required' => 'Kontak harus diisi.',
             'kontak.max' => 'Kontak maksimal 15 karakter.',
             'alamat.required' => 'Alamat harus diisi.',
@@ -78,7 +78,7 @@ class SiswaController extends Controller
         $user = new User();
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
-        $user->password = bcrypt($validatedData['password']);
+        $user->password = bcrypt('12345');
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
         $user->kontak = $validatedData['kontak'];
         $user->alamat = $validatedData['alamat'];
@@ -160,6 +160,7 @@ class SiswaController extends Controller
         $user->email = $validatedData['email'];
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
         $user->kontak = $validatedData['kontak'];
+        $user->password = $validatedData['password'];
         $user->alamat = $validatedData['alamat'];
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];

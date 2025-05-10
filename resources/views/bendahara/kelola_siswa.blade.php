@@ -179,12 +179,6 @@
                             <input type="email" id="email-horizontal" class="form-control" name="email" placeholder="Email" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="password-horizontal">Password</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="password" id="password-horizontal" class="form-control" name="password" placeholder="Password" required>
-                        </div>
-                        <div class="col-md-4">
                             <label for="gender-horizontal">Jenis Kelamin</label>
                         </div>
                         <div class="col-md-8 form-group">
@@ -260,6 +254,12 @@
                             <input type="email" id="edit-email" class="form-control" name="email" placeholder="Email" required>
                         </div>
                         <div class="col-md-4">
+                            <label for="edit-password">Password</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="password" id="edit-password" class="form-control" name="password" placeholder="Password" required>
+                        </div>
+                        <div class="col-md-4">
                             <label for="edit-jenis_kelamin">Jenis Kelamin</label>
                         </div>
                         <div class="col-md-8 form-group">
@@ -298,23 +298,43 @@
     </div>
 </div>
 
-{{-- Modal Konfirmasi Delete --}}
-<div class="modal fade modal-borderless" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+{{-- Modal Konfirmasi Delete Yang Ditingkatkan --}}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Konfirmasi Hapus
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                Apakah Anda yakin ingin menghapus data ini?
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="mb-3 text-danger">
+                    <i class="bi bi-trash-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Anda yakin ingin menghapus?</h4>
+                    <p class="text-muted">
+                    Perihatikan bahwa menghapus data siswa akan menghapus semua data yang terkait dengan
+                    <span class="fw-bold text-danger">tabungan</span>.
+                    </p>
+                    <div class="alert alert-warning d-flex align-items-center mt-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <div>Tindakan ini tidak dapat dibatalkan setelah dilakukan.</div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Batal
+                </button>
                 <form id="deleteForm" method="POST" action="{{ route('bendahara.siswa.delete', '') }}">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Hapus</button>
+                    <button type="submit" class="btn btn-danger px-4 py-2">
+                    <i class="bi bi-trash me-1"></i> Hapus Data
+                    </button>
                 </form>
             </div>
         </div>
@@ -326,7 +346,7 @@
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="importModalLabel">import Data Siswa</h1>
+                <h1 class="modal-title fs-5" id="importModalLabel">Import Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data">
@@ -349,6 +369,30 @@
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Script untuk animasi tambahan saat membuka modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function() {
+            const trashIcon = this.querySelector('.bi-trash-fill');
+            trashIcon.style.transform = 'scale(0)';
+            setTimeout(() => {
+            trashIcon.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                trashIcon.style.transform = 'scale(1)';
+            }, 200);
+            }, 300);
+        });
+
+        // Script untuk animasi saat form delete disubmit
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Menghapus...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
 <script>
     $(document).ready(function() {
         $('.btn-warning').on('click', function() {

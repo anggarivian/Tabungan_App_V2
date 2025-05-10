@@ -48,55 +48,89 @@ class TabunganController extends Controller
     public function bendahara_index()
     {
         $perPage = request('perPage', 10);
+        $kelasList = [];
 
-        $kelas1 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 1);
-            })
+        for ($i = 1; $i <= 6; $i++) {
+            $transaksi = Transaksi::whereHas('user.kelas', function ($query) use ($i) {
+                    $query->where('kelas_id', $i);
+                })
+                ->whereDate('created_at', Carbon::today())
+                ->orderBy('created_at', 'desc')
+                ->paginate($perPage);
+
+            $stor = Transaksi::whereHas('user.kelas', function ($query) use ($i) {
+                    $query->where('kelas_id', $i);
+                })
+                ->where('tipe_transaksi', 'Stor')
+                ->where('status', 'success')
+                ->whereDate('created_at', Carbon::today())
+                ->sum('jumlah_transaksi');
+
+            $tarik = Transaksi::whereHas('user.kelas', function ($query) use ($i) {
+                    $query->where('kelas_id', $i);
+                })
+                ->where('tipe_transaksi', 'Tarik')
+                ->where('status', 'success')
+                ->whereDate('created_at', Carbon::today())
+                ->sum('jumlah_transaksi');
+
+            $kelasList["kelas$i"] = [
+                'data' => $transaksi,
+                'stor' => $stor,
+                'tarik' => $tarik,
+            ];
+        }
+
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->sum('jumlah_transaksi');
 
-        $kelas2 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 2);
-            })
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->sum('jumlah_transaksi');
 
-        $kelas3 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 3);
-            })
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->where('pembayaran', 'Tunai')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
-
-        $kelas4 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 4);
-            })
+            ->sum('jumlah_transaksi')
+            - Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->where('pembayaran', 'Tunai')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->sum('jumlah_transaksi');
 
-        $kelas5 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 5);
-            })
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->where('pembayaran', 'Digital')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
-
-        $kelas6 = Transaksi::whereHas('user.kelas', function ($query) {
-                $query->where('kelas_id', 6);
-            })
+            ->sum('jumlah_transaksi')
+            - Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->where('pembayaran', 'Digital')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->sum('jumlah_transaksi');
 
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->whereDate('created_at', Carbon::today())->sum('jumlah_transaksi');
+        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelasList'));
+    }
 
-        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas1','kelas2','kelas3','kelas4','kelas5','kelas6'));
+    /**
+    * Import Data Transaksi Tabungan oleh Bendahara.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
+    public function bendahara_importTransaksi(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new TransaksiImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Data transaksi berhasil diimport!');
     }
 
     /**
@@ -644,9 +678,37 @@ class TabunganController extends Controller
 
     public function siswa_stor()
     {
+        $user = auth()->user();
+
+        // Ambil saldo dan terbilang
+        $nominal = $user->tabungan->saldo;
+        $terbilang = RupiahHelper::terbilangRupiah($nominal);
+
+        $invoice = null;
+
+        // Cari transaksi terbaru user yang berstatus 'pending'
+        $pendingTransaksi = Transaksi::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        if ($pendingTransaksi && $pendingTransaksi->external_id) {
+            // Ambil data invoice dari Xendit
+            $response = Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+                ->get('https://api.xendit.co/v2/invoices', [
+                    'external_id' => $pendingTransaksi->external_id,
+                ]);
+
+            if ($response->successful() && count($response->json()) > 0) {
+                $invoice = $response->json()[0];
+
+                $invoice['expiry_date_carbon'] = Carbon::parse($invoice['expiry_date']);
+            }
+        }
+
         $nominal = auth()->user()->tabungan->saldo ;
         $terbilang = RupiahHelper::terbilangRupiah($nominal);
-        return view('siswa.tabungan.stor', compact('nominal', 'terbilang'));
+        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice'));
     }
 
     /**
@@ -681,12 +743,15 @@ class TabunganController extends Controller
 
         $externalId = 'stor-' . $user->id . '-' . time();
 
+        $successRedirectUrl = route('payment.success');
+
         $invoiceRequest = new CreateInvoiceRequest([
             'external_id' => $externalId,
             'payer_email' => $user->email,
             'description' => 'Stor Tabungan untuk ' . $user->name,
             'amount' => (int) $jumlahStor,
             'invoice_duration' => 86400,
+            'success_redirect_url' => $successRedirectUrl,
         ]);
 
         try {
@@ -703,7 +768,7 @@ class TabunganController extends Controller
             $transaksi->checkout_link = $invoice['invoice_url'];
             $transaksi->external_id = $externalId;
             $transaksi->token_stor = \Illuminate\Support\Str::random(10);;
-            $transaksi->user_id = $user->id;
+            $transaksi->user_id = auth()->user()->id;
             $transaksi->tabungan_id = $user->tabungan->id;
             $transaksi->save();
 
@@ -749,8 +814,49 @@ class TabunganController extends Controller
                 $tabungan->saldo += $transaksi->jumlah_transaksi;
                 $tabungan->save();
 
-                $user = $transaksi->user;
-                Mail::to($user->email)->send(new TabunganStorNotification($transaksi));
+                $user = User::find($transaksi->user_id);
+
+                try {
+                    Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
+                } catch (\Exception $e) {
+                    dd($e);
+                    \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+                }
+
+                try {
+                    $token = '9mF7bUeEeQ84gN21aWNF';
+
+                    $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+                    if (substr($nomor, 0, 2) === '62') {
+                        $nomor = '0' . substr($nomor, 2);
+                    }
+                    if (substr($nomor, 0, 1) === '0') {
+                        $nomor = substr($nomor, 1);
+                    }
+
+                    $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+                    $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+                    $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+                    $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                        "*Stor Tabungan* Anda Berhasil :\n\n" .
+                        "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                        "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                        "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                        "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                        "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+                    Http::withHeaders([
+                        'Authorization' => $token,
+                    ])->asForm()->post('https://api.fonnte.com/send', [
+                        'target' => $nomor,
+                        'message' => $pesan,
+                        'countryCode' => '62',
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
+                }
 
                 \DB::commit();
                 return response()->json(['message' => 'Payment success and email sent']);
@@ -763,4 +869,10 @@ class TabunganController extends Controller
 
         return response()->json(['message' => 'Success']);
     }
+
+    public function success()
+    {
+        return view('payment.success');
+    }
+
 }

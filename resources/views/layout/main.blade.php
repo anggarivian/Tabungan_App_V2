@@ -13,6 +13,8 @@
     {{-- @laravelPWA --}}
     @yield('style')
 
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-300-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
@@ -32,6 +34,49 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
 
     <style>
+        /* Animasi untuk modal */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: scale(0.9);
+        }
+        .modal.show .modal-dialog {
+            transform: scale(1);
+        }
+
+        /* Gaya tombol */
+        .btn {
+            transition: all 0.2s;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4b4b, #ff6b6b);
+            border: none;
+        }
+        .btn-light {
+            background: #f8f9fa;
+            border: 1px solid #eaeaea;
+        }
+
+        /* Efek shake saat hover pada icon hapus */
+        .bi-trash-fill {
+            transition: all 0.3s;
+        }
+        .bi-trash-fill:hover {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
         /* ======== DESKTOP DEFAULT (>=1201px) ======== */
         .main-navbar {
             position: fixed;
@@ -500,11 +545,8 @@
     <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
     <script src="{{ asset('/dist/assets/static/js/components/dark.js') }}"></script>
     <script src="{{ asset('/dist/assets/static/js/pages/horizontal-layout.js') }}"></script>
-    <script src="{{ asset('/dist/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
 
     <script src="{{ asset('/dist/assets/compiled/js/app.js') }}"></script>
-
-    <script src="{{ asset('/dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     @yield('js')
 

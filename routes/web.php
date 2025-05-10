@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
+        Route::post('/bendahara/tabungan/import', [TabunganController::class, 'bendahara_importTransaksi'])->name('bendahara.tabungan.import');
         Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'bendahara_stor'])->name('bendahara.tabungan.stor');
         Route::get('/bendahara/tabungan/stor/kelas/{id}', [TabunganController::class, 'bendahara_storMasal'])->name('bendahara.tabungan.stor.masal');
         Route::post('/bendahara/tabungan/stor/kelas/add', [TabunganController::class, 'bendahara_storMasalTabungan'])->name('bendahara.tabungan.storMasalTabungan');
@@ -140,6 +141,7 @@ Route::middleware(['auth'])->group(function () {
         // Menangani siswa stor tabungan Digital.
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
+        Route::get('/siswa/tabungan/success', [TabunganController::class, 'success'])->name('payment.success');
 
         // Menangani pengajuan penarikan tabungan Tunai / Digital.
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');

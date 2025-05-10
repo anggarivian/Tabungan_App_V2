@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SakuRame</title>
 
+    <meta name="theme-color" content="#6777ef"/>
+    <link rel="apple-touch-icon" href="{{ asset('Logo.png') }}">
+    <link rel="manifest" href="{{ asset('/manifest.json') }}">
+
     <link rel="shortcut icon" href="{{ asset('dist/assets/compiled/svg/Logo.svg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('/dist/assets/compiled/css/app-dark.css') }}">

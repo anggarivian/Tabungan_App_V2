@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SakuRame - Sistem Tabungan Digital Sekolah</title>
 
+    <meta name="theme-color" content="#6777ef"/>
+    <link rel="apple-touch-icon" href="{{ asset('Logo.png') }}">
+    <link rel="manifest" href="{{ asset('/manifest.json') }}">
+
     <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -332,9 +336,15 @@
                         <a class="nav-link" href="#faq">FAQ</a>
                     </li>
                     <li class="nav-item ms-3">
-                        <a href="/login" class="btn btn-primary px-4">
-                            <i class="fas fa-sign-in-alt me-2"></i>Masuk
-                        </a>
+                        @auth
+                            <a href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}" class="btn btn-dark px-4">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary px-4">
+                                <i class="fas fa-sign-in-alt me-2"></i>Masuk
+                            </a>
+                        @endauth
                     </li>
                 </ul>
             </div>
@@ -342,44 +352,41 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero text-white">
+    <section class="hero text-white py-7 py-lg-8">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <div class="badge bg-white text-primary mb-4 px-3 py-2 rounded-pill">
+                <!-- SVG Section (Pindah ke atas di ponsel) -->
+                <div class="col-lg-6 order-1 order-lg-2 text-center mb-5 mb-lg-0" data-aos="fade-left">
+                    <img src="Savings-pana.svg" class="img-fluid rounded-3 mx-auto" style="max-width: 90%;">
+                </div>
+
+                <!-- Text Section -->
+                <div class="col-lg-6 order-2 order-lg-1 text-center text-lg-start" data-aos="fade-right">
+                    <div class="badge bg-white text-primary mb-4 px-3 py-2 rounded-pill d-inline-block">
                         🚀 Solusi Tabungan Digital Terdepan
                     </div>
-                    <h1 class="display-3 fw-bold mb-3">
+                    <h1 class="display-5 fw-bold mb-3">
                         Kelola Tabungan Siswa<br>
                         <span class="text-warning">Secara Modern</span>
                     </h1>
-                    <p class="lead mb-4 opacity-75">Sistem tabungan digital terpercaya untuk SDN Sukarame yang memudahkan siswa, guru, dan orang tua.</p>
+                    <p class="lead mb-4 opacity-75 px-2 px-lg-0">
+                        Sistem tabungan digital terpercaya untuk SDN Sukarame yang memudahkan siswa, guru, dan orang tua.
+                    </p>
 
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <a href="/login" class="btn btn-light btn-lg rounded-pill">
-                            <i class="fas fa-sign-in-alt me-2"></i>Masuk Sekarang
-                        </a>
-                        <a href="#fitur" class="btn btn-outline-light btn-lg rounded-pill">
-                            <i class="fas fa-info-circle me-2"></i>Pelajari
+                    <div class="d-flex flex-column flex-md-row justify-content-center justify-content-lg-start align-items-center gap-3 px-2 px-lg-0">
+                        @auth
+                            <a class="btn btn-dark btn-lg rounded-pill w-100 w-md-auto text-center" href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        @else
+                            <a class="btn btn-light btn-lg rounded-pill w-100 w-md-auto text-center" href="{{ route('login') }}">
+                                <i class="fas fa-sign-in-alt me-2"></i>Masuk Sekarang
+                            </a>
+                        @endauth
+                        <a href="#" id="installAppBtn" class="btn btn-outline-light btn-lg rounded-pill w-100 w-md-auto text-center">
+                            <i class="fas fa-info-circle me-2"></i>Install Aplikasi
                         </a>
                     </div>
-                </div>
-                <div class="col-lg-6 mt-5 mt-lg-0" data-aos="fade-left">
-                    <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" class="img-fluid rounded-3 shadow-lg">
-                        <style>
-                            .device { fill: #fff; }
-                            .screen { fill: #f8fafc; }
-                            .chart { fill: var(--primary); }
-                            .coins { fill: var(--accent); }
-                        </style>
-                        <rect x="50" y="50" width="500" height="300" rx="25" class="device"/>
-                        <rect x="75" y="75" width="450" height="250" rx="15" class="screen"/>
-                        <path d="M100 150h400v40H100z" class="chart" opacity="0.8"/>
-                        <path d="M100 220h300v40H100z" class="chart" opacity="0.6"/>
-                        <path d="M100 290h250v40H100z" class="chart" opacity="0.4"/>
-                        <circle cx="450" cy="200" r="40" class="coins"/>
-                        <text x="450" y="200" text-anchor="middle" fill="#fff" font-size="20" dy=".3em">IDR</text>
-                    </svg>
                 </div>
             </div>
         </div>
@@ -623,7 +630,7 @@
             <p class="fs-5 mb-5 opacity-75 mx-auto" style="max-width: 700px;" data-aos="zoom-in" data-aos-delay="100">
                 Bergabunglah dengan ratusan sekolah yang telah menggunakan SakuRame untuk pengelolaan tabungan digital
             </p>
-            <a href="/login" class="btn btn-light btn-lg px-5 fw-bold" data-aos="fade-up" data-aos-delay="200">
+            <a href="{{ route ('login')}}" class="btn btn-light btn-lg px-5 fw-bold" data-aos="fade-up" data-aos-delay="200">
                 <i class="fas fa-sign-in-alt me-2"></i>Masuk Sekarang
             </a>
         </div>
@@ -678,51 +685,86 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            once: true,
-            easing: 'ease-in-out-quad',
-            offset: 100,
-            disable: window.innerWidth < 768
-        });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true,
+                easing: 'ease-in-out-quad',
+                offset: 100,
+                disable: function () {
+                    return window.innerWidth < 768;
+                }
+            });
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Close mobile menu after click
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            if (navbarCollapse && typeof bootstrap !== 'undefined') {
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (navbarCollapse.classList.contains('show')) {
+                            new bootstrap.Collapse(navbarCollapse).hide();
+                        }
                     });
+                });
+            }
+
+            // Sticky navbar on scroll
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    if (window.scrollY > 100) {
+                        navbar.classList.add('navbar-scrolled');
+                    } else {
+                        navbar.classList.remove('navbar-scrolled');
+                    }
                 }
             });
         });
+    </script>
 
-        // Close mobile menu after click
-        const navbarCollapse = document.querySelector('.navbar-collapse');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (navbarCollapse.classList.contains('show')) {
-                    new bootstrap.Collapse(navbarCollapse).hide();
-                }
-            });
+    <script>
+        let deferredPrompt;
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
         });
-
-        // Sticky navbar on scroll
-        window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 100) {
-                navbar.classList.add('navbar-scrolled');
+    </script>
+    <script>
+        document.getElementById("installAppBtn").addEventListener("click", async (e) => {
+            e.preventDefault();
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === "accepted") {
+                    console.log("User accepted the install prompt");
+                } else {
+                    console.log("User dismissed the install prompt");
+                }
+                deferredPrompt = null; // Hapus agar tidak bisa dipakai dua kali
             } else {
-                navbar.classList.remove('navbar-scrolled');
+                alert("Install tidak tersedia di browser ini. Silakan gunakan Chrome atau Edge.");
             }
         });
     </script>

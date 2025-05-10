@@ -148,6 +148,10 @@
                                 </svg>
                                 Tarik
                             </a>
+
+                            <a class="btn btn-success w-10 m-1 p-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                                Import
+                            </a>
                         </div>
                     </div>
 
@@ -160,6 +164,7 @@
                         {{-- <button type="button" class="btn btn-success">Print Mingguan</button> --}}
                     </div>
                     <!-- Button Group -->
+                    <p>Pilih Kelas :</p>
                     <div class="row justify-content-center g-2">
                         <div class="col-6 col-sm-4 col-md-2">
                             <button class="btn btn-sm btn-secondary w-100" onclick="showTable(1)">Kelas 1</button>
@@ -184,8 +189,22 @@
 
                     <!-- Dropdown Table Section -->
                     <div class="dropdown-table mt-3 w-100">
-                        @foreach (['kelas1' => 'Kelas 1', 'kelas2' => 'Kelas 2', 'kelas3' => 'Kelas 3', 'kelas4' => 'Kelas 4', 'kelas5' => 'Kelas 5', 'kelas6' => 'Kelas 6'] as $kelas => $namaKelas)
-                            <div id="table{{ $loop->index + 1 }}" class="table-responsive-lg" style="display: none;">
+                        @foreach (range(1,6) as $i)
+                            @php
+                                $kelasData = $kelasList['kelas'.$i];
+                            @endphp
+                            <div id="table{{ $i }}" class="table-responsive-lg" style="display: none;">
+                                <div class="mb-3">
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <h6 class="mb-0">{{ "Kelas $i" }} : </h6>
+                                        <div class="badge bg-success">
+                                            Stor: Rp. {{ number_format($kelasData['stor']) }}
+                                        </div>
+                                        <div class="badge bg-danger">
+                                            Tarik: Rp. {{ number_format($kelasData['tarik']) }}
+                                        </div>
+                                    </div>
+                                </div>
                                 <table class="table table-hover" style="width: 100%">
                                     <thead>
                                         <tr>
@@ -202,7 +221,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($$kelas as $transaksis)
+                                        @forelse ($kelasData['data'] as $transaksis)
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td class="text-center">{{ $transaksis->user->username }}</td>
@@ -233,6 +252,7 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+
                                 <div class="d-flex justify-content-between">
                                     <form method="GET" action="{{ request()->url() }}">
                                         <div class="d-flex justify-content-end mb-3">
@@ -247,7 +267,7 @@
                                         </div>
                                     </form>
                                     <div class="justify-content-end">
-                                        {{ $$kelas->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+                                        {{ $kelasData['data']->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
                                     </div>
                                 </div>
                             </div>
@@ -255,6 +275,31 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Import --}}
+<div class="modal fade modal-borderless" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="importModalLabel">Import Data Transaksi</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('bendahara.tabungan.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Pilih File ( Format : .xls .xlsx)</label>
+                        <input class="form-control" type="file" name="file" id="formFile">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
