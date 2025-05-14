@@ -270,63 +270,37 @@ class TabunganController extends Controller
             \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
         }
 
-        // Kirim pesan WhatsApp pakai Fonnte
         try {
-            // Device Tokens
-            $devices = [
-                [
-                    'token' => '9mF7bUeEeQ84gN21aWNF', // ganti dengan token device 1
-                ],
-                [
-                    'token' => 'vXxbkknjhdXJq3WtcXvs', // ganti dengan token device 2
-                ]
-            ];
+            $token = '9mF7bUeEeQ84gN21aWNF';
 
-            $nomor = $user->kontak;
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+            if (substr($nomor, 0, 2) === '62') {
+                $nomor = '0' . substr($nomor, 2);
+            }
+            if (substr($nomor, 0, 1) === '0') {
+                $nomor = substr($nomor, 1);
+            }
+
             $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
             $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
             $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
 
             $pesan = "Halo,\n {$user->name} 👋\n\n" .
-                        "*Stor Tabungan* Anda Berhasil :\n\n" .
-                        "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
-                        "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
-                        "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
-                        "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                        "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                "*Stor Tabungan* Anda Berhasil :\n\n" .
+                "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
 
-            $pesanTerkirim = false;
-
-            foreach ($devices as $device) {
-                // Cek limit pesan device
-                $response = Http::withHeaders([
-                    'Authorization' => $device['token'],
-                ])->get('https://api.fonnte.com/me');
-
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $sisaLimit = $data['limit'] ?? 0;
-
-                    if ($sisaLimit > 0) {
-                        // Jika masih ada limit, langsung kirim pesan
-                        Http::withHeaders([
-                            'Authorization' => $device['token'],
-                        ])->asForm()->post('https://api.fonnte.com/send', [
-                            'target' => $nomor,
-                            'message' => $pesan,
-                            'countryCode' => '62',
-                        ]);
-
-                        $pesanTerkirim = true;
-                        break; // Setelah kirim, stop loop
-                    }
-                }
-            }
-
-            if (!$pesanTerkirim) {
-                \Log::error('Semua device kehabisan limit pesan.');
-            }
-
+            Http::withHeaders([
+                'Authorization' => $token,
+            ])->asForm()->post('https://api.fonnte.com/send', [
+                'target' => $nomor,
+                'message' => $pesan,
+                'countryCode' => '62',
+            ]);
         } catch (\Exception $e) {
             \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
         }
@@ -374,6 +348,48 @@ class TabunganController extends Controller
                 $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
                 $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
                 $tabungan->save();
+            }
+
+            try {
+                Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
+            } catch (\Exception $e) {
+                dd($e);
+                \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+            }
+
+            try {
+                $token = '9mF7bUeEeQ84gN21aWNF';
+
+                $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+                if (substr($nomor, 0, 2) === '62') {
+                    $nomor = '0' . substr($nomor, 2);
+                }
+                if (substr($nomor, 0, 1) === '0') {
+                    $nomor = substr($nomor, 1);
+                }
+
+                $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+                $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+                $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+                $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                    "*Stor Tabungan* Anda Berhasil :\n\n" .
+                    "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                    "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                    "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                    "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                    "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+                Http::withHeaders([
+                    'Authorization' => $token,
+                ])->asForm()->post('https://api.fonnte.com/send', [
+                    'target' => $nomor,
+                    'message' => $pesan,
+                    'countryCode' => '62',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
             }
 
             $transaksi->save();
@@ -473,23 +489,11 @@ class TabunganController extends Controller
         ->where('status', 'success')
         ->where('pembayaran', 'Tunai')
         ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Tarik')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Tunai')
-        ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
         $jumlah_saldo_digital = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Stor')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Digital')
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi') - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Tarik')
         ->where('status', 'success')
         ->where('pembayaran', 'Digital')
         ->whereDate('created_at', Carbon::today())
@@ -617,6 +621,48 @@ class TabunganController extends Controller
         $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5 ;
         $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi ;
 
+        try {
+            Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
+        } catch (\Exception $e) {
+            dd($e);
+            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+        }
+
+        try {
+            $token = '9mF7bUeEeQ84gN21aWNF';
+
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+            if (substr($nomor, 0, 2) === '62') {
+                $nomor = '0' . substr($nomor, 2);
+            }
+            if (substr($nomor, 0, 1) === '0') {
+                $nomor = substr($nomor, 1);
+            }
+
+            $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+            $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+            $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+            $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                "*Stor Tabungan* Anda Berhasil :\n\n" .
+                "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+            Http::withHeaders([
+                'Authorization' => $token,
+            ])->asForm()->post('https://api.fonnte.com/send', [
+                'target' => $nomor,
+                'message' => $pesan,
+                'countryCode' => '62',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
+        }
+
         $transaksi->save();
 
         $tabungan->save();
@@ -664,6 +710,48 @@ class TabunganController extends Controller
                 $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
                 $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
                 $tabungan->save();
+            }
+
+            try {
+                Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
+            } catch (\Exception $e) {
+                dd($e);
+                \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+            }
+
+            try {
+                $token = '9mF7bUeEeQ84gN21aWNF';
+
+                $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+                if (substr($nomor, 0, 2) === '62') {
+                    $nomor = '0' . substr($nomor, 2);
+                }
+                if (substr($nomor, 0, 1) === '0') {
+                    $nomor = substr($nomor, 1);
+                }
+
+                $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+                $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+                $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+                $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                    "*Stor Tabungan* Anda Berhasil :\n\n" .
+                    "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                    "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
+                    "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                    "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                    "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+                Http::withHeaders([
+                    'Authorization' => $token,
+                ])->asForm()->post('https://api.fonnte.com/send', [
+                    'target' => $nomor,
+                    'message' => $pesan,
+                    'countryCode' => '62',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
             }
 
             $transaksi->save();

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\TabunganStorNotification;
+use App\Mail\TabunganStoredMail;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
@@ -12,6 +12,11 @@ use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\WalikelasController;
+
+Route::get('/kirim-email', function () {
+    Mail::to('gtalowsetpc@gmail.com')->send(new TabunganStoredMail());
+    return 'Email telah dikirim!';
+});
 
 /*
 |--------------------------------------------------------------------------
