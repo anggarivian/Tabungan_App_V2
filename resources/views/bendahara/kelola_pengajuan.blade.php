@@ -214,6 +214,12 @@
                         <div class="col-md-8 form-group">
                             <input type="text" id="edit-nomor_tujuan" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
                         </div>
+                        <div class="col-md-4">
+                            <label for="edit-premi">Tentukan Biaya Admin</label>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <input type="text" id="edit-premi" class="form-control" name="premi" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

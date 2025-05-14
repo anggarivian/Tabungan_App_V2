@@ -10,7 +10,42 @@
 <div class="page-content">
     <section class="row">
         <div class="col-12 col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-lg-3 col-md-6 mb-1">
+                            <a href="" class="btn btn-primary w-100">Stor Tabungan</a>
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-6 mb-1">
+                            <a href="" class="btn btn-danger w-100">Tarik Tabungan</a>
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-6 mb-1">
+                            <a href="" class="btn btn-light w-100">Laporan Transaksi</a>
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-6 mb-1">
+                            <a href="" class="btn btn-light w-100">Laporan Pengajuan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
+                <div class="col-12 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-4 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                    <div class="stats-icon purple mb-2">
+                                        <i class="iconly-boldWallet"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                    <h6 class="text-muted font-semibold">Saldo Tunai</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
@@ -45,24 +80,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon purple mb-2">
-                                        <i class="iconly-boldWallet"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Saldo Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 col-md-6">
+                <div class="col-12 col-lg-3 col-md-6">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -80,15 +98,16 @@
                     </div>
                 </div>
             </div>
+            <h3 class="mb-3">Diagram Tabungan</h3>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi 2024/2025</h5>
+                    <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
                     <div id="frekuensi"></div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Tabungan 2024/2025</h5>
+                    <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
                     <div id="total"></div>
                 </div>
             </div>

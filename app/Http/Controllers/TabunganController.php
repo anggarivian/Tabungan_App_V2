@@ -55,6 +55,7 @@ class TabunganController extends Controller
                     $query->where('kelas_id', $i);
                 })
                 ->whereDate('created_at', Carbon::today())
+                ->where('status', 'success')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 
@@ -395,6 +396,7 @@ class TabunganController extends Controller
             'name' => 'required',
             'kelas' => 'required',
             'jumlah_tabungan' => 'required|numeric|min:0',
+            'premi' => 'required|numeric|min:0',
             'jumlah_tarik' => 'required|numeric|min:0',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
@@ -402,6 +404,7 @@ class TabunganController extends Controller
             'kelas.required' => 'Kelas harus diisi.',
             'jumlah_tabungan.required' => 'Jumlah tabungan harus diisi.',
             'jumlah_tabungan.numeric' => 'Jumlah tabungan harus berupa angka.',
+            'premi.required' => 'Jumlah premi harus diisi.',
             'jumlah_tarik.required' => 'Jumlah tarik harus diisi.',
             'jumlah_tarik.numeric' => 'Jumlah tarik harus berupa angka.',
         ]);
@@ -418,7 +421,7 @@ class TabunganController extends Controller
         $transaksi = new Transaksi();
         $transaksi->jumlah_transaksi = $validatedData['jumlah_tarik'];
         $transaksi->saldo_awal = $tabungan->saldo;
-        $transaksi->saldo_akhir = $tabungan->saldo - $validatedData['jumlah_tarik'];
+        $transaksi->saldo_akhir = $tabungan->saldo - $validatedData['jumlah_tarik'] - $validatedData['premi'];
         $transaksi->tipe_transaksi = 'Tarik';
         $transaksi->pembayaran = 'Tunai';
         $transaksi->status = 'success';

@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="col-md-8 mb-1">
                                     <div class="input-group mb-3">
-                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan"autocomplete="off">
+                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan" autocomplete="off" autofocus>
                                         <button class="btn btn-primary" type="submit">Cari</button>
                                     </div>
                                 </div>
@@ -107,6 +107,19 @@
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
                                         <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readonly >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                    <label for="premi">Tentukan Biaya Admin</label>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp.</span>
+                                        <input type="number" class="form-control" id="premi" name="premi" placeholder="Masukkan Biaya Admin" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +193,7 @@
                             $('#kelas').val('');
                             $('#jumlah_tabungan').val('');
                         }
-                        $('#jumlah_tarik').focus();
+                        $('#premi').focus();
                     } else {
                         alert('User tidak ditemukan');
                     }
@@ -193,7 +206,7 @@
 
         $('#username').on('keypress', function(e) {
             if(e.which === 13) {
-                $('#jumlah_tarik').focus();
+                $('#premi').focus();
             }
         });
     });

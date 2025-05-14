@@ -101,13 +101,13 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi 2024/2025</h5>
+                    <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
                     <div id="frekuensi"></div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Tabungan 2024/2025</h5>
+                    <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
                     <div id="total"></div>
                 </div>
             </div>

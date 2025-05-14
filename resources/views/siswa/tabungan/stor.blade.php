@@ -79,7 +79,8 @@
                                 </div>
                             </div>
                         </ul>
-                        <a href="{{$invoice['invoice_url']}}" class="btn btn-primary " style="width: 100%">Lanjutkan</a>
+                        <a href="{{$invoice['invoice_url']}}" class="btn btn-primary mb-2" style="width: 100%">Lanjutkan</a>
+                        <a href="{{$invoice['invoice_url']}}" class="btn btn-light " style="width: 100%">Batalkan</a>
                     </div>
                 </div>
             </div>

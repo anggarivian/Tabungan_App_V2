@@ -186,6 +186,7 @@ class PengajuanController extends Controller
         $validatedData = $request->validate([
             'username'      => 'required',
             'jumlah_tarik'  => 'required|numeric|min:10000',
+            'premi'         => 'required|numeric',
             'pembayaran'    => 'required|string|in:Tunai,Digital',
             'alasan'        => 'required|string',
         ]);
@@ -203,8 +204,12 @@ class PengajuanController extends Controller
                     ->withInput();
             }
 
+            if ($validatedData['jumlah_tarik'] == $tabungan->saldo) {
+                $hasil_potong = $validatedData['jumlah_tarik'] - $validatedData['premi'];
+            }
+
             if ($pengajuan->pembayaran === 'Digital') {
-                $amount = (int)$validatedData['jumlah_tarik'];
+                $amount = (int)$hasil_potong;
                 $this->processDigitalPayout($pengajuan, $user, $amount);
             }
 
