@@ -17,12 +17,13 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Helpers\RupiahHelper;
 use Xendit\Invoice\InvoiceApi;
+use App\Mail\TabunganTarikMail;
 use App\Mail\TabunganStoredMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Xendit\Invoice\CreateInvoiceRequest;
 
 
@@ -449,6 +450,48 @@ class TabunganController extends Controller
         $tabungan->saldo = $transaksi->saldo_akhir;
         $tabungan->premi = $tabungan->saldo / 100 * 2.5;
         $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
+
+        try {
+            Mail::to($user->email)->send(new TabunganTarikMail($user, $transaksi));
+        } catch (\Exception $e) {
+            dd($e);
+            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+        }
+
+        try {
+            $token = '9mF7bUeEeQ84gN21aWNF';
+
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+            if (substr($nomor, 0, 2) === '62') {
+                $nomor = '0' . substr($nomor, 2);
+            }
+            if (substr($nomor, 0, 1) === '0') {
+                $nomor = substr($nomor, 1);
+            }
+
+            $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+            $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+            $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+            $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                "*Tarik Tabungan* Anda Berhasil :\n\n" .
+                "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                "🔹 *Jumlah Tarik : Rp {$jumlahStor}*\n" .
+                "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+            Http::withHeaders([
+                'Authorization' => $token,
+            ])->asForm()->post('https://api.fonnte.com/send', [
+                'target' => $nomor,
+                'message' => $pesan,
+                'countryCode' => '62',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
+        }
 
         $transaksi->save();
         $tabungan->save();

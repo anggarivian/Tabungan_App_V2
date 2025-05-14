@@ -8,9 +8,11 @@ use App\Models\Pengajuan;
 use App\Models\Transaksi;
 use Xendit\Configuration;
 use Illuminate\Support\Str;
-use Xendit\Payout\PayoutApi;
+use App\Mail\TabunganAjukan;
 use Illuminate\Http\Request;
+use Xendit\Payout\PayoutApi;
 use App\Helpers\RupiahHelper;
+use App\Mail\TabunganTarikMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Xendit\Payout\CreatePayoutRequest;
@@ -146,6 +148,8 @@ class PengajuanController extends Controller
                 $pengajuan->ewallet_number = $validatedData['ewallet_number'];
             }
         }
+
+        Mail::to($user->email)->send(new TabunganAjukan($user, $pengajuan, $saldo));
 
         $pengajuan->save();
 
@@ -361,6 +365,48 @@ class PengajuanController extends Controller
                 'user_id' => $pengajuan->user_id,
                 'tabungan_id' => $tabungan->id
             ]);
+
+            try {
+                Mail::to($user->email)->send(new TabunganTarikMail($user, $transaksi));
+            } catch (\Exception $e) {
+                dd($e);
+                \Log::error('Gagal mengirim email tarik tabungan: '.$e->getMessage());
+            }
+
+            try {
+                $token = '9mF7bUeEeQ84gN21aWNF';
+
+                $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+
+                if (substr($nomor, 0, 2) === '62') {
+                    $nomor = '0' . substr($nomor, 2);
+                }
+                if (substr($nomor, 0, 1) === '0') {
+                    $nomor = substr($nomor, 1);
+                }
+
+                $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
+                $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+                $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
+
+                $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                    "*Tarik Tabungan* Anda Berhasil :\n\n" .
+                    "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
+                    "🔹 *Jumlah Tarik : Rp {$jumlahStor}*\n" .
+                    "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                    "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
+                    "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+
+                Http::withHeaders([
+                    'Authorization' => $token,
+                ])->asForm()->post('https://api.fonnte.com/send', [
+                    'target' => $nomor,
+                    'message' => $pesan,
+                    'countryCode' => '62',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
+            }
 
             DB::commit();
 
