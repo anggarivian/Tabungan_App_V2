@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -258,7 +258,7 @@
                         $('#edit-type_tujuan').val(response.type_tujuan);
                         $('#edit-nomor_tujuan').val(response.nomor_tujuan);
 
-                        $('#tolakButton').attr('href', '/bendahara/kelola-pengajuan/tolak/' + response.id);
+                        $('#tolakButton').attr('href', '/bendahara/pengajuan/tolak/' + response.id);
 
                     } else {
                         alert('Gagal mengambil data');

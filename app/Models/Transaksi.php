@@ -10,8 +10,10 @@ use App\Models\User;
 class Transaksi extends Model
 {
     use HasFactory;
-    
+
     protected $guarded = [];
+
+    protected $table = 'transaksis';
 
     public function tabungan()
     {

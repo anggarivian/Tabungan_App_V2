@@ -28,7 +28,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">

@@ -12,7 +12,7 @@
         <div class="col-12 col-lg-12">
             <div class="row">
                 <div class="col-12 col-lg-4 col-md-12">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -65,7 +65,7 @@
             </div>
             <div class="row">
                 <div class="col-6 col-lg-6 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-6 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -99,13 +99,14 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <h3 class="mb-3">Diagram Tabungan</h3>
+            <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
                     <div id="frekuensi"></div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
                     <div id="total"></div>

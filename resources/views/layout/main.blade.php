@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- PWA -->
     <meta name="theme-color" content="#6777ef"/>
-    <link rel="apple-touch-icon" href="{{ asset('Logo.png') }}">
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192x192.png') }}">
 
     <title>@yield('title')</title>
     {{-- @laravelPWA --}}
@@ -34,6 +34,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
 
     <style>
+        @media (orientation: portrait) {
+            .portrait-card {
+                display: block !important;
+            }
+        }
+        @media (orientation: landscape) {
+            .portrait-card {
+                display: none !important;
+            }
+        }
         /* Animasi untuk modal */
         .modal.fade .modal-dialog {
             transition: transform 0.3s ease-out;
@@ -253,7 +263,7 @@
     <div id="app">
         <div id="main" class="layout-horizontal">
             <header class="mb-5">
-                <div class="header-top">
+                <div class="header-top shadow-sm">
                     <div class="container">
                         <a class="d-flex" href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
                             <img id="logo-img" src="{{ asset('Logo Normal.svg') }}" height="40px" width="190px" alt="Logo">
@@ -297,7 +307,7 @@
                         </div>
                     </div>
                 </div>
-                <nav class="main-navbar">
+                <nav class="main-navbar shadow-sm">
                     <div class="container">
                         <ul>
                             {{-- Dasdhboard -------------------------------------------------------------------------------------------------------------------- --}}
@@ -549,6 +559,20 @@
     <script src="{{ asset('/dist/assets/compiled/js/app.js') }}"></script>
 
     @yield('js')
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/service-worker.js")
+                .then(registration => {
+                console.log("ServiceWorker registered with scope:", registration.scope);
+                })
+                .catch(error => {
+                console.error("ServiceWorker registration failed:", error);
+                });
+            });
+        }
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

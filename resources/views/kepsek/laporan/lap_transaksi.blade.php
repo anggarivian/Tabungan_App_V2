@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body" style="margin-bottom: -20px">
             <form action="/kepsek/laporan/transaksi" method="GET">
                 <div class="container">

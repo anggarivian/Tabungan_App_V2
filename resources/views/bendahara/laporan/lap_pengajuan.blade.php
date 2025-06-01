@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body" style="margin-bottom: -20px">
             <form action="/bendahara/laporan/pengajuan" method="GET">
                 <div class="container">
@@ -119,15 +119,18 @@
                                 <td>{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
                                 <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->tabungan->saldo ?? 0) }}</td>
-                                <td class="text-center">{{ $pengajuans->jumlah_penarikan ?? '-' }}</td>
+                                <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0) }}</td>
                                 <td class="text-center">
-                                    @if ($pengajuans->status == 'Pending')
+                                    @if ($pengajuans->status == 'Pending' || $pengajuans->status == 'pending')
                                         <span class="badge bg-warning">Pending</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
-                                    @elseif ($pengajuans->status == 'Tolak')
+                                    @elseif ($pengajuans->status == 'Batal' || $pengajuans->status == 'batal')
+                                        <span class="badge bg-danger">Batal</span>
+                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                    @elseif ($pengajuans->status == 'Tolak' || $pengajuans->status == 'tolak')
                                         <span class="badge bg-danger">Tolak</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
-                                    @elseif ($pengajuans->status == 'Terima' || $pengajuans->status == 'SUCCEEDED')
+                                    @elseif ($pengajuans->status == 'Terima' || $pengajuans->status == 'Diterima' || $pengajuans->status == 'SUCCEEDED')
                                         <span class="badge bg-success">Terima</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @else

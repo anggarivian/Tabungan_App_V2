@@ -39,7 +39,7 @@
     <div class="row">
         @if($invoice != null)
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="card mb-4">
+                <div class="card shadow-lg mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold text-primary mb-3">
                             Lanjutkan Pembayaran Anda
@@ -80,37 +80,16 @@
                             </div>
                         </ul>
                         <a href="{{$invoice['invoice_url']}}" class="btn btn-primary mb-2" style="width: 100%">Lanjutkan</a>
-                        <a href="{{$invoice['invoice_url']}}" class="btn btn-light " style="width: 100%">Batalkan</a>
+                        <button class="btn btn-danger w-100" onclick="openBatalModal({{ auth()->user()->id }})">
+                            Batalkan
+                        </button>
                     </div>
                 </div>
             </div>
         @else
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold text-primary mb-3">
-                            Informasi Penting
-                        </h5>
-                        <p>Penabung dapat melakukan penyetoran secara mandiri menggunakan:</p>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item border-0">
-                                <i class="bi bi-qr-code text-success"></i> <strong>QRIS</strong> – Pembayaran cepat dengan kode QR.
-                            </li>
-                            <li class="list-group-item border-0">
-                                <i class="bi bi-bank text-warning"></i> <strong>Transfer Bank</strong> – Kirim dana langsung ke rekening sekolah.
-                            </li>
-                            <li class="list-group-item border-0">
-                                <i class="bi bi-wallet2 text-info"></i> <strong>E-Wallet</strong> – Gunakan dompet digital pilihan Anda.
-                            </li>
-                        </ul>
-                        <p class="mt-3 text-muted">
-                            * Perhatikan bahwa setiap metode memiliki biaya administrasi yang berbeda.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="card">
+            <!-- Card Form Stor Tabungan -->
+            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                <div class="card shadow-lg">
                     <div class="card-body">
                         @if(session('success'))
                             <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -214,10 +193,72 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Card Informasi Penting -->
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-info-circle"></i> Informasi Penting
+                        </h5>
+                        <p>Penabung dapat melakukan penyetoran secara mandiri menggunakan:</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item border-0 px-0">
+                                <i class="bi bi-qr-code text-success"></i> <strong>QRIS</strong><br>
+                                <small class="text-muted">Pembayaran cepat dengan kode QR</small>
+                            </li>
+                            <li class="list-group-item border-0 px-0">
+                                <i class="bi bi-bank text-warning"></i> <strong>Transfer Bank</strong><br>
+                                <small class="text-muted">Kirim dana langsung ke rekening sekolah</small>
+                            </li>
+                            <li class="list-group-item border-0 px-0">
+                                <i class="bi bi-wallet2 text-info"></i> <strong>E-Wallet</strong><br>
+                                <small class="text-muted">Gunakan dompet digital pilihan Anda</small>
+                            </li>
+                        </ul>
+                        <div class="alert alert-warning mt-3" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <small>Perhatikan bahwa setiap metode memiliki biaya administrasi yang berbeda.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @endif
+    </div>
+</div>
+
+{{-- Modal Konfirmasi Batal --}}
+<div class="modal fade modal-borderless" id="batalModal" tabindex="-1" aria-labelledby="batalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batalModalLabel">Konfirmasi Pembatalan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin membatalkan pengajuan ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
+                <form id="batalForm" method="POST" action="">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Batalkan</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @section('js')
+<script>
+    function openBatalModal(id) {
+        var form = document.getElementById('batalForm');
+        form.action = '/siswa/tabungan/stor/batal/' + id;
+
+        var myModal = new bootstrap.Modal(document.getElementById('batalModal'));
+        myModal.show();
+    }
+</script>
 @endsection

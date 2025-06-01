@@ -34,7 +34,7 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <form id="profilForm" action="{{ route('profil.update') }}" method="POST" class="card shadow-sm p-4">
+    <form id="profilForm" action="{{ route('profil.update') }}" method="POST" class="card shadow-lg p-4">
         @csrf
         @method('PUT')
 

@@ -28,7 +28,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">
@@ -161,7 +161,7 @@
             var username = $('#username').val();
 
             $.ajax({
-                url: "{{ route('bendahara.search') }}",
+                url: "{{ route('walikelas.search') }}",
                 method: "GET",
                 data: { username: username },
                 success: function(data) {
@@ -170,10 +170,7 @@
                         if(data.name !== 'Tidak Ada' && data.kelas !== 'Tidak Ada' && data.tabungan !== 'Tidak Ada') {
                             $('#name').val(data.name);
                             $('#kelas').val(data.kelas);
-
-                            // Format number
-                            let formattedTabungan = formatNumber(data.tabungan);
-                            $('#jumlah_tabungan').val(formattedTabungan);
+                            $('#jumlah_tabungan').val(data.tabungan);
                         } else {
                             $('#tidak-ada').html('<div class="alert alert-danger">Data tidak ditemukan</div>');
                             setTimeout(function() {

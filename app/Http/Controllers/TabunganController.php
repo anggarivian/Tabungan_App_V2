@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Xendit\Invoice\CreateInvoiceRequest;
+use Illuminate\Support\Facades\Validator;
 
 
 class TabunganController extends Controller
@@ -193,26 +194,26 @@ class TabunganController extends Controller
     {
         $username = $request->get('username');
 
-        $user = DB::table('users')
-            ->join('tabungans', 'tabungans.user_id', '=', 'users.id')
-            ->join('kelas', 'kelas.id', '=', 'users.kelas_id')
-            ->where('users.username', $username)
-            ->select('users.name as user_name', 'kelas.name as kelas_name', 'tabungans.saldo as tabungan_saldo')
+        // Ambil user dan relasinya langsung fresh dari database
+        $user = User::where('username', $username)
             ->first();
 
         if ($user) {
+            // Ambil ulang tabungan dan kelas langsung dari DB, bukan dari cache Eloquent
+            $user = $user->fresh(['tabungan', 'kelas']);
+
             return response()->json([
-                'name' => $user->user_name,
-                'kelas' => $user->kelas_name,
-                'tabungan' => $user->tabungan_saldo,
-            ]);
-        } else {
-            return response()->json([
-                'name' => 'Tidak Ada',
-                'kelas' => 'Tidak Ada',
-                'tabungan' => 'Tidak Ada',
+                'name' => $user->name ?? 'Tidak Ada',
+                'kelas' => $user->kelas->name ?? 'Tidak Ada',
+                'tabungan' => $user->tabungan->saldo ?? 'Tidak Ada',
             ]);
         }
+
+        return response()->json([
+            'name' => 'Tidak Ada',
+            'kelas' => 'Tidak Ada',
+            'tabungan' => 'Tidak Ada',
+        ]);
     }
 
     /**
@@ -229,7 +230,7 @@ class TabunganController extends Controller
             'name' => 'required',
             'kelas' => 'required',
             'jumlah_tabungan' => 'required|numeric|min:0',
-            'jumlah_stor' => 'required|numeric|min:0',
+            'jumlah_stor' => 'required|numeric|min:1000',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -245,36 +246,34 @@ class TabunganController extends Controller
         $transaksi = new Transaksi();
         $transaksi->jumlah_transaksi = $validatedData['jumlah_stor'];
         $transaksi->saldo_awal = $validatedData['jumlah_tabungan'];
-        $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'] ;
+        $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'];
         $transaksi->tipe_transaksi = 'Stor';
         $transaksi->pembayaran = 'Tunai';
         $transaksi->status = 'success';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
-        $transaksi->user_id = $user->id ;
+        $transaksi->user_id = $user->id;
         $transaksi->tabungan_id = $user->tabungan->id;
 
         $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
-
-        $tabungan->saldo = $transaksi->saldo_akhir ;
-        $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5 ;
-        $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi ;
+        $tabungan->saldo = $transaksi->saldo_akhir;
+        $tabungan->premi = $transaksi->saldo_akhir * 2.5 / 100;
+        $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
 
         $transaksi->save();
-
         $tabungan->save();
 
+        // Kirim Email
         try {
             Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
         } catch (\Exception $e) {
-            dd($e);
-            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+            \Log::error('Gagal mengirim email stor tabungan: ' . $e->getMessage());
         }
 
+        // Kirim WhatsApp
         try {
             $token = '9mF7bUeEeQ84gN21aWNF';
-
-            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak);
 
             if (substr($nomor, 0, 2) === '62') {
                 $nomor = '0' . substr($nomor, 2);
@@ -293,7 +292,7 @@ class TabunganController extends Controller
                 "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
                 "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
                 "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
             Http::withHeaders([
                 'Authorization' => $token,
@@ -306,7 +305,11 @@ class TabunganController extends Controller
             \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
+        return redirect()->back()
+            ->with('success', 'Tabungan berhasil disimpan')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Tabungan berhasil disimpan')
+            ->with('alert-duration', 3000);
     }
 
     /**
@@ -319,49 +322,56 @@ class TabunganController extends Controller
     public function bendahara_storMasalTabungan(Request $request)
     {
         foreach ($request->input('input') as $data) {
-            if (empty($data['stor']) || $data['stor'] <= 0) {
+            $stor = str_replace([',', '.'], '', $data['stor']);
+
+            if ($stor === null || $stor === '' || $stor == 0) {
                 continue;
             }
 
-            $data['stor'] = str_replace([',', '.'], '', $data['stor']);
+            if ($stor < 1000) {
+                continue;
+            }
 
             $user = User::where('username', $data['username'])->first();
-
             if (!$user) {
                 continue;
             }
 
+            $saldoAwal = $data['saldo'] ?? 0;
+            $jumlahStor = (int) $stor;
+            $saldoAkhir = $saldoAwal + $jumlahStor;
+
             $transaksi = new Transaksi();
-            $transaksi->jumlah_transaksi = $data['stor'];
-            $transaksi->saldo_awal = $data['saldo'] ?? 0;
-            $transaksi->saldo_akhir = $transaksi->saldo_awal + $data['stor'];
+            $transaksi->jumlah_transaksi = $jumlahStor;
+            $transaksi->saldo_awal = $saldoAwal;
+            $transaksi->saldo_akhir = $saldoAkhir;
             $transaksi->tipe_transaksi = 'Stor';
             $transaksi->pembayaran = 'Tunai';
             $transaksi->status = 'success';
             $transaksi->pembuat = auth()->user()->name;
             $transaksi->token_stor = \Illuminate\Support\Str::random(10);
             $transaksi->user_id = $user->id;
-            $transaksi->tabungan_id = $user->tabungan->id ?? null;
+            $transaksi->tabungan_id = optional($user->tabungan)->id;
 
             $tabungan = Tabungan::where('user_id', $user->id)->first();
             if ($tabungan) {
-                $tabungan->saldo = $transaksi->saldo_akhir;
-                $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5;
-                $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi;
+                $tabungan->saldo = $saldoAkhir;
+                $tabungan->premi = $saldoAkhir * 0.025;
+                $tabungan->sisa = $saldoAkhir - $tabungan->premi;
                 $tabungan->save();
             }
+
+            $transaksi->save();
 
             try {
                 Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
             } catch (\Exception $e) {
-                dd($e);
-                \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+                \Log::error('Gagal mengirim email stor tabungan: ' . $e->getMessage());
             }
 
             try {
                 $token = '9mF7bUeEeQ84gN21aWNF';
-
-                $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+                $nomor = preg_replace('/[^0-9]/', '', $user->kontak);
 
                 if (substr($nomor, 0, 2) === '62') {
                     $nomor = '0' . substr($nomor, 2);
@@ -370,17 +380,13 @@ class TabunganController extends Controller
                     $nomor = substr($nomor, 1);
                 }
 
-                $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
-                $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
-                $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
-
-                $pesan = "Halo,\n {$user->name} 👋\n\n" .
+                $pesan = "Halo,\n{$user->name} 👋\n\n" .
                     "*Stor Tabungan* Anda Berhasil :\n\n" .
-                    "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
-                    "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
-                    "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
+                    "🔹 Saldo Awal : Rp " . number_format($saldoAwal, 0, ',', '.') . "\n" .
+                    "🔹 *Jumlah Stor : Rp " . number_format($jumlahStor, 0, ',', '.') . "*\n" .
+                    "🔹 Saldo Akhir : Rp " . number_format($saldoAkhir, 0, ',', '.') . "\n\n" .
                     "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                    "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                    "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
                 Http::withHeaders([
                     'Authorization' => $token,
@@ -392,11 +398,13 @@ class TabunganController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal mengirim WhatsApp: ' . $e->getMessage());
             }
-
-            $transaksi->save();
         }
 
-        return redirect()->back()->with('success', 'Data stor tabungan berhasil disimpan.')->with('alert-type', 'success')->with('alert-message', 'Data stor tabungan berhasil disimpan.')->with('alert-duration', 3000);
+        return redirect()->back()
+            ->with('success', 'Data stor tabungan berhasil disimpan.')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Data stor tabungan berhasil disimpan.')
+            ->with('alert-duration', 3000);
     }
 
     /**
@@ -413,8 +421,8 @@ class TabunganController extends Controller
             'name' => 'required',
             'kelas' => 'required',
             'jumlah_tabungan' => 'required|numeric|min:0',
-            'premi' => 'required|numeric|min:0',
-            'jumlah_tarik' => 'required|numeric|min:0',
+            'premi' => 'required|numeric|min:1000',
+            'jumlah_tarik' => 'required|numeric|min:10000',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -427,12 +435,13 @@ class TabunganController extends Controller
         ]);
 
         $user = User::where('username', $validatedData['username'])->firstOrFail();
-
         $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+        $bendahara = Tabungan::where('user_id', 2 )->firstOrFail();
 
-        // Cek apakah jumlah tarik melebihi saldo awal
         if ($validatedData['jumlah_tarik'] > $tabungan->saldo) {
-            return redirect()->back()->withErrors(['jumlah_tarik' => 'Penarikan tabungan melebihi saldo tabungan'])->withInput();
+            return redirect()->back()
+                ->withErrors(['jumlah_tarik' => 'Penarikan tabungan melebihi saldo tabungan'])
+                ->withInput();
         }
 
         $transaksi = new Transaksi();
@@ -447,21 +456,24 @@ class TabunganController extends Controller
         $transaksi->user_id = $user->id;
         $transaksi->tabungan_id = $tabungan->id;
 
+        // Update tabungan
         $tabungan->saldo = $transaksi->saldo_akhir;
         $tabungan->premi = $tabungan->saldo / 100 * 2.5;
         $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
 
+        $bendahara->saldo = $bendahara->saldo + $validatedData['premi'];
+
+        // Kirim email
         try {
             Mail::to($user->email)->send(new TabunganTarikMail($user, $transaksi));
         } catch (\Exception $e) {
-            dd($e);
-            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+            \Log::error('Gagal mengirim email tarik tabungan: ' . $e->getMessage());
         }
 
+        // Kirim WhatsApp
         try {
             $token = '9mF7bUeEeQ84gN21aWNF';
-
-            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak);
 
             if (substr($nomor, 0, 2) === '62') {
                 $nomor = '0' . substr($nomor, 2);
@@ -471,16 +483,16 @@ class TabunganController extends Controller
             }
 
             $saldoAwal = number_format($transaksi->saldo_awal, 0, ',', '.');
-            $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
+            $jumlahTarik = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
             $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
 
             $pesan = "Halo,\n {$user->name} 👋\n\n" .
                 "*Tarik Tabungan* Anda Berhasil :\n\n" .
                 "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
-                "🔹 *Jumlah Tarik : Rp {$jumlahStor}*\n" .
+                "🔹 *Jumlah Tarik : Rp {$jumlahTarik}*\n" .
                 "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
                 "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
             Http::withHeaders([
                 'Authorization' => $token,
@@ -495,8 +507,13 @@ class TabunganController extends Controller
 
         $transaksi->save();
         $tabungan->save();
+        $bendahara->save();
 
-        return redirect()->back()->with('success', 'Tabungan berhasil ditarik')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil ditarik')->with('alert-duration', 3000);
+        return redirect()->back()
+            ->with('success', 'Tabungan berhasil ditarik')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Tabungan berhasil ditarik')
+            ->with('alert-duration', 3000);
     }
 
 
@@ -633,7 +650,7 @@ class TabunganController extends Controller
             'name' => 'required',
             'kelas' => 'required',
             'jumlah_tabungan' => 'required|numeric|min:0',
-            'jumlah_stor' => 'required|numeric|min:0',
+            'jumlah_stor' => 'required|numeric|min:1000',
         ], [
             'username.required' => 'Id Tabungan harus diisi.',
             'name.required' => 'Nama harus diisi.',
@@ -645,36 +662,37 @@ class TabunganController extends Controller
         ]);
 
         $user = User::where('username', $validatedData['username'])->firstOrFail();
+        $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
 
         $transaksi = new Transaksi();
         $transaksi->jumlah_transaksi = $validatedData['jumlah_stor'];
         $transaksi->saldo_awal = $validatedData['jumlah_tabungan'];
-        $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'] ;
+        $transaksi->saldo_akhir = $validatedData['jumlah_tabungan'] + $validatedData['jumlah_stor'];
         $transaksi->tipe_transaksi = 'Stor';
         $transaksi->pembayaran = 'Tunai';
         $transaksi->status = 'success';
         $transaksi->pembuat = auth()->user()->name;
         $transaksi->token_stor = \Illuminate\Support\Str::random(10);
-        $transaksi->user_id = $user->id ;
-        $transaksi->tabungan_id = $user->tabungan->id;
+        $transaksi->user_id = $user->id;
+        $transaksi->tabungan_id = $tabungan->id;
 
-        $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+        // Update tabungan
+        $tabungan->saldo = $transaksi->saldo_akhir;
+        $tabungan->premi = $transaksi->saldo_akhir * 0.025;
+        $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
 
-        $tabungan->saldo = $transaksi->saldo_akhir ;
-        $tabungan->premi = $transaksi->saldo_akhir / 100 * 2.5 ;
-        $tabungan->sisa = $transaksi->saldo_akhir - $tabungan->premi ;
-
+        // Kirim email
         try {
             Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
         } catch (\Exception $e) {
-            dd($e);
-            \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+            \Log::error('Gagal mengirim email stor tabungan: ' . $e->getMessage());
+            // Hapus dd($e); agar tidak menghentikan eksekusi
         }
 
+        // Kirim WhatsApp via Fonnte
         try {
             $token = '9mF7bUeEeQ84gN21aWNF';
-
-            $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+            $nomor = preg_replace('/[^0-9]/', '', $user->kontak);
 
             if (substr($nomor, 0, 2) === '62') {
                 $nomor = '0' . substr($nomor, 2);
@@ -687,13 +705,13 @@ class TabunganController extends Controller
             $jumlahStor = number_format($transaksi->jumlah_transaksi, 0, ',', '.');
             $saldoAkhir = number_format($transaksi->saldo_akhir, 0, ',', '.');
 
-            $pesan = "Halo,\n {$user->name} 👋\n\n" .
+            $pesan = "Halo,\n{$user->name} 👋\n\n" .
                 "*Stor Tabungan* Anda Berhasil :\n\n" .
                 "🔹 Saldo Awal : Rp {$saldoAwal}\n" .
                 "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
                 "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
                 "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
             Http::withHeaders([
                 'Authorization' => $token,
@@ -707,10 +725,14 @@ class TabunganController extends Controller
         }
 
         $transaksi->save();
-
         $tabungan->save();
 
-        return redirect()->back()->with('success', 'Tabungan berhasil disimpan')->with('alert-type', 'success')->with('alert-message', 'Tabungan berhasil disimpan')->with('alert-duration', 3000);
+        return redirect()->back()->with([
+            'success' => 'Tabungan berhasil disimpan',
+            'alert-type' => 'success',
+            'alert-message' => 'Tabungan berhasil disimpan',
+            'alert-duration' => 3000,
+        ]);
     }
 
     /**
@@ -784,7 +806,7 @@ class TabunganController extends Controller
                     "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
                     "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
                     "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                    "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                    "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
                 Http::withHeaders([
                     'Authorization' => $token,
@@ -845,6 +867,24 @@ class TabunganController extends Controller
         return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice'));
     }
 
+    public function batal($id)
+    {
+        $transaksi = Transaksi::where('user_id', $id)->latest()->first();
+
+
+        if (!$transaksi) {
+            return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+        }
+
+        $transaksi->status = 'Batal';
+        $transaksi->save();
+
+        return redirect()->back()->with('success', 'Transaksi Telah di Batalkan.')
+        ->with('alert-type', 'success')
+        ->with('alert-message', 'Transaksi Telah di Batalkan.')
+        ->with('alert-duration', 30000);
+    }
+
     /**
     * Menampilkan Dashboard Tarik Tabungan oleh Siswa.
     *
@@ -869,6 +909,14 @@ class TabunganController extends Controller
 
     public function createInvoice(Request $request)
     {
+        $request->validate([
+            'jumlah_stor' => ['required', 'numeric', 'min:10000'],
+        ], [
+            'jumlah_stor.min' => 'Jumlah stor minimal Rp10.000.',
+            'jumlah_stor.required' => 'Jumlah stor harus diisi.',
+            'jumlah_stor.numeric' => 'Jumlah stor harus berupa angka.',
+        ]);
+
         $user = Auth::user();
         $jumlahStor = $request->jumlah_stor;
 
@@ -876,7 +924,6 @@ class TabunganController extends Controller
         $apiInstance = new InvoiceApi();
 
         $externalId = 'stor-' . $user->id . '-' . time();
-
         $successRedirectUrl = route('payment.success');
 
         $invoiceRequest = new CreateInvoiceRequest([
@@ -901,14 +948,13 @@ class TabunganController extends Controller
             $transaksi->pembuat = $user->name;
             $transaksi->checkout_link = $invoice['invoice_url'];
             $transaksi->external_id = $externalId;
-            $transaksi->token_stor = \Illuminate\Support\Str::random(10);;
-            $transaksi->user_id = auth()->user()->id;
+            $transaksi->token_stor = \Illuminate\Support\Str::random(10);
+            $transaksi->user_id = $user->id;
             $transaksi->tabungan_id = $user->tabungan->id;
             $transaksi->save();
 
             return redirect($invoice['invoice_url']);
         } catch (\Exception $e) {
-            dd($e);
             return back()->with('error', 'Gagal membuat pembayaran: ' . $e->getMessage());
         }
     }
@@ -950,17 +996,18 @@ class TabunganController extends Controller
 
                 $user = User::find($transaksi->user_id);
 
+                // Kirim email (dibungkus try-catch sendiri)
                 try {
                     Mail::to($user->email)->send(new TabunganStoredMail($user, $transaksi));
                 } catch (\Exception $e) {
-                    dd($e);
-                    \Log::error('Gagal mengirim email stor tabungan: '.$e->getMessage());
+                    \Log::error('Gagal mengirim email stor tabungan: ' . $e->getMessage());
                 }
 
+                // Kirim pesan WhatsApp (dibungkus try-catch sendiri)
                 try {
                     $token = '9mF7bUeEeQ84gN21aWNF';
 
-                    $nomor = preg_replace('/[^0-9]/', '', $user->kontak); // hanya angka
+                    $nomor = preg_replace('/[^0-9]/', '', $user->kontak);
 
                     if (substr($nomor, 0, 2) === '62') {
                         $nomor = '0' . substr($nomor, 2);
@@ -979,7 +1026,7 @@ class TabunganController extends Controller
                         "🔹 *Jumlah Stor : Rp {$jumlahStor}*\n" .
                         "🔹 Saldo Akhir : Rp {$saldoAkhir}\n\n" .
                         "Terima kasih telah mempercayakan tabungan Anda kepada kami. 🙏\n\n" .
-                        "_Apabila terdapat kesalahan atau pertanyaan, silakan hubungi Bendahara._";
+                        "_Hubungi Bendahara jika ada pertanyaan. Notifikasi ini dibatasi 1000/bulan. Jika tidak menerima pesan saat stor/tarik, kunjungi sukarame-tabungan-siswa.my.id._";
 
                     Http::withHeaders([
                         'Authorization' => $token,
@@ -993,7 +1040,7 @@ class TabunganController extends Controller
                 }
 
                 \DB::commit();
-                return response()->json(['message' => 'Payment success and email sent']);
+                return response()->json(['message' => 'Payment success, email/whatsapp attempted']);
             } catch (\Exception $e) {
                 \DB::rollBack();
                 \Log::error('Handle Webhook Error: ' . $e->getMessage());
@@ -1004,9 +1051,9 @@ class TabunganController extends Controller
         return response()->json(['message' => 'Success']);
     }
 
+
     public function success()
     {
         return view('payment.success');
     }
-
 }

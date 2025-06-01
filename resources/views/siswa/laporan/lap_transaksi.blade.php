@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body">
             <ul class="nav nav-tabs" id="tabunganTabs" role="tablist">
                 <li class="nav-item" role="presentation">

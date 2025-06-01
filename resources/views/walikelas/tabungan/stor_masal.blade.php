@@ -28,7 +28,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card pd-0">
+    <div class="card shadow-lg pd-0">
         <div class="card-body">
             <div class="row">
                 @if(session('success'))
@@ -81,7 +81,7 @@
             </div>
         </div>
     </div>
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body">
             <form method="post" action="{{ route('walikelas.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
                 @csrf
@@ -131,7 +131,7 @@
                     </table>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ route('walikelas.tabungan.index') }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Stor Tabungan</button>
                 </div>
             </form>

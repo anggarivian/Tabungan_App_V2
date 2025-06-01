@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -257,7 +257,7 @@
                             <label for="edit-password">Password</label>
                         </div>
                         <div class="col-md-8 form-group">
-                            <input type="password" id="edit-password" class="form-control" name="password" placeholder="Password" required>
+                            <input type="password" id="edit-password" class="form-control" name="password" placeholder="Password">
                         </div>
                         <div class="col-md-4">
                             <label for="edit-jenis_kelamin">Jenis Kelamin</label>

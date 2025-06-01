@@ -46,7 +46,7 @@
         <div class="col-12 col-lg-12">
             <div class="row">
                 <div class="col-12 col-sm-12 col-lg-6 col-md-12">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-6 col-md-2 col-sm-6 mb-3 mb-sm-0 mb-md-0 mb-lg-0  d-flex justify-content-center ">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
@@ -89,7 +89,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
@@ -110,7 +110,7 @@
     </section>
     <div class="row justify-content-center">
         <div class="container">
-            <div class="card col-12">
+            <div class="card shadow-lg col-12">
                 <div class="card-body">
                     <h5 class="card-title">Input Transaksi</h5>
                     <div class="row">
@@ -149,15 +149,15 @@
                                 Tarik
                             </a>
 
-                            <a class="btn btn-success w-10 m-1 p-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                            {{-- <a class="btn btn-success w-10 m-1 p-2" data-bs-toggle="modal" data-bs-target="#importModal">
                                 Import
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
 
                 </div>
             </div>
-            <div class="card">
+            <div class="card shadow-lg">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="card-title">Transaksi Hari Ini</h5>

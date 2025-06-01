@@ -10,27 +10,19 @@
 <div class="page-content">
     <section class="row">
         <div class="col-12 col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12 col-lg-3 col-md-6 mb-1">
-                            <a href="" class="btn btn-primary w-100">Stor Tabungan</a>
-                        </div>
-                        <div class="col-12 col-lg-3 col-md-6 mb-1">
-                            <a href="" class="btn btn-danger w-100">Tarik Tabungan</a>
-                        </div>
-                        <div class="col-12 col-lg-3 col-md-6 mb-1">
-                            <a href="" class="btn btn-light w-100">Laporan Transaksi</a>
-                        </div>
-                        <div class="col-12 col-lg-3 col-md-6 mb-1">
-                            <a href="" class="btn btn-light w-100">Laporan Pengajuan</a>
-                        </div>
-                    </div>
+            <div class="card shadow-lg portrait-card d-none">
+                <div class="card-body py-3">
+                    <p class="mb-0 d-flex align-items-center justify-content-between">
+                        <span class="fw-medium">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Pilih Menu di kanan atas untuk Stor/Tarik, dan Laporan Tabungan
+                        </span>
+                    </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12 col-lg-3 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -47,7 +39,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -64,7 +56,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -81,7 +73,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-6">
-                    <div class="card">
+                    <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -98,14 +90,65 @@
                     </div>
                 </div>
             </div>
-            <h3 class="mb-3">Diagram Tabungan</h3>
-            <div class="card">
+            <h3 class="mb-3">Tabungan</h3>
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title">Buku Tabungan 2024/2025</h5>
+                    <p class="text-muted fst-italic">Menampilkan transaksi terbaru di atas</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-center">
+                                        Tanggal <i class="bi bi-arrow-down-short"></i>
+                                    </th>
+                                    <th colspan="2" class="text-center">Tabungan</th>
+                                    <th rowspan="2" class="text-center">Jumlah Sisa</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">Masuk</th>
+                                    <th class="text-center">Keluar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($transaksi as $transaksis)
+                                    <tr>
+                                        <td class="text-center"> <span class="badge bg-light">{{ $transaksis->created_at->format('d-m-Y') }}</span></td>
+                                        <td class="text-center">
+                                            @if ($transaksis->tipe_transaksi == 'Stor')
+                                                <span class="badge bg-success">+ Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($transaksis->tipe_transaksi == 'Tarik')
+                                                <span class="badge bg-danger">- Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Data Kosong</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
                     <div id="frekuensi"></div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
                     <div id="total"></div>

@@ -15,6 +15,7 @@ use App\Helpers\RupiahHelper;
 use App\Mail\TabunganTarikMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Xendit\Payout\CreatePayoutRequest;
 
 class PengajuanController extends Controller
@@ -114,7 +115,7 @@ class PengajuanController extends Controller
         $saldo = $user->tabungan->saldo;
 
         $validatedData = $request->validate([
-            'jumlah_tarik'      => 'required|numeric|min:1000|max:' . $saldo,
+            'jumlah_tarik'      => 'required|numeric|min:10000|max:' . $saldo,
             'alasan'            => 'required|string|max:255',
             'jenis_pembayaran'  => 'required|in:Tunai,Digital',
             'metode_digital'    => 'required_if:jenis_pembayaran,Digital',
@@ -149,7 +150,11 @@ class PengajuanController extends Controller
             }
         }
 
-        Mail::to($user->email)->send(new TabunganAjukan($user, $pengajuan, $saldo));
+        try {
+            Mail::to($user->email)->send(new TabunganAjukan($user, $pengajuan, $saldo));
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email pengajuan penarikan: ' . $e->getMessage());
+        }
 
         $pengajuan->save();
 
@@ -189,9 +194,8 @@ class PengajuanController extends Controller
     {
         $validatedData = $request->validate([
             'username'      => 'required',
-            'jumlah_tarik'  => 'required|numeric|min:10000',
-            'premi'         => 'required|numeric',
-            'pembayaran'    => 'required|string|in:Tunai,Digital',
+            'jumlah_tarik'  => 'required|numeric',
+            'premi'         => 'required|numeric|min:1000',
             'alasan'        => 'required|string',
         ]);
 
@@ -208,18 +212,38 @@ class PengajuanController extends Controller
                     ->withInput();
             }
 
-            if ($validatedData['jumlah_tarik'] == $tabungan->saldo) {
-                $hasil_potong = $validatedData['jumlah_tarik'] - $validatedData['premi'];
-            }
+            $hasil_potong = $validatedData['jumlah_tarik'] - $validatedData['premi'];
+
+            $tabungan->saldo -= $validatedData['jumlah_tarik'];
+            $tabungan->save();
+
+            $pengajuan->status = 'Diterima';
+            $pengajuan->save();
+
+            $bendahara = Tabungan::where('user_id', 2 )->firstOrFail();
+            $bendahara->saldo = $bendahara->saldo + $validatedData['premi'];
+            $bendahara->save();
 
             if ($pengajuan->pembayaran === 'Digital') {
                 $amount = (int)$hasil_potong;
                 $this->processDigitalPayout($pengajuan, $user, $amount);
             }
 
+            // Kirim email notifikasi
+            try {
+                Mail::to($user->email)->send(new TabunganTarikMail($user, $pengajuan));
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim email konfirmasi pengajuan diterima: ' . $e->getMessage());
+            }
+
             DB::commit();
 
-            return redirect()->route('bendahara.pengajuan.index')->with('success', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')->with('alert-type', 'success')->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')->with('alert-duration', 30000);
+            return redirect()->route('bendahara.pengajuan.index')
+                ->with('success', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')
+                ->with('alert-type', 'success')
+                ->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')
+                ->with('alert-duration', 30000);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
@@ -262,33 +286,53 @@ class PengajuanController extends Controller
             }
             $channelProperties = [
                 'account_holder_name' => $user->name,
-                'account_number' => $pengajuan->ewallet_number,
+                'account_number'      => $pengajuan->ewallet_number,
             ];
             $channelCode = $pengajuan->ewallet_type;
         }
 
-        $payoutRequest = new CreatePayoutRequest([
-            'reference_id'       => $referenceId,
-            'currency'           => 'IDR',
-            'channel_code'       => $channelCode,
-            'channel_properties' => $channelProperties,
-            'amount'             => $amount,
-            'description'        => 'Penarikan Tabungan Siswa ' . $user->name,
-            'type'               => 'DIRECT_DISBURSEMENT'
-        ]);
+        try {
+            $payoutRequest = new CreatePayoutRequest([
+                'reference_id'       => $referenceId,
+                'currency'           => 'IDR',
+                'channel_code'       => $channelCode,
+                'channel_properties' => $channelProperties,
+                'amount'             => $amount,
+                'description'        => 'Penarikan Tabungan Siswa ' . $user->name,
+                'type'               => 'DIRECT_DISBURSEMENT'
+            ]);
 
-        $result = $this->payoutApi->createPayout(
-            'DISB-' . Str::random(10),
-            null,
-            $payoutRequest
-        );
+            $result = $this->payoutApi->createPayout(
+                'DISB-' . Str::random(10),
+                null,
+                $payoutRequest
+            );
 
-        $pengajuan->xendit_payout_id = $result->getId();
-        $pengajuan->status = 'PROCESSING';
-        $pengajuan->reference_id = $referenceId;
-        $pengajuan->save();
+            $pengajuan->xendit_payout_id = $result->getId();
+            $pengajuan->status = 'PROCESSING';
+            $pengajuan->reference_id = $referenceId;
+            $pengajuan->save();
 
-        return $result;
+            return $result;
+        } catch (\Exception $e) {
+            \Log::error('Gagal memproses digital payout: ' . $e->getMessage(), [
+                'user_id'      => $user->id,
+                'pengajuan_id' => $pengajuan->id,
+                'amount'       => $amount,
+                'channel_code' => $channelCode ?? null,
+            ]);
+
+            // Kirim email notifikasi ke admin (jika diperlukan)
+            try {
+                Mail::to(config('mail.admin_address', 'admin@example.com'))
+                    ->send(new \App\Mail\PayoutGagal($user, $pengajuan, $e->getMessage()));
+            } catch (\Exception $ex) {
+                \Log::error('Gagal mengirim email kegagalan payout: ' . $ex->getMessage());
+            }
+
+            // Tetap lempar exception agar rollback dilakukan di DB::transaction()
+            throw new \Exception('Proses pembayaran digital gagal. Silakan coba lagi atau hubungi admin.');
+        }
     }
 
     /**

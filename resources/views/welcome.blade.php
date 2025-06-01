@@ -6,8 +6,8 @@
     <title>SakuRame - Sistem Tabungan Digital Sekolah</title>
 
     <meta name="theme-color" content="#6777ef"/>
-    <link rel="apple-touch-icon" href="{{ asset('Logo.png') }}">
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192x192.png') }}">
 
     <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,118 +21,78 @@
             --accent: #FFB84C;
             --dark: #1e293b;
             --light: #f8fafc;
-            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
+        /* Base - hanya yang esensial */
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            font-family: system-ui, sans-serif;
             background: var(--light);
             color: var(--dark);
             line-height: 1.6;
+            margin: 0;
         }
 
         h1, h2, h3, h4, h5, h6 {
             font-weight: 700;
+            margin: 0 0 1rem;
         }
 
+        /* Buttons - tanpa animasi */
         .btn {
             font-weight: 600;
             padding: 0.6rem 1.5rem;
             border-radius: 0.75rem;
-            transition: all 0.3s ease;
+            border: 1px solid;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-primary {
             background: var(--primary);
             border-color: var(--primary);
+            color: white;
         }
 
-        .btn-primary:hover {
-            background: var(--secondary);
-            border-color: var(--secondary);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-
+        /* Navbar - minimal */
         .navbar {
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 0.8rem 0;
-            transition: all 0.3s ease;
-        }
-
-        .navbar-scrolled {
-            box-shadow: var(--shadow-md);
-            padding: 0.6rem 0;
         }
 
         .nav-link {
-            color: #475569 !important;
+            color: #475569;
             font-weight: 500;
-            position: relative;
             margin: 0 0.8rem;
-            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
-        .nav-link:hover {
-            color: var(--primary) !important;
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary);
         }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link.active::after,
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
+        /* Hero - sangat sederhana */
         .hero {
             padding: 160px 0 100px;
-            background: var(--gradient);
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 20%, rgba(255,255,255,0.1) 50%, transparent 80%);
-            animation: shine 8s infinite linear;
-        }
-
-        .feature-card {
+        /* Cards - tanpa hover effects */
+        .feature-card,
+        .step-card,
+        .testimonial-card {
             background: white;
             border-radius: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             height: 100%;
         }
 
-        .feature-card:hover {
-            transform: translateY(-0.5rem);
-            box-shadow: var(--shadow-lg);
-        }
-
         .icon-wrapper {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             width: 60px;
@@ -141,22 +101,13 @@
             margin-bottom: 1.5rem;
         }
 
-        .step-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            height: 100%;
-        }
-
         .step-number {
             position: absolute;
             top: -15px;
             left: -15px;
             width: 40px;
             height: 40px;
-            background: var(--gradient);
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -165,13 +116,8 @@
             font-weight: 700;
         }
 
-        .testimonial-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+        .step-card {
+            position: relative;
         }
 
         .testimonial-avatar {
@@ -185,9 +131,10 @@
             color: var(--accent);
         }
 
+        /* Accordion - minimal */
         .accordion-item {
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 0.75rem !important;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
             margin-bottom: 1rem;
             overflow: hidden;
         }
@@ -195,15 +142,20 @@
         .accordion-button {
             background: white;
             font-weight: 600;
-            box-shadow: none !important;
+            box-shadow: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
         }
 
         .accordion-button:not(.collapsed) {
             color: var(--primary);
         }
 
+        /* Footer */
         .footer {
-            background: #1e293b;
+            background: var(--dark);
             color: white;
             padding: 80px 0 30px;
         }
@@ -211,7 +163,6 @@
         .footer-links h5 {
             margin-bottom: 1.5rem;
             position: relative;
-            display: inline-block;
         }
 
         .footer-links h5::after {
@@ -227,6 +178,7 @@
         .footer-links ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         .footer-links li {
@@ -234,9 +186,8 @@
         }
 
         .footer-links a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            transition: all 0.3s ease;
         }
 
         .footer-links a:hover {
@@ -250,10 +201,10 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             margin-right: 0.5rem;
-            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .social-icons a:hover {
@@ -261,28 +212,13 @@
         }
 
         .copyright {
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 1.5rem;
             margin-top: 3rem;
         }
 
-        @keyframes shine {
-            0% { transform: translateX(-50%) rotate(45deg); }
-            100% { transform: translateX(50%) rotate(45deg); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-1rem); }
-        }
-
-        @media (max-width: 991.98px) {
-            .hero {
-                padding: 120px 0 70px;
-            }
-        }
-
-        @media (max-width: 767.98px) {
+        /* Media queries - minimal */
+        @media (max-width: 768px) {
             .hero {
                 padding: 100px 0 60px;
             }
@@ -294,9 +230,53 @@
             .display-5 {
                 font-size: 2rem;
             }
+
+            .nav-link {
+                margin: 0 0.4rem;
+            }
         }
 
-        @media (max-width: 575.98px) {
+        /* Mini stats cards - dioptimalkan */
+        .mini-stats-container {
+            width: 100%;
+        }
+
+        .mini-stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px;
+            height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mini-stat-card .title {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mini-stat-card .value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+        }
+
+        .mini-stat-card .subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 576px) {
             .hero {
                 padding: 90px 0 50px;
             }
@@ -304,9 +284,27 @@
             .display-3 {
                 font-size: 2rem;
             }
+
+            .feature-card,
+            .step-card,
+            .testimonial-card {
+                padding: 1rem;
+            }
+
+            .mini-stat-card {
+                padding: 8px;
+            }
+
+            .mini-stat-card .title,
+            .mini-stat-card .subtitle {
+                font-size: 0.65rem;
+            }
+
+            .mini-stat-card .value {
+                font-size: 0.8rem;
+            }
         }
     </style>
-
 </head>
 <body>
     <!-- Navbar -->
@@ -351,12 +349,12 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section dengan Mini Card Transparan -->
     <section class="hero text-white py-7 py-lg-8">
         <div class="container">
             <div class="row align-items-center">
                 <!-- SVG Section (Pindah ke atas di ponsel) -->
-                <div class="col-lg-6 order-1 order-lg-2 text-center mb-5 mb-lg-0" data-aos="fade-left">
+                <div class="col-lg-6 order-1 order-lg-2 text-center mb-3 mb-lg-0" data-aos="fade-left">
                     <img src="Savings-pana.svg" class="img-fluid rounded-3 mx-auto" style="max-width: 90%;">
                 </div>
 
@@ -372,6 +370,33 @@
                     <p class="lead mb-4 opacity-75 px-2 px-lg-0">
                         Sistem tabungan digital terpercaya untuk SDN Sukarame yang memudahkan siswa, guru, dan orang tua.
                     </p>
+
+                    <!-- Mini Card Transparan -->
+                    <div class="mini-stats-container mb-4">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="mini-stat-card">
+                                    <div class="title">Si Paling Banyak Nabung</div>
+                                    <div class="value">{{ $palingSering->nama ?? '-' }}</div>
+                                    <div class="subtitle">{{ $palingSering->value ?? '0' }}x</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-stat-card">
+                                    <div class="title">Si Paling Banyak Saldo</div>
+                                    <div class="value">{{ $palingGede->nama ?? '-' }}</div>
+                                    <div class="subtitle">Rp. {{ substr(number_format($palingGede->value ?? 0, 0, ',', '.'), 0, 7) }}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-stat-card">
+                                    <div class="title">Si Paling Konsisten Nabung</div>
+                                    <div class="value">{{ $palingKonsisten->nama ?? '-' }}</div>
+                                    <div class="subtitle">{{ $palingKonsisten->value ?? '0' }} minggu</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="d-flex flex-column flex-md-row justify-content-center justify-content-lg-start align-items-center gap-3 px-2 px-lg-0">
                         @auth
@@ -623,19 +648,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-5 text-white" style="background: var(--gradient);">
-        <div class="container py-5 text-center">
-            <h2 class="display-5 fw-bold mb-4" data-aos="zoom-in">Mulai Kelola Tabungan Siswa Sekarang</h2>
-            <p class="fs-5 mb-5 opacity-75 mx-auto" style="max-width: 700px;" data-aos="zoom-in" data-aos-delay="100">
-                Bergabunglah dengan ratusan sekolah yang telah menggunakan SakuRame untuk pengelolaan tabungan digital
-            </p>
-            <a href="{{ route ('login')}}" class="btn btn-light btn-lg px-5 fw-bold" data-aos="fade-up" data-aos-delay="200">
-                <i class="fas fa-sign-in-alt me-2"></i>Masuk Sekarang
-            </a>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -688,6 +700,20 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/service-worker.js")
+                .then(registration => {
+                console.log("ServiceWorker registered with scope:", registration.scope);
+                })
+                .catch(error => {
+                console.error("ServiceWorker registration failed:", error);
+                });
+            });
+        }
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

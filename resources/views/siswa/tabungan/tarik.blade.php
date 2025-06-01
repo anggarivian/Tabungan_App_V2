@@ -29,29 +29,9 @@
 
 <div class="page-content">
     <div class="row">
-        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="card mb-4">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3 text-primary">
-                        Informasi Penting
-                    </h5>
-                    <p class="mb-2">Penabung dapat mengajukan penarikan tabungan melalui bendahara dengan dua metode:</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item border-0">
-                            <i class="bi bi-cash-coin text-success"></i> <strong>Tunai</strong> Pengambilan uang langsung di sekolah.
-                        </li>
-                        <li class="list-group-item border-0">
-                            <i class="bi bi-wallet2 text-info"></i> <strong>Digital</strong> Dana ditransfer langsung ke e-wallet/bank yang Anda pilih.
-                        </li>
-                    </ul>
-                    <p class="mt-3 text-muted">
-                        * Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi yang berbeda.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="card">
+        <!-- Card Form Penarikan -->
+        <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+            <div class="card shadow-lg">
                 <div class="card-body">
                     @if(session('success'))
                         <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -95,7 +75,7 @@
                         <table class="table table-borderless">
                             <tr>
                                 <th>ID Tabungan</th>
-                                <td>{{ $pengajuan->tabungan_id }}</td>
+                                <td>{{ $pengajuan->user->username }}</td>
                             </tr>
                             <tr>
                                 <th>Jumlah Penarikan</th>
@@ -292,6 +272,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- Card Informasi Penting -->
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">
+                        <i class="bi bi-info-circle"></i> Informasi Penting
+                    </h5>
+                    <p class="mb-2">Penabung dapat mengajukan penarikan tabungan melalui bendahara dengan dua metode:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0 px-0">
+                            <i class="bi bi-cash-coin text-success"></i> <strong>Tunai</strong><br>
+                            <small class="text-muted">Pengambilan uang langsung di sekolah</small>
+                        </li>
+                        <li class="list-group-item border-0 px-0">
+                            <i class="bi bi-wallet2 text-info"></i> <strong>Digital</strong><br>
+                            <small class="text-muted">Dana ditransfer langsung ke e-wallet/bank yang Anda pilih</small>
+                        </li>
+                    </ul>
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <small>Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi yang berbeda.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -307,7 +313,7 @@
                 Apakah Anda yakin ingin membatalkan pengajuan ini?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
                 <form id="batalForm" method="POST" action="">
                     @csrf
                     @method('DELETE')

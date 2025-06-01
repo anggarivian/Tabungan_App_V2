@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TabunganStoredMail;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
@@ -30,9 +31,7 @@ Route::get('/kirim-email', function () {
 */
 
 // Menampilkan halaman welcome sebagai halaman utama aplikasi.
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [Controller::class, 'index']);
 
 Route::get('/home', function () {
     return redirect('/');
@@ -147,6 +146,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
         Route::get('/siswa/tabungan/success', [TabunganController::class, 'success'])->name('payment.success');
+        Route::delete('/siswa/tabungan/stor/batal/{id}', [TabunganController::class, 'batal'])->name('siswa.batal.stor');
 
         // Menangani pengajuan penarikan tabungan Tunai / Digital.
         Route::get('/siswa/tabungan/tarik', [TabunganController::class, 'siswa_tarik'])->name('siswa.tabungan.tarik');
