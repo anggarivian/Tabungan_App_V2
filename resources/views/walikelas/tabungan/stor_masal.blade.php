@@ -106,7 +106,7 @@
                                                style="border: none; outline: none; background: transparent;" readonly tabindex="-1" />
                                     </td>
                                     <td class="text-center d-none d-md-table-cell">
-                                        <input type="text" class="form-control text-center" name="input[{{$no3++}}][saldo]" value="{{$siswas->tabungan->saldo ?? 0}}"
+                                        <input type="text" class="form-control text-center" name="input[{{$no3++}}][saldo]" value="{{ number_format($siswas->tabungan->saldo ?? 0) }}"
                                                style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
                                     </td>
                                     <td class="text-center col-md-2">

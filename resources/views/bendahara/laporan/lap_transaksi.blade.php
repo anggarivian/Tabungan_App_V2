@@ -102,6 +102,7 @@
                                     </div>
                                 </div>
                             </form>
+                            <hr>
                             <div class="table-responsive">
                                 <table class="table table-hover" style="width: 100%">
                                     <thead>
@@ -160,7 +161,7 @@
                                                 <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
                                                 <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
                                                 <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                                                <option value="1000" {{ request('perPage') == 1000 ? 'selected' : '' }}>Semua</option>
+                                                <option value="1000" {{ request('perPage') == 1000 ? 'selected' : '' }}>1000</option>
                                             </select>
                                         </div>
                                     </form>
@@ -176,30 +177,29 @@
                             <div class="table-responsive">
                                 <table class="table table-hover" style="width: 100%">
                                     <thead>
-                                        <tr>
-                                            <th colspan="1" class="text-center">No.</th>
-                                            <th class="text-center">Tanggal</th>
-                                            <th class="text-center">Kelas 1</th>
-                                            <th class="text-center">Kelas 2</th>
-                                            <th class="text-center">Kelas 3</th>
-                                            <th class="text-center">Kelas 4</th>
-                                            <th class="text-center">Kelas 5</th>
-                                            <th class="text-center">Kelas 6</th>
-                                            <th class="text-center">Total</th>
+                                        <tr class="text-center">
+                                            <th>No.</th>
+                                            <th>Tanggal</th>
+                                            @foreach($classes as $kelas)
+                                                <th>Kelas {{ $kelas->name }}</th>
+                                            @endforeach
+                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($transaksi as $transaksis)
-                                            <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td class="text-center">{{ \Carbon\Carbon::parse($transaksis->created_at)->format('d M Y') }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
+                                        @forelse($rows as $i => $row)
+                                            <tr class="text-center">
+                                                <td>{{ $i + 1 }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($row['tanggal'])->format('d M Y') }}</td>
+
+                                                @foreach($classes as $kelas)
+                                                @php
+                                                    $val = $row['perKelas'][(string)$kelas->id] ?? 0;
+                                                @endphp
+                                                <td>{{ number_format($val, 0, ',', ',') }}</td>
+                                                @endforeach
+
+                                                <td><strong>{{ number_format($row['total'], 0, ',', ',') }}</strong></td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -208,24 +208,6 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                <div class="d-flex justify-content-between">
-                                    <form method="GET" action="{{ request()->url() }}">
-                                        <div class="d-flex justify-content-end mb-3">
-                                            <label for="perPage" style="margin-top: 3px">Show</label>
-                                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
-                                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
-                                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                                                <option value="1000" {{ request('perPage') == 1000 ? 'selected' : '' }}>Semua</option>
-                                            </select>
-                                        </div>
-                                    </form>
-                                    <div class="justify-content-end">
-                                        {{ $transaksi->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

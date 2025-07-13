@@ -56,7 +56,7 @@ class WalikelasController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'jenis_kelamin' => 'required|in:L,P',
-            'kontak' => 'required|numeric|max:15',
+            'kontak' => 'required|numeric|min:1000000000|max:999999999999999',
             'alamat' => 'required|string',
         ], [
             'name.required' => 'Nama harus diisi.',

@@ -56,7 +56,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
+                                        {{-- <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button> --}}
                                     </div>
                                 </div>
                             </form>
@@ -76,7 +76,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
+                                        {{-- <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button> --}}
                                     </div>
                                 </div>
                             </form>
@@ -96,7 +96,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
+                                        {{-- <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button> --}}
                                     </div>
                                 </div>
                             </form>

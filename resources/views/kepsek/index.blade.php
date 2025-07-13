@@ -99,17 +99,33 @@
                     </div>
                 </div>
             </div>
-            <h3 class="mb-3">Diagram Tabungan</h3>
             <div class="card shadow-lg">
                 <div class="card-body">
-                    <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
-                    <div id="frekuensi"></div>
-                </div>
-            </div>
-            <div class="card shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
-                    <div id="total"></div>
+                    <h5 class="card-title">Statistik Tabungan</h5>
+
+                    <!-- Tabs Navigation -->
+                    <ul class="nav nav-tabs" id="tabunganTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="frekuensi-tab" data-bs-toggle="tab" data-bs-target="#frekuensi-tab-pane" type="button" role="tab" aria-controls="frekuensi-tab-pane" aria-selected="true">
+                                Frekuensi Menabung ({{ count($chart_frekuensi) }}x)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="total-tab" data-bs-toggle="tab" data-bs-target="#total-tab-pane" type="button" role="tab" aria-controls="total-tab-pane" aria-selected="false">
+                                Pertumbuhan Tabungan
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tabs Content -->
+                    <div class="tab-content pt-3" id="tabunganTabsContent">
+                        <div class="tab-pane fade show active" id="frekuensi-tab-pane" role="tabpanel" aria-labelledby="frekuensi-tab" tabindex="0">
+                            <div id="frekuensi"></div>
+                        </div>
+                        <div class="tab-pane fade" id="total-tab-pane" role="tabpanel" aria-labelledby="total-tab" tabindex="0">
+                            <div id="total"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

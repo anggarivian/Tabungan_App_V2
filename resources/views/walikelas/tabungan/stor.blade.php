@@ -106,7 +106,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readonly >
+                                        <input type="text" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readonly >
                                     </div>
                                 </div>
                             </div>
@@ -119,7 +119,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
+                                        <input type="text" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -163,7 +163,10 @@
             $.ajax({
                 url: "{{ route('walikelas.search') }}",
                 method: "GET",
-                data: { username: username },
+                data: {
+                    username: username,
+                    timestamp: new Date().getTime()
+                },
                 success: function(data) {
                     if (data) {
                         console.log(data);
@@ -208,6 +211,19 @@
     $('#username').on('change', function() {
         $('#username2').val($(this).val());
     });
+
+    $('#jumlah_tabungan').on('input', function () {
+        let angka = $(this).val().replace(/\D/g, '');
+        let format = new Intl.NumberFormat('id-ID').format(angka);
+        $(this).val(format);
+    });
+
+    $('#jumlah_stor').on('input', function () {
+        let angka = $(this).val().replace(/\D/g, '');
+        let format = new Intl.NumberFormat('id-ID').format(angka);
+        $(this).val(format);
+    });
+
 
     $(document).ready(function(){
         setTimeout(function(){

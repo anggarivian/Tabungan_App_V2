@@ -119,7 +119,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
+                                        <input type="text" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -163,7 +163,10 @@
             $.ajax({
                 url: "{{ route('bendahara.search') }}",
                 method: "GET",
-                data: { username: username },
+                data: {
+                    username: username,
+                    timestamp: new Date().getTime()
+                },
                 success: function(data) {
                     if (data) {
                         console.log(data);
@@ -191,21 +194,26 @@
             });
         });
 
+        $('#jumlah_stor').on('input', function () {
+            var value = $(this).val().replace(/\D/g, '');
+            var formatted = new Intl.NumberFormat('id-ID').format(value);
+            $(this).val(formatted);
+        });
+
         $('#username').on('keypress', function(e) {
             if(e.which === 13) {
                 $('#jumlah_stor').focus();
             }
         });
-    });
 
-    $('#username').on('change', function() {
-        $('#username2').val($(this).val());
-    });
+        $('#username').on('change', function() {
+            $('#username2').val($(this).val());
+        });
 
-    $(document).ready(function(){
         setTimeout(function(){
             $('#username').focus();
         }, 500);
     });
 </script>
+
 @endsection

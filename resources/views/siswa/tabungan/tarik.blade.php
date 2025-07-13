@@ -264,10 +264,10 @@
                                 </div>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <button type="submit" class="btn btn-primary w-100">Ajukan</button>
-                            </div>
                         </form>
+                            <div class="form-group mb-3">
+                                <button class="btn btn-primary w-100" disabled>Segera Hadir ... !</button>
+                            </div>
                     @endif
                 </div>
             </div>
@@ -280,7 +280,7 @@
                     <h5 class="fw-bold mb-3 text-primary">
                         <i class="bi bi-info-circle"></i> Informasi Penting
                     </h5>
-                    <p class="mb-2">Penabung dapat mengajukan penarikan tabungan melalui bendahara dengan dua metode:</p>
+                    <p class="mb-2">Penabung dapat mengajukan penarikan tabungan <strong>sebanyak 2x</strong> dengan dua metode:</p>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item border-0 px-0">
                             <i class="bi bi-cash-coin text-success"></i> <strong>Tunai</strong><br>
@@ -293,7 +293,7 @@
                     </ul>
                     <div class="alert alert-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle"></i>
-                        <small>Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi yang berbeda.</small>
+                        <small>Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi antara Rp. 100 ~ Rp. 5,000 tergantung besaran transaksinya.</small>
                     </div>
                 </div>
             </div>

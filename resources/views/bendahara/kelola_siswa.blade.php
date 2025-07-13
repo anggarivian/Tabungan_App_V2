@@ -85,7 +85,7 @@
                             <th class="text-center">Orang Tua</th>
                             <th class="text-center">Kontak</th>
                             <th>Alamat</th>
-                            <th class="text-center">Tanggal</th>
+                            {{-- <th class="text-center">Tanggal</th> --}}
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -101,7 +101,7 @@
                                 <td >{{ Str::limit($users->orang_tua, 10, '...') }}</td>
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ Str::limit($users->alamat, 10, '...') }}</td>
-                                <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td>
+                                {{-- <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td> --}}
                                 <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-warning" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
@@ -219,84 +219,92 @@
 
 {{-- Modal Edit --}}
 <div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Siswa</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="{{ route('bendahara.siswa.edit', '') }}">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="edit-name">Nama</label>
+
+            <div class="modal-body">
+                {{-- Form --}}
+                <form id="editForm" method="POST" action="{{ route('bendahara.siswa.edit', '') }}">
+                    @csrf
+                    @method('PUT')
+
+                    {{-- Tabs --}}
+                    <ul class="nav nav-tabs" id="editTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#dataTab" type="button" role="tab">Edit Data</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#passwordTab" type="button" role="tab">Ganti Password</button>
+                        </li>
+                    </ul>
+
+                    {{-- Tab Content --}}
+                    <div class="tab-content p-3">
+                        {{-- Tab 1: Edit Data --}}
+                        <div class="tab-pane fade show active" id="dataTab" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-4"><label for="edit-name">Nama</label></div>
+                                <div class="col-md-8 mb-2"><input type="text" id="edit-name" class="form-control" name="name" required></div>
+
+                                <div class="col-md-4"><label for="edit-kelas">Kelas</label></div>
+                                <div class="col-md-8 mb-2">
+                                    <select id="edit-kelas" class="form-select" name="kelas" required>
+                                        <option value="">Pilih Kelas</option>
+                                        @foreach($kelas as $k)
+                                            <option value="{{ $k->id }}">{{ $k->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4"><label for="edit-email">Email</label></div>
+                                <div class="col-md-8 mb-2"><input type="email" id="edit-email" class="form-control" name="email" required></div>
+
+                                <div class="col-md-4"><label for="edit-jenis_kelamin">Jenis Kelamin</label></div>
+                                <div class="col-md-8 mb-2">
+                                    <select id="edit-jenis_kelamin" class="form-select" name="jenis_kelamin" required>
+                                        <option value="">Pilih Jenis Kelamin</option>
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4"><label for="edit-kontak">Kontak</label></div>
+                                <div class="col-md-8 mb-2"><input type="text" id="edit-kontak" class="form-control" name="kontak" required></div>
+
+                                <div class="col-md-4"><label for="edit-alamat">Alamat</label></div>
+                                <div class="col-md-8 mb-2"><textarea id="edit-alamat" class="form-control" name="alamat" rows="3" required></textarea></div>
+
+                                <div class="col-md-4"><label for="edit-orang-tua">Orang Tua</label></div>
+                                <div class="col-md-8 mb-2"><input type="text" id="edit-orang_tua" class="form-control" name="orang_tua" required></div>
+                            </div>
                         </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-name" class="form-control" name="name" placeholder="Nama" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-kelas">Kelas</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="edit-kelas" class="form-select" name="kelas" required>
-                                <option value="">Pilih Kelas</option>
-                                @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-email">Email</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="email" id="edit-email" class="form-control" name="email" placeholder="Email" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-password">Password</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="password" id="edit-password" class="form-control" name="password" placeholder="Password">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-jenis_kelamin">Jenis Kelamin</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="edit-jenis_kelamin" class="form-select" name="jenis_kelamin" required>
-                                <option value="">Pilih Jenis Kelamin</option>
-                                <option value="L">Laki-laki</option>
-                                <option value="P">Perempuan</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-kontak">Kontak</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-kontak" class="form-control" name="kontak" placeholder="Kontak" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-alamat">Alamat</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <textarea id="edit-alamat" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-orang-tua">Orang Tua</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-orang_tua" class="form-control" name="orang_tua" placeholder="Orang Tua" required>
+
+                        {{-- Tab 2: Ganti Password --}}
+                        <div class="tab-pane fade" id="passwordTab" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-4"><label for="edit-password">Password Baru</label></div>
+                                <div class="col-md-8 mb-2">
+                                    <input type="password" id="edit-password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
+
+                    {{-- Footer --}}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
 
 {{-- Modal Konfirmasi Delete Yang Ditingkatkan --}}
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

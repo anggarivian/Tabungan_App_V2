@@ -119,7 +119,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="premi" name="premi" placeholder="Masukkan Biaya Admin" autocomplete="off">
+                                        <input type="text" class="form-control" id="premi" name="premi" placeholder="Masukkan Biaya Admin" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik" autocomplete="off">
+                                        <input type="text" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Tarik" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -176,7 +176,10 @@
             $.ajax({
                 url: "{{ route('bendahara.search') }}",
                 method: "GET",
-                data: { username: username },
+                data: {
+                    username: username,
+                    timestamp: new Date().getTime()
+                },
                 success: function(data) {
                     if (data) {
                         console.log(data);
@@ -209,6 +212,18 @@
                 $('#premi').focus();
             }
         });
+    });
+
+    $('#jumlah_tarik').on('input', function () {
+        var value = $(this).val().replace(/\D/g, ''); // hanya angka
+        var formatted = new Intl.NumberFormat('id-ID').format(value);
+        $(this).val(formatted);
+    });
+
+    $('#premi').on('input', function () {
+        var value = $(this).val().replace(/\D/g, ''); // hanya angka
+        var formatted = new Intl.NumberFormat('id-ID').format(value);
+        $(this).val(formatted);
     });
 
     $('#username').on('change', function() {

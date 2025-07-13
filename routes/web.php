@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TabunganStoredMail;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
@@ -31,7 +30,7 @@ Route::get('/kirim-email', function () {
 */
 
 // Menampilkan halaman welcome sebagai halaman utama aplikasi.
-Route::get('/', [Controller::class, 'index']);
+Route::get('/', [DashboardController::class, 'index']);
 
 Route::get('/home', function () {
     return redirect('/');
@@ -39,7 +38,7 @@ Route::get('/home', function () {
 
 // Menangani autentikasi dan otorisasi pengguna.
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
-Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
+Route::post('/login', [LoginController::class, 'login'])->name('getin');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/change-password', [LoginController::class, 'change_password'])->name('change.password')->middleware('auth');

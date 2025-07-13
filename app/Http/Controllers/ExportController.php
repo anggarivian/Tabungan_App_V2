@@ -32,7 +32,7 @@ class ExportController extends Controller
             'siswa_id' => 'nullable|exists:users,id',
             'kelas_id' => 'nullable|exists:kelas,id',
         ]);
-
+        // dd($validated);
         $exportType = $validated['export_type'];
         $exportOption = $validated['export_option'];
         $siswaId = $validated['siswa_id'];
@@ -54,22 +54,34 @@ class ExportController extends Controller
 
         $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
-        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
+        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'Tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
-            ->where('tipe_transaksi', 'stor')
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'Tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi') ;
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'Digital')
+            ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'Digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi') ;
+
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.tabungan', compact('siswas', 'exportOption', 'kelasId', 'user', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -128,6 +140,7 @@ class ExportController extends Controller
             $query->whereDate('created_at', '<=', $endDate);
         }
 
+        $query->where('status', 'success');
         $transaksis = $query->get();
         $user = User::find($siswaId);
 
@@ -135,20 +148,32 @@ class ExportController extends Controller
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
         $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.transaksi', compact('transaksis', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -216,18 +241,28 @@ class ExportController extends Controller
             ->where('tipe_transaksi', 'stor')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.pengajuan', compact('pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -277,22 +312,34 @@ class ExportController extends Controller
 
         $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
-        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
+        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'Tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
-            ->where('tipe_transaksi', 'stor')
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'Tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi') ;
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'Digital')
+            ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'Digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi') ;
+
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.tabungan', compact('siswas', 'exportOption', 'kelasId', 'user', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -351,6 +398,7 @@ class ExportController extends Controller
             $query->whereDate('created_at', '<=', $endDate);
         }
 
+        $query->where('status', 'success');
         $transaksis = $query->get();
         $user = User::find($siswaId);
 
@@ -358,20 +406,32 @@ class ExportController extends Controller
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
         $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.transaksi', compact('transaksis', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -439,18 +499,28 @@ class ExportController extends Controller
             ->where('tipe_transaksi', 'stor')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunaiAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlahSaldoDigitalAll = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.pengajuan', compact('pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
@@ -500,17 +570,29 @@ class ExportController extends Controller
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
         $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
         $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
@@ -570,6 +652,7 @@ class ExportController extends Controller
             $query->whereDate('created_at', '<=', $endDate);
         }
 
+        $query->where('status', 'success');
         $transaksis = $query->get();
         $user = User::find($siswaId);
 
@@ -577,17 +660,29 @@ class ExportController extends Controller
         $jumlahPenabungAll = User::where('roles_id', 4 )->count();
         $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'tunai')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
             ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->whereHas('user', function ($query) use ($kelasId) {
                 $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+            })->sum('jumlah_transaksi')
+            - Transaksi::where('pembayaran', 'digital')
+            ->where('tipe_transaksi', 'tarik')
+            ->where('status', 'success')
+            ->whereHas('user', function ($query) use ($kelasId) {
+                $query->where('kelas_id', $kelasId);
+            })->sum('jumlah_transaksi');
 
         $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
         $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
@@ -783,8 +878,11 @@ class ExportController extends Controller
         $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
         $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
 
+        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
+        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+
         if ($exportType == 'pdf') {
-            $pdf = PDF::loadView('export.pengajuan', compact('pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
+            $pdf = PDF::loadView('export.pengajuan', compact('pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll', 'saldoTunai', 'saldoDigital'));
             return $pdf->download('laporan_pengajuan.pdf');
         } elseif ($exportType == 'excel') {
             return Excel::download(new PengajuanExport($pengajuans, $exportType, $user), 'laporan_pengajuan.xlsx');

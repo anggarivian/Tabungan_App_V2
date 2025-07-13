@@ -76,7 +76,7 @@
                             <th>Nama</th>
                             <th class="text-center">Kelas</th>
                             <th class="text-center">Saldo</th>
-                            <th class="text-center">Sisa</th>
+                            {{-- <th class="text-center">Sisa</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -87,7 +87,7 @@
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ number_format($users->tabungan->saldo ?? 0 ) }}</td>
-                                <td class="text-center">Rp. {{ number_format($users->tabungan->sisa ?? 0 ) }}</td>
+                                {{-- <td class="text-center">Rp. {{ number_format($users->tabungan->sisa ?? 0 ) }}</td> --}}
                             </tr>
                         @empty
                             <tr>

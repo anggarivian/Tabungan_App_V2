@@ -84,7 +84,7 @@
                 <tr><td>Kelas</td><td>{{ $user->kelas->name }}</td></tr>
                 <tr><td>Kontak</td><td>{{ $user->kontak }}</td></tr>
                 <tr><td>Jumlah Tabungan Tunai</td><td>Rp. {{ number_format($user->tabungan->saldo, 0, ',', '.') }}</td></tr>
-                <tr><td>Jumlah Tabungan Digital</td><td>Rp. {{ number_format($user->tabungan->saldo, 0, ',', '.') }}</td></tr>
+                <tr><td>Jumlah Tabungan Digital</td><td>Rp. 0</td></tr>
             </table>
             @elseif($exportOption == 'kelas')
                 <table>
@@ -135,7 +135,7 @@
                 <p>Cianjur, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
                 <p><strong>Kepala Sekolah</strong></p>
                 <br><br>
-                <p><strong>SUYATNA</strong></p>
+                <p><strong>SUHENDI YUSUF, S.Pd, MM</strong></p>
             </div>
         </div>
     </div>

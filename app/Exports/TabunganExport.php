@@ -25,10 +25,10 @@ class TabunganExport implements FromCollection, WithHeadings
                     'nama' => $siswas->user->name,
                     'kelas' => $siswas->user->kelas->name,
                     'saldo_tunai' => \App\Models\Transaksi::where('user_id', $siswas->user_id)
-                                    ->where('pembayaran', 'tunai')
+                                    ->where('pembayaran', 'Tunai')
                                     ->sum('jumlah_transaksi'),
                     'saldo_digital' => \App\Models\Transaksi::where('user_id', $siswas->user_id)
-                                    ->where('pembayaran', 'digital')
+                                    ->where('pembayaran', 'Digital')
                                     ->sum('jumlah_transaksi'),
                     'terakhir_transaksi' => optional($siswas->user->transaksi()->latest('updated_at')->first())->updated_at,
                     'dapat_ditarik' => $siswas->sisa,

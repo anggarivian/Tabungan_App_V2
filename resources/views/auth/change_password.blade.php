@@ -17,11 +17,17 @@
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-800-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <style>
+        /* Force light theme regardless of system/parent theme */
         :root {
-            --primary-color: #485cbc;
-            --light-bg: #f8faff;
-            --shadow-color: rgba(72, 92, 188, 0.2);
-            --text-color: #333;
+            --primary-color: #485cbc !important;
+            --light-bg: #f8faff !important;
+            --shadow-color: rgba(72, 92, 188, 0.2) !important;
+            --text-color: #333 !important;
+        }
+
+        /* Override any parent dark mode settings */
+        * {
+            color-scheme: light !important;
         }
 
         body {
@@ -30,8 +36,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: var(--primary-color);
-            background-image: linear-gradient(135deg, #485cbc 0%, #3a4ba3 100%);
+            background: #485cbc !important;
+            background-image: linear-gradient(135deg, #485cbc 0%, #3a4ba3 100%) !important;
             min-height: 100vh;
             font-family: 'Nunito', sans-serif;
             margin: 0;
@@ -39,7 +45,7 @@
         }
 
         .screen-1 {
-            background: var(--light-bg);
+            background: #f8faff !important;
             padding: 35px 30px 30px;
             display: flex;
             flex-direction: column;
@@ -66,21 +72,21 @@
             text-align: center;
             margin-top: 5px;
             margin-bottom: 10px;
-            color: var(--primary-color);
+            color: #485cbc !important;
             font-weight: 700;
             font-size: 1.7rem;
         }
 
         .form-subtitle {
             text-align: center;
-            color: #666;
+            color: #666 !important;
             font-size: 0.95rem;
             margin-bottom: 25px;
         }
 
         .section-title {
             font-weight: 600;
-            color: var(--primary-color);
+            color: #485cbc !important;
             font-size: 1.1rem;
             margin-top: 20px;
             margin-bottom: 15px;
@@ -90,12 +96,12 @@
 
         .info-text {
             font-size: 0.85rem;
-            color: #666;
+            color: #666 !important;
             margin-bottom: 15px;
             padding: 8px 12px;
-            background-color: rgba(72, 92, 188, 0.05);
+            background-color: rgba(72, 92, 188, 0.05) !important;
             border-radius: 8px;
-            border-left: 3px solid var(--primary-color);
+            border-left: 3px solid #485cbc !important;
         }
 
         .form-group {
@@ -103,26 +109,26 @@
         }
 
         .input-field {
-            background: white;
+            background: white !important;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             padding: 12px 15px;
             display: flex;
             flex-direction: column;
             border-radius: 12px;
-            color: var(--text-color);
+            color: #333 !important;
             transition: all 0.3s ease;
-            border: 1px solid #e1e5f2;
+            border: 1px solid #e1e5f2 !important;
         }
 
         .input-field:focus-within {
-            box-shadow: 0 4px 12px rgba(72, 92, 188, 0.2);
-            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(72, 92, 188, 0.2) !important;
+            border-color: #485cbc !important;
         }
 
         label {
             font-weight: 600;
             font-size: 0.85rem;
-            color: #485cbc;
+            color: #485cbc !important;
             margin-bottom: 6px;
         }
 
@@ -133,7 +139,7 @@
         }
 
         ion-icon {
-            color: var(--primary-color);
+            color: #485cbc !important;
             margin-right: 10px;
             font-size: 1.2rem;
         }
@@ -144,8 +150,8 @@
             width: 100%;
             font-size: 0.95rem;
             padding: 6px 0;
-            color: #333;
-            background: transparent;
+            color: #333 !important;
+            background: transparent !important;
         }
 
         textarea {
@@ -155,7 +161,7 @@
         }
 
         .input-field input::placeholder, .input-field textarea::placeholder {
-            color: #aab;
+            color: #aab !important;
             font-size: 0.9rem;
         }
 
@@ -168,8 +174,8 @@
 
         .submit-btn {
             padding: 14px;
-            background: var(--primary-color);
-            color: white;
+            background: #485cbc !important;
+            color: white !important;
             border: none;
             border-radius: 12px;
             font-weight: 600;
@@ -182,12 +188,37 @@
         }
 
         .submit-btn:hover {
-            background: #3a4ba3;
+            background: #3a4ba3 !important;
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 92, 188, 0.4);
         }
 
         .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            padding: 14px;
+            background: #585b69 !important;
+            color: white !important;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(72, 92, 188, 0.3);
+        }
+
+        .secondary-btn:hover {
+            background: #a0a3b3 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 92, 188, 0.4);
+        }
+
+        .secondary-btn:active {
             transform: translateY(0);
         }
 
@@ -201,13 +232,13 @@
         }
 
         .alert-success {
-            background-color: #f0fff0;
-            color: #2e7d32;
-            border-left: 4px solid #2e7d32;
+            background-color: #f0fff0 !important;
+            color: #2e7d32 !important;
+            border-left: 4px solid #2e7d32 !important;
         }
 
         .invalid-feedback {
-            color: #d32f2f;
+            color: #d32f2f !important;
             font-size: 0.8rem;
             margin-top: 6px;
             padding-left: 30px;
@@ -217,8 +248,8 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(72, 92, 188, 0.1);
-            color: var(--primary-color);
+            background: rgba(72, 92, 188, 0.1) !important;
+            color: #485cbc !important;
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -231,7 +262,7 @@
         }
 
         .back-button:hover {
-            background: rgba(72, 92, 188, 0.2);
+            background: rgba(72, 92, 188, 0.2) !important;
             transform: translateX(-3px);
         }
 
@@ -239,15 +270,69 @@
             margin: 0;
             font-size: 1.4rem;
         }
+
+        /* Force override any dark mode media queries */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #485cbc !important;
+                --light-bg: #f8faff !important;
+                --shadow-color: rgba(72, 92, 188, 0.2) !important;
+                --text-color: #333 !important;
+            }
+
+            body {
+                background: #485cbc !important;
+                background-image: linear-gradient(135deg, #485cbc 0%, #3a4ba3 100%) !important;
+            }
+
+            .screen-1 {
+                background: #f8faff !important;
+            }
+
+            .input-field {
+                background: white !important;
+                color: #333 !important;
+            }
+
+            .input-field input, .input-field textarea {
+                color: #333 !important;
+                background: transparent !important;
+            }
+        }
+
+        /* Override any parent container dark mode styles */
+        [data-theme="dark"] .screen-1,
+        .dark .screen-1,
+        [data-bs-theme="dark"] .screen-1 {
+            background: #f8faff !important;
+            color: #333 !important;
+        }
+
+        [data-theme="dark"] .input-field,
+        .dark .input-field,
+        [data-bs-theme="dark"] .input-field {
+            background: white !important;
+            color: #333 !important;
+        }
+
+        [data-theme="dark"] .input-field input,
+        [data-theme="dark"] .input-field textarea,
+        .dark .input-field input,
+        .dark .input-field textarea,
+        [data-bs-theme="dark"] .input-field input,
+        [data-bs-theme="dark"] .input-field textarea {
+            color: #333 !important;
+            background: transparent !important;
+        }
     </style>
 </head>
 
 <body>
     <script src="{{ asset('/dist/assets/static/js/initTheme.js') }}"></script>
     <div class="screen-1">
-        <button class="back-button" onclick="goBack()">
+        <a class="back-button" style="border-radius: 50%" href="/">
             <ion-icon name="arrow-back-outline"></ion-icon>
-        </button>
+        </a>
 
         <div class="logo-container">
             <div class="logo">
@@ -372,8 +457,9 @@
                 @enderror
             </div>
 
-            <button type="submit" class="submit-btn">Simpan Perubahan</button>
+            <button type="submit" class="submit-btn" style="border-radius: 12px">Simpan Perubahan</button>
         </form>
+        <a href="/bendahara/dashboard" class="secondary-btn text-center" style="margin-top: 5px">Nanti Saja</a>
     </div>
 
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

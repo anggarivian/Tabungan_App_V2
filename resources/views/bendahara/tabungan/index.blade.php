@@ -211,7 +211,7 @@
                                             <th class="text-center">No.</th>
                                             <th class="text-center">ID</th>
                                             <th>Nama</th>
-                                            <th class="text-center">Kelas</th>
+                                            {{-- <th class="text-center">Kelas</th> --}}
                                             <th class="text-center">Saldo Awal</th>
                                             <th class="text-center">Jumlah Transaksi</th>
                                             <th class="text-center">Saldo Akhir</th>
@@ -226,7 +226,7 @@
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                                 <td>{{ Str::limit($transaksis->user->name, 20, '...') }}</td>
-                                                <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
+                                                {{-- <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td> --}}
                                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0) }}</td>
                                                 <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</td>
                                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>

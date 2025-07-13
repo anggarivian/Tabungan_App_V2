@@ -179,17 +179,18 @@
                                     </div>
                                 </div>
                             </div>
+                        </form>
+
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
-                                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                         <div class="d-flex justify-content-between">
-                                            <button type="submit" class="btn btn-primary" style="width: 100%">Lanjutkan</button>
+                                            <button class="btn btn-primary" style="width: 100%" disabled>Segera Hadir ... !</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -218,7 +219,7 @@
                         </ul>
                         <div class="alert alert-warning mt-3" role="alert">
                             <i class="bi bi-exclamation-triangle"></i>
-                            <small>Perhatikan bahwa setiap metode memiliki biaya administrasi yang berbeda.</small>
+                            <small>Perhatikan bahwa metode <strong>Digital</strong> memiliki biaya administrasi antara Rp. 100 ~ Rp. 5,000 tergantung besaran transaksinya.</small>
                         </div>
                     </div>
                 </div>

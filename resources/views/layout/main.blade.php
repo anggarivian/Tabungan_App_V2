@@ -543,7 +543,7 @@
                             </div>
                             <div class="float-end">
                                 <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
-                                    href="https://github.com/anggarivian">Angga</a></p>
+                                    href="https://www.instagram.com/anggariviann/">Angga</a></p>
                             </div>
                         </div>
                     </div>
@@ -639,7 +639,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         let deferredPrompt;
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -745,7 +745,7 @@
             }
         });
 
-    </script>
+    </script> --}}
 
 
 </body>

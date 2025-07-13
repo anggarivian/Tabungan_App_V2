@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-lg-3 col-md-6">
+                <div class="col-12 col-lg-4 col-md-6">
                     <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3 col-md-6">
+                <div class="col-6 col-lg-4 col-md-6">
                     <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -55,7 +55,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3 col-md-6">
+                <div class="col-6 col-lg-4 col-md-6">
                     <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -72,7 +72,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-3 col-md-6">
+                {{-- <div class="col-12 col-lg-3 col-md-6">
                     <div class="card shadow-lg">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
@@ -88,12 +88,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
             <h3 class="mb-3">Tabungan</h3>
             <div class="card shadow-lg">
                 <div class="card-body">
-                    <h5 class="card-title">Buku Tabungan 2024/2025</h5>
+                    <h5 class="card-title">Buku Tabungan</h5>
                     <p class="text-muted fst-italic">Menampilkan transaksi terbaru di atas</p>
                     <div class="table-responsive">
                         <table class="table table-hover" style="width: 100%">
@@ -103,7 +103,7 @@
                                         Tanggal <i class="bi bi-arrow-down-short"></i>
                                     </th>
                                     <th colspan="2" class="text-center">Tabungan</th>
-                                    <th rowspan="2" class="text-center">Jumlah Sisa</th>
+                                    <th rowspan="2" class="text-center">Jumlah</th>
                                 </tr>
                                 <tr>
                                     <th class="text-center">Masuk</th>
@@ -113,23 +113,23 @@
                             <tbody>
                                 @forelse ($transaksi as $transaksis)
                                     <tr>
-                                        <td class="text-center"> <span class="badge bg-light">{{ $transaksis->created_at->format('d-m-Y') }}</span></td>
+                                        <td class="text-center"> <span class="badge bg-light">{{ $transaksis->created_at->format('d-m-y') }}</span></td>
                                         <td class="text-center">
                                             @if ($transaksis->tipe_transaksi == 'Stor')
-                                                <span class="badge bg-success">+ Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
+                                                <span class="badge bg-success">+  {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
                                             @else
                                                 -
                                             @endif
                                         </td>
                                         <td class="text-center">
                                             @if ($transaksis->tipe_transaksi == 'Tarik')
-                                                <span class="badge bg-danger">- Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
+                                                <span class="badge bg-danger">-  {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</span>
                                             @else
                                                 -
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-secondary">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</span>
+                                            <span class="badge bg-secondary"> {{ number_format($transaksis->saldo_akhir ?? 0) }}</span>
                                         </td>
                                     </tr>
                                 @empty
@@ -139,19 +139,53 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-between">
+                            <form method="GET" action="{{ request()->url() }}">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <label for="perPage" style="margin-top: 3px">Show</label>
+                                    <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
+                                        <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
+                                        <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                </div>
+                            </form>
+                            <div class="justify-content-end">
+                                {{ $transaksi->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="card shadow-lg">
                 <div class="card-body">
-                    <h5 class="card-title">Frekuensi Menabung 2024/2025</h5>
-                    <div id="frekuensi"></div>
-                </div>
-            </div>
-            <div class="card shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Pertumbuhan Tabungan 2024/2025</h5>
-                    <div id="total"></div>
+                    <h5 class="card-title">Statistik Tabungan</h5>
+
+                    <!-- Tabs Navigation -->
+                    <ul class="nav nav-tabs" id="tabunganTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="frekuensi-tab" data-bs-toggle="tab" data-bs-target="#frekuensi-tab-pane" type="button" role="tab" aria-controls="frekuensi-tab-pane" aria-selected="true">
+                                Frekuensi ({{ count($chart_frekuensi) }}x)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="total-tab" data-bs-toggle="tab" data-bs-target="#total-tab-pane" type="button" role="tab" aria-controls="total-tab-pane" aria-selected="false">
+                                Pertumbuhan
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tabs Content -->
+                    <div class="tab-content pt-3" id="tabunganTabsContent">
+                        <div class="tab-pane fade show active" id="frekuensi-tab-pane" role="tabpanel" aria-labelledby="frekuensi-tab" tabindex="0">
+                            <div id="frekuensi"></div>
+                        </div>
+                        <div class="tab-pane fade" id="total-tab-pane" role="tabpanel" aria-labelledby="total-tab" tabindex="0">
+                            <div id="total"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -166,138 +200,157 @@
     const chartDataFrekuensi = @json($chart_frekuensi);
     const chartDataTotal = @json($chart_total);
 
-    var optionsFrekuensi = {
+    const commonOptions = {
+        chart: {
+            type: 'area',
+            height: 350,
+            stacked: false,
+            foreColor: '#373d3f',
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true,
+                },
+            },
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 700,
+                animateGradually: {
+                    enabled: true,
+                    delay: 200
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
+            },
+            zoom: {
+                enabled: true,
+                type: 'x',
+                autoScaleYaxis: true
+            },
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        dataLabels: {
+            enabled: false
+        },
+        markers: {
+            size: 6,
+            hover: {
+                sizeOffset: 3
+            }
+        },
+        grid: {
+            borderColor: '#e0e0e0',
+            row: {
+                colors: ['transparent'],
+                opacity: 0
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: "vertical",
+                shadeIntensity: 0.5,
+                gradientToColors: undefined,
+                inverseColors: true,
+                opacityFrom: 0.7,
+                opacityTo: 0.1,
+                stops: [0, 90, 100]
+            },
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                format: 'dd MMM',
+                style: {
+                    fontSize: '13px'
+                }
+            },
+            tooltip: {
+                enabled: false
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: val => "Rp. " + val.toLocaleString('id-ID'),
+                style: {
+                    fontSize: '13px'
+                }
+            },
+            title: {
+                text: 'Jumlah (Rp)'
+            }
+        },
+        tooltip: {
+            shared: true,
+            intersect: false,
+            theme: 'light',
+            x: {
+                format: 'dd MMM yyyy'
+            },
+            y: {
+                formatter: val => "Rp. " + val.toLocaleString('id-ID')
+            }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'right',
+            floating: false,
+            offsetY: -10,
+            offsetX: -5
+        }
+    };
+
+    const optionsFrekuensi = {
+        ...commonOptions,
         series: [{
-            name: 'Data Frekuensi',
+            name: 'Frekuensi Menabung',
             data: chartDataFrekuensi
         }],
-        chart: {
-            type: 'area',
-            stacked: false,
-            height: 350,
-            zoom: {
-                type: 'x',
-                enabled: true,
-                autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        markers: {
-            size: 0
-        },
+        colors: ['#00b894'],
         title: {
-            text: 'Jumlah Menabung',
-            align: 'left'
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                inverseColors: false,
-                opacityFrom: 0.5,
-                opacityTo: 0,
-                stops: [0, 90, 100]
-            }
-        },
-        yaxis: {
-            labels: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
-            },
-            title: {
-                text: 'Rupiah (Rp.)'
-            }
-        },
-        xaxis: {
-            type: 'datetime',
-            labels: {
-                format: 'dd MMM yyyy'
-            }
-        },
-        tooltip: {
-            shared: false,
-            y: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
+            text: 'Frekuensi Menabung Siswa',
+            align: 'left',
+            style: {
+                fontSize: '16px',
+                fontWeight: 'bold',
+                color: '#2d3436'
             }
         }
     };
 
-    var chartFrekuensi = new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi);
-    chartFrekuensi.render();
-
-    var optionsTotal = {
+    const optionsTotal = {
+        ...commonOptions,
         series: [{
-            name: 'Data Total',
+            name: 'Total Tabungan',
             data: chartDataTotal
         }],
-        chart: {
-            type: 'area',
-            stacked: false,
-            height: 350,
-            zoom: {
-                type: 'x',
-                enabled: true,
-                autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        markers: {
-            size: 0
-        },
+        colors: ['#0984e3'],
         title: {
-            text: 'Jumlah Saldo',
-            align: 'left'
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                inverseColors: false,
-                opacityFrom: 0.5,
-                opacityTo: 0,
-                stops: [0, 90, 100]
-            }
-        },
-        yaxis: {
-            labels: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
-            },
-            title: {
-                text: 'Rupiah (Rp.)'
-            }
-        },
-        xaxis: {
-            type: 'datetime',
-            labels: {
-                format: 'dd MMM yyyy'
-            }
-        },
-        tooltip: {
-            shared: false,
-            y: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
+            text: 'Pertumbuhan Total Tabungan',
+            align: 'left',
+            style: {
+                fontSize: '16px',
+                fontWeight: 'bold',
+                color: '#2d3436'
             }
         }
     };
 
-    var chartTotal = new ApexCharts(document.querySelector("#total"), optionsTotal);
-    chartTotal.render();
-    </script>
+    new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi).render();
+    new ApexCharts(document.querySelector("#total"), optionsTotal).render();
+</script>
+
 @endsection

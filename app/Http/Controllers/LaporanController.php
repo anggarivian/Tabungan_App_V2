@@ -263,7 +263,44 @@ class LaporanController extends Controller
             ->appends($request->all());
 
         $kelasList = Kelas::orderBy('name')->get();
-        return view('bendahara.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
+
+        // 1) Daftar kelas
+    $classes = Kelas::orderBy('id')->get();
+
+    // 2) Ambil transaksi + eager‐load
+    $transactions = Transaksi::with('user.kelas')->get();
+
+    // 3) Group by tanggal, lalu map ke array
+    $rows = $transactions
+        ->groupBy('tanggal')
+        ->map(function($trsOnDate, $tanggal) use($classes) {
+            // siapkan array awal semua kelas = 0
+            $perKelas = $classes
+                ->pluck('id')
+                ->mapWithKeys(fn($id) => [(string)$id => 0])
+                ->toArray();
+
+            $totalAll = 0;
+
+            // akumulasi
+            foreach ($trsOnDate as $t) {
+                $kelasId = (string) optional($t->user)->kelas_id;
+                if (array_key_exists($kelasId, $perKelas)) {
+                    $perKelas[$kelasId] += $t->jumlah_transaksi;
+                    $totalAll += $t->jumlah_transaksi;
+                }
+            }
+
+            return [
+                'tanggal'  => $tanggal,
+                'perKelas' => $perKelas,
+                'total'    => $totalAll,
+            ];
+        })
+        ->values()   // hilangkan key tanggal sebagai index
+        ->toArray(); // PASTIKAN ini array, bukan Collection!
+
+        return view('bendahara.laporan.lap_transaksi', compact('transaksi', 'kelasList', 'rows', 'classes'));
     }
 
     /**
@@ -443,7 +480,7 @@ class LaporanController extends Controller
 
     public function lap_walikelas_export(Request $request)
     {
-        $siswas = User::where('kelas_id', auth()->user()->kelas->id )->get();
+        $siswas = User::where('kelas_id', auth()->user()->kelas->id )->where('roles_id', 4)->get();
         $kelas = Kelas::all();
 
         return view('walikelas.laporan.export', compact('siswas', 'kelas'));
@@ -461,7 +498,9 @@ class LaporanController extends Controller
         $kelasId = auth()->user()->kelas->id;
         $perPage = request('perPage', 10);
         $user = User::where('roles_id', 4)->where('kelas_id', $kelasId)->paginate($perPage);
-        return view('siswa.laporan.lap_tabungan', compact('user'));
+        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
+        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+        return view('siswa.laporan.lap_tabungan', compact('user', 'saldoTunai', 'saldoDigital'));
     }
 
     /**
@@ -495,7 +534,10 @@ class LaporanController extends Controller
             ->orderBy('created_at', 'asc')
             ->paginate($perPage);
 
-        return view('siswa.laporan.lap_transaksi', compact('transaksi'));
+        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
+        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+
+        return view('siswa.laporan.lap_transaksi', compact('transaksi', 'saldoTunai', 'saldoDigital'));
     }
 
     /**
@@ -528,7 +570,10 @@ class LaporanController extends Controller
             })
             ->paginate($perPage);
 
-        return view('siswa.laporan.lap_pengajuan', compact('pengajuan'));
+        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
+        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+
+        return view('siswa.laporan.lap_pengajuan', compact('pengajuan', 'saldoTunai', 'saldoDigital'));
     }
 
     /**

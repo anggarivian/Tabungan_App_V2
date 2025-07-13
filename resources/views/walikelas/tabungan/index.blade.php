@@ -129,7 +129,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Transaksi Hari Ini</h5>
+                    <h5 class="card-title">Transaksi Kelas {{auth()->user()->kelas->id}} Hari Ini</h5>
                     <div class="dropdown-table mt-3 w-100">
                         <div class="table-responsive-lg">
                             <table class="table table-hover" style="width: 100%">
@@ -138,7 +138,7 @@
                                         <th class="text-center">No.</th>
                                         <th class="text-center">ID</th>
                                         <th>Nama</th>
-                                        <th class="text-center">Kelas</th>
+                                        {{-- <th class="text-center">Kelas</th> --}}
                                         <th class="text-center">Saldo Awal</th>
                                         <th class="text-center">Jumlah Transaksi</th>
                                         <th class="text-center">Saldo Akhir</th>
@@ -153,7 +153,7 @@
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <td class="text-center">{{ $transaksis->user->username }}</td>
                                             <td>{{ Str::limit($transaksis->user->name, 20, '...') }}</td>
-                                            <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
+                                            {{-- <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td> --}}
                                             <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>
                                             <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0 ) }}</td>
                                             <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0 ) }}</td>

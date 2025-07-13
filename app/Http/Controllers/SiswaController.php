@@ -56,9 +56,8 @@ class SiswaController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            // 'password' => 'required|string|min:8',
             'jenis_kelamin' => 'required|in:L,P',
-            'kontak' => 'required|numeric',
+            'kontak' => 'required|numeric|min:1000000000|max:999999999999999',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
         ], [
@@ -67,8 +66,6 @@ class SiswaController extends Controller
             'email.required' => 'Email harus diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
-            // 'password.required' => 'Password harus diisi.',
-            // 'password.min' => 'Password minimal 8 karakter.',
             'kontak.required' => 'Kontak harus diisi.',
             'kontak.max' => 'Kontak maksimal 15 karakter.',
             'alamat.required' => 'Alamat harus diisi.',
@@ -134,16 +131,15 @@ class SiswaController extends Controller
 
     public function edit(Request $request)
     {
-
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$request->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $request->id,
             'jenis_kelamin' => 'required|in:L,P',
-            'kontak' => 'required|numeric|max:15',
+            'kontak' => 'required|numeric|min:1000000000|max:999999999999999',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
             'kelas' => 'required|integer',
-            'password' => 'sometimes|string|min:8',
+            'password' => 'nullable|string|min:8',
         ], [
             'name.required' => 'Nama harus diisi',
             'email.required' => 'Email harus diisi',
@@ -152,8 +148,6 @@ class SiswaController extends Controller
             'alamat.required' => 'Alamat harus diisi',
             'orang_tua.required' => 'Orang tua harus diisi',
             'kelas.required' => 'Kelas harus diisi',
-            // 'password.required' => 'Password harus diisi',
-            // 'password.min' => 'Password minimal 8 karakter',
         ]);
 
         $user = User::findOrFail($request->id);
@@ -161,15 +155,25 @@ class SiswaController extends Controller
         $user->email = $validatedData['email'];
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
         $user->kontak = $validatedData['kontak'];
-        $user->password = bcrypt($validatedData['password']);
         $user->alamat = $validatedData['alamat'];
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
 
+        // Hanya update password jika diisi
+        if (!empty($validatedData['password'])) {
+            $user->password = bcrypt($validatedData['password']);
+        }
+
         $user->save();
 
-        return redirect()->route('bendahara.siswa.index')->with('success', 'Data siswa berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data siswa berhasil diperbarui')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.siswa.index')->with([
+            'success' => 'Data siswa berhasil diperbarui',
+            'alert-type' => 'warning',
+            'alert-message' => 'Data siswa berhasil diperbarui',
+            'alert-duration' => 3000
+        ]);
     }
+
 
     /**
      * Menghapus data siswa berdasarkan ID.

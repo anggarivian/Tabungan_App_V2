@@ -33,4 +33,11 @@ return [
     'xendit' => [
         'api_key' => env('XENDIT_SECRET_KEY'),
     ],
+
+    'wablas' => [
+        'token'      => env('WABLAS_TOKEN'),
+        'secret_key' => env('WABLAS_SECRET'),
+        'endpoint'   => 'https://sby.wablas.com/api/v2/send-message',
+    ],
+
 ];
