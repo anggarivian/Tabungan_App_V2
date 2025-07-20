@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 class UsersImport implements ToModel, WithHeadingRow
 {
     protected $kelasMap = [
-        '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6
+        '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6 , '7' => 7,
     ];
 
     public function model(array $row)
@@ -23,14 +23,15 @@ class UsersImport implements ToModel, WithHeadingRow
         }
 
         // Generate username sesuai aturan
-        $existingUser = User::where('username', 'like', $row['kelas'] . '%')
-                            ->orderBy('username', 'desc')
-                            ->first();
+        $existingUser = User::where('username', 'like', $row['kelas'] . '__') // dua digit setelah kelas
+                    ->orderBy('username', 'desc')
+                    ->first();
         if ($existingUser) {
-            $nextNumber = (int)substr($existingUser->username, -3) + 1;
-            $username = $row['kelas'] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $lastDigits = substr($existingUser->username, strlen($row['kelas']));
+            $nextNumber = (int)$lastDigits + 1;
+            $username = $row['kelas'] . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
         } else {
-            $username = $row['kelas'] . '001';
+            $username = $row['kelas'] . '01';
         }
 
         // Generate email berdasarkan username

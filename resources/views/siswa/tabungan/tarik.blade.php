@@ -3,6 +3,15 @@
 @section('title') Ajukan Tarik Tabungan - SakuRame @endsection
 
 @section('content')
+<style>
+    .success-details {
+            background-color: #f1f5f9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+</style>
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
@@ -72,40 +81,51 @@
                     @if($pengajuan && $pengajuan->status == 'Pending')
                         <h5 class="fw-bold mb-3 text-primary">Menunggu Proses Bendahara</h5>
                         <p>Detail Pengajuan Penarikan Tabungan :</p>
-                        <table class="table table-borderless">
-                            <tr>
-                                <th>ID Tabungan</th>
-                                <td>{{ $pengajuan->user->username }}</td>
-                            </tr>
-                            <tr>
-                                <th>Jumlah Penarikan</th>
-                                <td>Rp{{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</td>
-                            </tr>
-                            <tr>
-                                <th>Pembayaran</th>
-                                <td>{{ $pengajuan->pembayaran }}</td>
-                            </tr>
-                            <tr>
-                                <th>Metode Digital</th>
-                                <td>{{ $pengajuan->metode_digital }}</td>
-                            </tr>
-                            <tr>
-                                <th>E-Wallet</th>
-                                <td>{{ $pengajuan->ewallet_type }}</td>
-                            </tr>
-                            <tr>
-                                <th>Nomor E-Wallet</th>
-                                <td>{{ $pengajuan->ewallet_number }}</td>
-                            </tr>
-                            <tr>
-                                <th>Alasan</th>
-                                <td>{{ $pengajuan->alasan }}</td>
-                            </tr>
-                            <tr>
-                                <th>Dibuat Pada</th>
-                                <td>{{ \Carbon\Carbon::parse($pengajuan->created_at)->format('d M Y H:i') }}</td>
-                            </tr>
-                        </table>
+                        <div class="success-details">
+                            <table class="table table-borderless">
+                                @php
+                                    $jumlahTarik = $pengajuan->jumlah_penarikan;
+                                    $biayaAdmin = ceil(($jumlahTarik * 0.05) / 1000) * 1000;
+                                    $totalPemotongan = $jumlahTarik + $biayaAdmin;
+                                @endphp
+                                <tr>
+                                    <th>ID Tabungan</th>
+                                    <td>{{ $pengajuan->user->username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Jumlah Penarikan</th>
+                                    <td>Rp. {{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Biaya Admin (5%)<br><small class="text-muted">*Belum termasuk biaya transfer digital</small></th>
+                                    <td>Rp. {{ number_format($biayaAdmin, 0, ',', '.') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Pembayaran</th>
+                                    <td>{{ $pengajuan->pembayaran }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Metode Digital</th>
+                                    <td>{{ $pengajuan->metode_digital }}</td>
+                                </tr>
+                                <tr>
+                                    <th>E-Wallet</th>
+                                    <td>{{ $pengajuan->ewallet_type }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nomor E-Wallet</th>
+                                    <td>{{ $pengajuan->ewallet_number }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Alasan</th>
+                                    <td>{{ $pengajuan->alasan }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dibuat Pada</th>
+                                    <td>{{ \Carbon\Carbon::parse($pengajuan->created_at)->format('d M Y H:i') }}</td>
+                                </tr>
+                            </table>
+                        </div>
                         <button class="btn btn-danger w-100" onclick="openBatalModal({{ $pengajuan->id }})">
                             Batalkan Pengajuan
                         </button>
@@ -169,6 +189,9 @@
                                             <span class="input-group-text">Rp.</span>
                                             <input type="number" class="form-control" id="jumlah_tarik" name="jumlah_tarik" placeholder="Masukkan Jumlah Penarikan" required>
                                         </div>
+                                        <!-- ⬇️ Tampilkan Biaya Admin di sini -->
+                                        <small class="text-muted d-block mt-1">Biaya Admin: <span id="biaya_admin_text">Rp0</span></small>
+                                        <input type="hidden" id="biaya_admin" name="biaya_admin">
                                     </div>
                                 </div>
                             </div>
@@ -263,11 +286,14 @@
                                     </div>
                                 </div>
                             </div>
-
-                        </form>
                             <div class="form-group mb-3">
-                                <button class="btn btn-primary w-100" disabled>Segera Hadir ... !</button>
+                                @if(Auth()->user()->username == '722')
+                                    <button class="btn btn-primary w-100" type="submit">Ajukan</button>
+                                @else
+                                    <button class="btn btn-primary w-100" disabled>Segera Hadir ... !</button>
+                                @endif
                             </div>
+                        </form>
                     @endif
                 </div>
             </div>
@@ -327,6 +353,29 @@
 @endsection
 
 @section('js')
+<script>
+    function genapkanKeRibuan(angka) {
+        return Math.ceil(angka / 1000) * 1000;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const jumlahTarikInput = document.getElementById('jumlah_tarik');
+        const biayaAdminText = document.getElementById('biaya_admin_text');
+        const biayaAdminInput = document.getElementById('biaya_admin');
+
+        jumlahTarikInput.addEventListener('input', function () {
+            let value = jumlahTarikInput.value.replace(/\D/g, '');
+            let jumlahTarik = parseInt(value) || 0;
+
+            let biaya = Math.ceil(jumlahTarik * 0.05);
+            let dibulatkan = genapkanKeRibuan(biaya);
+
+            biayaAdminText.textContent = 'Rp' + new Intl.NumberFormat('id-ID').format(dibulatkan);
+            biayaAdminInput.value = dibulatkan;
+        });
+    });
+</script>
+
 <script>
     function openBatalModal(id) {
         var form = document.getElementById('batalForm');

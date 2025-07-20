@@ -405,8 +405,10 @@
     $(document).ready(function() {
         $('.btn-warning').on('click', function() {
             var id = $(this).data('id');
+            var timestamp = new Date().getTime(); // Tambahkan timestamp
+
             $.ajax({
-                url: "{{ route('bendahara.siswa.getData', '') }}/" + id,
+                url: "{{ route('bendahara.siswa.getData', '') }}/" + id + "?t=" + timestamp,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
@@ -430,6 +432,7 @@
             });
         });
     });
+
     function confirmDelete(id) {
         $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
         $('#deleteModal').modal('show');

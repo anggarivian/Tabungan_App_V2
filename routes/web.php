@@ -106,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bendahara/pengajuan/tolak/{id}', [PengajuanController::class, 'tolak'])->name('bendahara.pengajuan.tolak');
 
         // Menangani pengelolaan Laporan.
+        Route::get('/bendahara/online-users', [LoginController::class, 'check'])->name('laporan.bendahara.online-users');
         Route::get('/bendahara/laporan/tabungan', [LaporanController::class, 'lap_bendahara_tabungan'])->name('laporan.bendahara.tabungan');
         Route::get('/bendahara/laporan/transaksi', [LaporanController::class, 'lap_bendahara_transaksi'])->name('laporan.bendahara.transaksi');
         Route::get('/bendahara/laporan/pengajuan', [LaporanController::class, 'lap_bendahara_pengajuan'])->name('laporan.bendahara.pengajuan');
@@ -144,7 +145,6 @@ Route::middleware(['auth'])->group(function () {
         // Menangani siswa stor tabungan Digital.
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
-        Route::get('/siswa/tabungan/success', [TabunganController::class, 'success'])->name('payment.success');
         Route::delete('/siswa/tabungan/stor/batal/{id}', [TabunganController::class, 'batal'])->name('siswa.batal.stor');
 
         // Menangani pengajuan penarikan tabungan Tunai / Digital.
@@ -164,23 +164,17 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/siswa/laporan/export/transaksi', [ExportController::class, 'siswa_exportTransaksi'])->name('siswa.export.transaksi');
             Route::post('/siswa/laporan/export/pengajuan', [ExportController::class, 'siswa_exportPengajuan'])->name('siswa.export.pengajuan');
     });
+
 });
 
-// Menangani webhook dari Xendit dan CreateInvoice.
-Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
+    // Menangani webhook dari Xendit dan CreateInvoice.
+    Route::post('/xendit/webhook', [TabunganController::class, 'handleWebhook']);
 
-// Menangani webhook dari Xendit dan CreatePayout.
-Route::post('/webhook/payout', [PengajuanController::class, 'handlePayoutWebhook']);
+    // Menangani webhook dari Xendit dan CreatePayout.
+    Route::post('/webhook/payout', [PengajuanController::class, 'handlePayoutWebhook']);
+    
+    Route::get('/siswa/tabungan/success', [TabunganController::class, 'success'])->name('payment.success');
 
-// Menangani halaman offline untuk aplikasi PWA.
 route::get('/offline', function () {
     return view('modules/laravelpwa/offline');
-});
-
-
-Route::get('/test-email', function () {
-    $user = \App\Models\User::first();
-    $transaksi = \App\Models\Transaksi::latest()->first(); // Ambil transaksi paling baru
-    Mail::to($user->email)->send(new TabunganStorNotification($transaksi));
-    return "Email dikirim (kalau berhasil)";
 });

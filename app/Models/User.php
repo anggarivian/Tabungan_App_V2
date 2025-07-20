@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Role;
+use App\Models\Kelas;
+use App\Models\Tabungan;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\Kelas;
-use App\Models\Role;
-use App\Models\Tabungan;
 
 class User extends Authenticatable
 {
@@ -41,6 +42,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pengajuan::class, 'user_id');
     }
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-' . $this->id);
+    }
+
 
     /**
      * Atribut yang harus disembunyikan untuk serialisasi.

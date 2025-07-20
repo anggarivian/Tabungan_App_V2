@@ -97,7 +97,49 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php $no=1; $no1=0; $no2=0; $no3=0; $no4=0; @endphp
+                            @foreach($siswa as $index => $siswas)
+                                <tr>
+                                    <td class="text-center d-none d-md-table-cell">{{ $index + 1 }}</td>
+                                    <td class="text-center d-none d-md-table-cell">
+                                        <input type="text"
+                                            name="input[{{ $index }}][nama]"
+                                            value="{{ old("input.$index.nama", $siswas->name) }}"
+                                            readonly
+                                            class="form-control-plaintext text-center"
+                                            style="border: none; outline: none; background: transparent;" readonly tabindex="-1">
+                                    </td>
+                                    <td class="text-center d-none d-md-table-cell">
+                                        <input type="text"
+                                            name="input[{{ $index }}][saldo]"
+                                            value="{{ old("input.$index.saldo", number_format($siswas->tabungan->saldo ?? 0)) }}"
+                                            readonly
+                                            class="form-control-plaintext text-center"
+                                            style="border: none; outline: none; background: transparent;" readonly tabindex="-1">
+                                    </td>
+                                    <td class="text-center col-md-2">
+                                        <input type="text"
+                                            name="input[{{ $index }}][username]"
+                                            value="{{ old("input.$index.username", $siswas->username) }}"
+                                            readonly
+                                            class="form-control-plaintext text-center"
+                                            style="border: none; outline: none; background: transparent;" readonly tabindex="-1">
+                                    </td>
+                                    <td class="text-center col-md-3 col-9">
+                                        <input type="text"
+                                            name="input[{{ $index }}][stor]"
+                                            id="stor_{{ $index }}"
+                                            oninput="updateCalculation(this)"
+                                            autocomplete="off"
+                                            value="{{ old("input.$index.stor") }}"
+                                            class="form-control text-center @error("input.$index.stor") is-invalid @enderror">
+                                        @error("input.$index.stor")
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                            {{-- @php $no=1; $no1=0; $no2=0; $no3=0; $no4=0; @endphp
                             @foreach($siswa as $siswas)
                                 <tr>
                                     <td class="text-center d-none d-md-table-cell">{{$no++}}</td>
@@ -118,7 +160,7 @@
                                                oninput="updateCalculation(this)" autocomplete="off" />
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                         <tfoot>
                             <tr>

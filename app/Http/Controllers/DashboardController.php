@@ -22,104 +22,44 @@ class DashboardController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function index(Request $request){
-
-        // 1. User yang paling sering transaksi
-
+    public function index(Request $request)
+    {
+        // 1. User yang paling sering transaksi (stor & success)
         $palingSeringData = Transaksi::select('user_id', DB::raw('COUNT(*) as total_transaksi'))
+            ->where('tipe_transaksi', 'stor')
+            ->where('status', 'success')
             ->groupBy('user_id')
             ->orderByDesc('total_transaksi')
+            ->with('user') // relasi user() di model Transaksi
             ->first();
 
-        if ($palingSeringData) {
+        if ($palingSeringData && $palingSeringData->user) {
             $palingSering = (object)[
-                'nama'  => User::find($palingSeringData->user_id)->name,
+                'nama'  => $palingSeringData->user->name,
                 'value' => $palingSeringData->total_transaksi,
             ];
         } else {
-            $palingSering = (object)[
-                'nama'  => null,
-                'value' => 0,
-            ];
+            $palingSering = (object)[ 'nama' => null, 'value' => 0 ];
         }
 
-        // 2. User yang saldo akhirnya paling besar (diambil dari model Tabungan::saldo)
-
-        $palingGedeData = Tabungan::select('user_id', DB::raw('CAST(saldo AS UNSIGNED) as saldo_numeric'))
+        // 2. User dengan saldo tabungan terbesar (khusus roles_id = 4)
+        $palingGedeData = Tabungan::select('tabungans.user_id', DB::raw('CAST(tabungans.saldo AS UNSIGNED) as saldo_numeric'))
+            ->join('users', 'users.id', '=', 'tabungans.user_id')
+            ->where('users.roles_id', 4)
             ->orderByDesc('saldo_numeric')
+            ->with('user') // relasi user() di model Tabungan
             ->first();
 
-        if ($palingGedeData) {
-            $userGede = User::find($palingGedeData->user_id);
+        if ($palingGedeData && $palingGedeData->user) {
             $palingGede = (object)[
-                'nama'  => $userGede ? $userGede->name : null,
+                'nama'  => $palingGedeData->user->name,
                 'value' => $palingGedeData->saldo_numeric,
             ];
         } else {
-            $palingGede = (object)[
-                'nama'  => null,
-                'value' => 0,
-            ];
+            $palingGede = (object)[ 'nama' => null, 'value' => 0 ];
         }
 
-        // 3. User yang paling konsisten “streak” menabung setiap minggu (kecuali hari Minggu)
-
-        $allUsers = User::with(['transaksi' => function($q){
-            $q->whereRaw('DAYOFWEEK(created_at) != 1')
-            ->orderBy('created_at');
-        }])->get();
-
-        $maxStreakGlobal = 0;
-        $palingKonsisten = (object)[ 'nama' => null, 'value' => 0 ];
-
-        foreach ($allUsers as $user) {
-            $dateStrings = $user->transaksi
-                ->map(function($t){ return Carbon::parse($t->created_at)->toDateString(); })
-                ->unique()
-                ->sort()
-                ->values();
-
-            $streakMaxUser = 0;
-            $currentStreak = 0;
-            $prevDate = null;
-
-            foreach ($dateStrings as $dateStr) {
-                $curr = Carbon::parse($dateStr);
-
-                if (is_null($prevDate)) {
-                    $currentStreak = 1;
-                } else {
-                    $yesterday = $prevDate->copy()->addDay();
-                    $skipSunday = $prevDate->dayOfWeek == Carbon::SATURDAY
-                                && $curr->dayOfWeek == Carbon::MONDAY;
-
-                    if ($curr->toDateString() === $yesterday->toDateString() || $skipSunday) {
-                        $currentStreak++;
-                    } else {
-                        $currentStreak = 1;
-                    }
-                }
-
-                $prevDate = $curr->copy();
-                if ($currentStreak > $streakMaxUser) {
-                    $streakMaxUser = $currentStreak;
-                }
-            }
-
-            if ($streakMaxUser > $maxStreakGlobal) {
-                $maxStreakGlobal = $streakMaxUser;
-                $palingKonsisten = (object)[
-                    'nama'  => $user->name,
-                    'value' => $streakMaxUser,
-                ];
-            }
-        }
-
-        if ($maxStreakGlobal === 0) {
-            $palingKonsisten = (object)[ 'nama' => null, 'value' => 0 ];
-        }
-
-        return view('welcome', compact('palingSering', 'palingGede', 'palingKonsisten'));
+        return view('welcome', compact('palingSering', 'palingGede'));
     }
 
     // Kepsek Dasboard -----------------------------------------------------------------------------------------------
@@ -164,12 +104,21 @@ class DashboardController extends Controller
                 return $carry;
             }, collect());
 
+        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->count();
+        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->count();
+
         return view('kepsek.index', compact(
             'jumlah_penabung',
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
-            'jumlah_saldo_digital'
+            'jumlah_saldo_digital',
+            'storKali',
+            'tarikKali'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
@@ -222,6 +171,13 @@ class DashboardController extends Controller
                 return $carry;
             }, collect());
 
+        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->count();
+        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->count();
+
         return view('bendahara.index', compact(
             'jumlah_penabung',
             'transaksi_masuk',
@@ -229,7 +185,9 @@ class DashboardController extends Controller
             'jumlah_saldo_tunai',
             'jumlah_saldo_digital',
             'premi',
-            'bendahara'
+            'bendahara',
+            'storKali',
+            'tarikKali'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
@@ -350,12 +308,28 @@ class DashboardController extends Controller
                     return $carry;
                 }, collect());
 
+        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->whereHas('user.kelas', function ($query) use ($kelas_id) {
+                $query->where('id', $kelas_id);
+            })
+            ->count();
+
+        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->whereHas('user.kelas', function ($query) use ($kelas_id) {
+                $query->where('id', $kelas_id);
+            })
+            ->count();
+
         return view('walikelas.index', compact(
             'jumlah_penabung',
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
-            'jumlah_saldo_digital'
+            'jumlah_saldo_digital',
+            'storKali',
+            'tarikKali'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
@@ -448,13 +422,25 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
+        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->where('user_id', $userId)
+            ->count();
+
+        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->where('user_id', $userId)
+            ->count();
+
         return view('siswa.index', compact(
             'jumlah_penabung',
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
             'jumlah_saldo_digital',
-            'transaksi'
+            'transaksi',
+            'storKali',
+            'tarikKali'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',

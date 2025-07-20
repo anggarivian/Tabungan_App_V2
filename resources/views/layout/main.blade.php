@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#6777ef"/>
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192x192.png') }}">
+    <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
 
     <title>@yield('title')</title>
     {{-- @laravelPWA --}}
@@ -253,11 +254,45 @@
             100% { transform: rotate(360deg); }
         }
 
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 1rem;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+        }
+
+        .menu-link {
+            padding: 5px;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .menu-link:hover {
+            padding: 5px;
+            border-radius: 1rem;
+            transform: translateY(3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .submenu-item {
+            padding: 5px;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .submenu-item:hover {
+            padding: 5px;
+            border-radius: 1rem;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
     </style>
-
 </head>
-
-
 <body>
     <script src="{{ asset('/dist/assets/static/js/initTheme.js') }}"></script>
     <div id="app">
@@ -414,6 +449,9 @@
                                             </li>
                                             <li class="submenu-item {{ request()->routeIs('laporan.bendahara.export') ? 'active' : '' }}">
                                                 <a href="{{ route('laporan.bendahara.export') }}" class="submenu-link">Laporan Export</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.online-users') ? 'active' : '' }}">
+                                                <a href="{{ route('laporan.bendahara.online-users') }}" class="submenu-link">Online Users</a>
                                             </li>
                                         </ul>
                                     </div>

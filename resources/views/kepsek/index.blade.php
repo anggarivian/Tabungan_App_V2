@@ -3,8 +3,36 @@
 @section('title') Dashboard - SakuRame @endsection
 
 @section('content')
+<style>
+    .page-heading h3 {
+        font-size: 1.8rem;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2, #667eea);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: darkWave 3s ease-in-out infinite, slideInUp 2s ease-out;
+        font-weight: 800;
+    }
+
+    .page-heading h4 {
+        font-size: 1.2rem;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2, #667eea);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: darkWave 3s ease-in-out infinite, slideInUp 2s ease-out;
+        font-weight: 200;
+    }
+
+    @keyframes darkWave {
+        0%, 100% { background-position: 0% 50% }
+        50% { background-position: 100% 50% }
+    }
+</style>
 <div class="page-heading">
-    <h3>Selamat Datang, </h3>
+    <h4>Selamat Datang, </h4>
     <h3>{{auth()->user()->name}}</h3>
 </div>
 <div class="page-content">
@@ -75,7 +103,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Transaksi Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}} | {{$storKali}}x</h6>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +120,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Transaksi Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}} | {{$tarikKali}}x</h6>
                                 </div>
                             </div>
                         </div>

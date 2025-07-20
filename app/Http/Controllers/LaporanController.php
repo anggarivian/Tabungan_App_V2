@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Transaksi;
-use App\Models\Pengajuan;
 use App\Models\Kelas;
+use App\Models\Pengajuan;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
@@ -263,42 +264,51 @@ class LaporanController extends Controller
             ->appends($request->all());
 
         $kelasList = Kelas::orderBy('name')->get();
+        // 1) Ambil daftar kelas
+            $classes = Kelas::orderBy('id')->get();
 
-        // 1) Daftar kelas
-    $classes = Kelas::orderBy('id')->get();
+            // 2) Query: join ke users, group by DATE(created_at) & kelas_id,
+            //    lalu SUM jumlah_transaksi
+            $aggregates = Transaksi::join('users', 'transaksis.user_id', '=', 'users.id')
+                ->select([
+                    DB::raw('DATE(transaksis.created_at) as tanggal'),
+                    'users.kelas_id',
+                    DB::raw('SUM(transaksis.jumlah_transaksi) as total_per_kelas'),
+                ])
+                ->groupBy('tanggal', 'users.kelas_id')
+                ->orderBy('tanggal')
+                ->get();
 
-    // 2) Ambil transaksi + eager‐load
-    $transactions = Transaksi::with('user.kelas')->get();
+            // 3) Kumpulkan semua tanggal unik
+            $dates = $aggregates->pluck('tanggal')->unique();
 
-    // 3) Group by tanggal, lalu map ke array
-    $rows = $transactions
-        ->groupBy('tanggal')
-        ->map(function($trsOnDate, $tanggal) use($classes) {
-            // siapkan array awal semua kelas = 0
-            $perKelas = $classes
-                ->pluck('id')
-                ->mapWithKeys(fn($id) => [(string)$id => 0])
-                ->toArray();
+            // 4) Bangun array pivot per tanggal
+            $rows = $dates->map(function($date) use ($classes, $aggregates) {
+                // inisialisasi semua kelas ke 0
+                $perKelas = $classes
+                    ->pluck('id')
+                    ->mapWithKeys(fn($id) => [(string)$id => 0])
+                    ->toArray();
 
-            $totalAll = 0;
+                $totalAll = 0;
 
-            // akumulasi
-            foreach ($trsOnDate as $t) {
-                $kelasId = (string) optional($t->user)->kelas_id;
-                if (array_key_exists($kelasId, $perKelas)) {
-                    $perKelas[$kelasId] += $t->jumlah_transaksi;
-                    $totalAll += $t->jumlah_transaksi;
-                }
-            }
+                // isi nilai dari hasil query
+                $aggregates
+                    ->where('tanggal', $date)
+                    ->each(function($item) use (&$perKelas, &$totalAll) {
+                        $key = (string)$item->kelas_id;
+                        $perKelas[$key] = (int) $item->total_per_kelas;
+                        $totalAll += (int) $item->total_per_kelas;
+                    });
 
-            return [
-                'tanggal'  => $tanggal,
-                'perKelas' => $perKelas,
-                'total'    => $totalAll,
-            ];
-        })
-        ->values()   // hilangkan key tanggal sebagai index
-        ->toArray(); // PASTIKAN ini array, bukan Collection!
+                return [
+                    'tanggal'  => $date,
+                    'perKelas' => $perKelas,
+                    'total'    => $totalAll,
+                ];
+            })
+            ->values()
+            ->toArray();
 
         return view('bendahara.laporan.lap_transaksi', compact('transaksi', 'kelasList', 'rows', 'classes'));
     }

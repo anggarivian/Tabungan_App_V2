@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * LoginController menghandle proses autentikasi pengguna.
@@ -161,5 +163,41 @@ class LoginController extends Controller
         $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function check(Request $request)
+    {
+        // 1) Ambil semua user
+        $allUsers = User::all();
+
+        // 2) Filter user online
+        $onlineCollection = $allUsers->filter(fn($u) => $u->isOnline());
+
+        // 3) Filter user yang password-nya **BUKAN** '12345'
+        $notWeakCollection = $allUsers->filter(fn($u) => !Hash::check('12345', $u->password));
+
+        // 4) Pagination manual
+        $perPage   = $request->input('perPage', 10);
+        $page      = $request->input('page', 1);
+        $path      = $request->url();
+        $query     = $request->query();
+
+        // Helper untuk bikin LengthAwarePaginator dari Collection
+        $makePaginator = function($collection) use ($perPage, $page, $path, $query) {
+            $total = $collection->count();
+            $slice = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+            return new LengthAwarePaginator(
+                $slice,
+                $total,
+                $perPage,
+                $page,
+                ['path' => $path, 'query' => $query]
+            );
+        };
+
+        $onlineUsers         = $makePaginator($onlineCollection);
+        $notWeakPasswordUsers = $makePaginator($notWeakCollection);
+
+        return view('auth.online_users', compact('onlineUsers', 'notWeakPasswordUsers'));
     }
 }

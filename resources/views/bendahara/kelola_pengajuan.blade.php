@@ -141,89 +141,134 @@
 </div>
 
 {{-- Modal --}}
-<div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="editModalLabel">Proses Pengajuan</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST" action="{{ route ('bendahara.pengajuan.terima') }}">
-                @csrf
-                @method('PUT')
+
+            <form id="editForm" method="POST" action="#">
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="edit-id">ID Tabungan</label>
+                    <div class="row g-4">
+
+                        <!-- Kolom Kiri: Data User -->
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3 border-bottom pb-2">Data Siswa</h6>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">ID Tabungan</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-id" class="form-control d-none" name="id" required readonly>
+                                    <input type="text" id="edit-username" class="form-control-plaintext" name="username" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Nama</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-name" class="form-control-plaintext" name="name" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Kelas</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-kelas" class="form-control-plaintext" name="kelas" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Jumlah Tabungan</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-tabungan" class="form-control-plaintext bg-warning bg-opacity-25 border border-warning rounded px-2 py-1 fw-bold" name="tabungan" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-start mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Alasan</label>
+                                </div>
+                                <div class="col-8">
+                                    <textarea id="edit-alasan" class="form-control-plaintext" name="alasan" rows="2" required readonly></textarea>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-id" class="form-control" name="id"  required readonly hidden>
-                            <input type="text" id="edit-username" class="form-control" name="username"  required readonly style="border: none; outline: none; background: transparent;">
+
+                        <!-- Kolom Kanan: Data Pembayaran -->
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3 border-bottom pb-2">Detail Pembayaran</h6>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Jenis Pembayaran</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-pembayaran" class="form-control-plaintext" name="pembayaran" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Jumlah Penarikan</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-jumlah_tarik" class="form-control-plaintext bg-success bg-opacity-25 border border-success rounded px-2 py-1 text-success fw-bold" name="jumlah_tarik" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Metode Penarikan</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-metode_digital" class="form-control-plaintext" name="metode_digital" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Tujuan Penarikan</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-type_tujuan" class="form-control-plaintext" name="type_tujuan" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">No. Rekening/E-Wallet</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-nomor_tujuan" class="form-control-plaintext" name="nomor_tujuan" required readonly>
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4">
+                                    <label class="form-label mb-0 fw-medium">Biaya Admin (5%)</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="edit-premi" class="form-control-plaintext bg-warning bg-opacity-25 border border-warning rounded px-2 py-1 text-warning fw-bold" name="premi" readonly>
+                                    <small class="text-muted d-block mt-1">Biaya admin dihitung otomatis</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="edit-name">Nama</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-name" class="form-control" name="name"  required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-kelas">Kelas</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-kelas" class="form-control" name="kelas" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-alasan">Alasan</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <textarea id="edit-alasan" class="form-control" name="alasan"  rows="3" required readonly style="border: none; outline: none; background: transparent;"></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-tabungan">Jumlah Tabungan</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-tabungan" class="form-control" name="tabungan" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-jumlah_tarik">Jumlah Penarikan</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="number" id="edit-jumlah_tarik" class="form-control" name="jumlah_tarik" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-pembayaran">Pembayaran</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-pembayaran" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-metode_digital">Metode Penarikan</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-metode_digital" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-type_tujuan">Tujuan Penarikan</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-type_tujuan" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-nomor_tujuan">No. Rekening/E-Wallet</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-nomor_tujuan" class="form-control" name="pembayaran" required readonly style="border: none; outline: none; background: transparent;">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="edit-premi">Tentukan Biaya Admin</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="edit-premi" class="form-control" name="premi" required>
-                        </div>
+
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <a href="#" id="tolakButton" class="btn btn-light" type="button">Tolak</a>
+                    <button type="button" id="tolakButton" class="btn btn-outline-danger">Tolak</button>
                     <button type="submit" class="btn btn-primary">Setujui</button>
                 </div>
             </form>
@@ -270,9 +315,35 @@
             });
         });
     });
+    $('#tolakButton').on('click', function () {
+        var id = $('#edit-id').val();
+        if (id) {
+            window.location.href = '/bendahara/pengajuan/tolak/' + id;
+        }
+    });
     function confirmDelete(id) {
         $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
         $('#deleteModal').modal('show');
     }
 </script>
+<script>
+    function genapkanKeRibuan(angka) {
+        return Math.ceil(angka / 1000) * 1000;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const jumlahTarikInput = document.getElementById('edit-jumlah_tarik');
+        const premiInput = document.getElementById('edit-premi');
+
+        const modal = document.getElementById('editModal');
+        modal.addEventListener('shown.bs.modal', function () {
+            const jumlahTarik = parseInt(jumlahTarikInput.value.replace(/[^0-9]/g, '')) || 0;
+            const biayaAdmin = Math.ceil(jumlahTarik * 0.05);
+            const dibulatkan = genapkanKeRibuan(biayaAdmin);
+
+            premiInput.value = dibulatkan.toLocaleString('id-ID');
+        });
+    });
+</script>
+
 @endsection

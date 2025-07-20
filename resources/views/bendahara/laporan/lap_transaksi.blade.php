@@ -175,37 +175,29 @@
                     <div class="tab-pane fade" id="transaksi" role="tabpanel" aria-labelledby="transaksi-tab">
                         <div class="mt-3">
                             <div class="table-responsive">
-                                <table class="table table-hover" style="width: 100%">
+                                <table class="table table-hover w-100">
                                     <thead>
                                         <tr class="text-center">
                                             <th>No.</th>
                                             <th>Tanggal</th>
                                             @foreach($classes as $kelas)
-                                                <th>Kelas {{ $kelas->name }}</th>
+                                            <th>Kelas {{ $kelas->name }}</th>
                                             @endforeach
                                             <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($rows as $i => $row)
-                                            <tr class="text-center">
-                                                <td>{{ $i + 1 }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($row['tanggal'])->format('d M Y') }}</td>
-
-                                                @foreach($classes as $kelas)
-                                                @php
-                                                    $val = $row['perKelas'][(string)$kelas->id] ?? 0;
-                                                @endphp
-                                                <td>{{ number_format($val, 0, ',', ',') }}</td>
-                                                @endforeach
-
-                                                <td><strong>{{ number_format($row['total'], 0, ',', ',') }}</strong></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="10" class="text-center">Data Kosong</td>
-                                            </tr>
-                                        @endforelse
+                                    @foreach($rows as $i => $row)
+                                        <tr class="text-center">
+                                            <td>{{ $i + 1 }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($row['tanggal'])->format('d M Y') }}</td>
+                                            @foreach($classes as $kelas)
+                                            @php $val = $row['perKelas'][(string)$kelas->id] ?? 0; @endphp
+                                            <td>{{ number_format($val, 0, ',', '.') }}</td>
+                                            @endforeach
+                                            <td><strong>{{ number_format($row['total'], 0, ',', '.') }}</strong></td>
+                                        </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>

@@ -320,8 +320,10 @@
     $(document).ready(function() {
         $('.btn-warning').on('click', function() {
             var id = $(this).data('id');
+            var timestamp = new Date().getTime(); // Tambahkan timestamp
+
             $.ajax({
-                url: "{{ route('bendahara.walikelas.getData', '') }}/" + id,
+                url: "{{ route('bendahara.walikelas.getData', '') }}/" + id + "?t=" + timestamp,
                 type: 'GET',
                 success: function(response) {
                     if(response) {
@@ -345,6 +347,7 @@
             });
         });
     });
+
     function confirmDelete(id) {
         $('#deleteForm').attr('action', '/bendahara/kelola-walikelas/hapus/' + id);
         $('#deleteModal').modal('show');

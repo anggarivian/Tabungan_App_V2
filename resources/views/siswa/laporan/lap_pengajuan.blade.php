@@ -99,7 +99,10 @@
                                     @elseif ($pengajuans->status == 'Tolak')
                                         <span class="badge bg-danger">Tolak</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
-                                    @elseif ($pengajuans->status == 'Terima')
+                                    @elseif ($pengajuans->status == 'Batal' || $pengajuans->status == 'batal')
+                                        <span class="badge bg-danger">Batal</span>
+                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                    @elseif ($pengajuans->status == 'Terima' || $pengajuans->status == 'SUCCEEDED')
                                         <span class="badge bg-success">Terima</span>
                                         <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @else
@@ -107,7 +110,7 @@
                                         <span class="badge bg-light">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $pengajuans->alasan ?? '-' }}</td>
+                                <td class="text-center">{{Str::limit($pengajuans->alasan, 30, '...')}}</td>
                                 <td class="text-center">{{ $pengajuans->created_at ?? '-' }}</td>
                             </tr>
                         @empty

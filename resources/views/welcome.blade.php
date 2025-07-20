@@ -15,484 +15,497 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary: #485CBC;
-            --secondary: #3d4e9e;
-            --accent: #FFB84C;
-            --dark: #1e293b;
-            --light: #f8fafc;
+<style>
+        /* ===== CSS VARIABLES ===== */
+    :root {
+        --primary: #485CBC;
+        --secondary: #3d4e9e;
+        --accent: #FFB84C;
+        --dark: #1e293b;
+        --light: #f8fafc;
+    }
+
+    /* ===== BASE STYLES ===== */
+    body {
+        font-family: system-ui, sans-serif;
+        background: var(--light);
+        color: var(--dark);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 700;
+        margin: 0 0 1rem;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+
+    .btn-back {
+        background: none;
+        border: none;
+        color: #475569;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        border-radius: 0.75rem;
+        cursor: pointer;
+    }
+
+    .btn-back:hover {
+        background-color: var(--light);
+    }
+
+    /* ===== NAVIGATION ===== */
+    .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 0.8rem 0;
+    }
+
+    .nav-link {
+        color: #475569;
+        font-weight: 500;
+        margin: 0 0.8rem;
+        text-decoration: none;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        color: var(--primary);
+    }
+
+    /* ===== HERO SECTION ===== */
+    .hero {
+        padding: 160px 0 100px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+    }
+
+    /* ===== LOGO ===== */
+    .logo-circle {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .logo-text {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--dark);
+    }
+
+    /* ===== CARDS ===== */
+    .feature-card,
+    .step-card,
+    .testimonial-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        height: 100%;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ===== STEP CARDS ===== */
+    .step-card {
+        position: relative;
+    }
+
+    .step-number {
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .rating {
+        color: var(--accent);
+    }
+
+    /* ===== MINI STATS ===== */
+    .mini-stats-container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .mini-stat-card {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 10px;
+        height: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .mini-stat-card .title {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 3px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .mini-stat-card .value {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: white;
+    }
+
+    .mini-stat-card .subtitle {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ===== ACCORDION ===== */
+    .accordion-item {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .accordion-button {
+        background: white;
+        font-weight: 600;
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        padding: 1rem;
+        cursor: pointer;
+    }
+
+    .accordion-button:not(.collapsed) {
+        color: var(--primary);
+    }
+
+    /* ===== LOGIN FORM ===== */
+    .login-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .login-header {
+        text-align: left;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-subtitle {
+        color: #475569;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    /* Login Form Elements */
+    .login-form {
+        width: 100%;
+    }
+
+    .login-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .login-form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .login-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border-radius: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        background: #fff;
+    }
+
+    .login-input-wrapper:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(72, 92, 188, 0.15);
+    }
+
+    .login-input-icon {
+        position: absolute;
+        left: 1rem;
+        color: #475569;
+        font-size: 0.9rem;
+        z-index: 2;
+    }
+
+    .login-form-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 2.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.75rem;
+        font-size: 0.9rem;
+        background-color: var(--light);
+        font-family: system-ui, sans-serif;
+    }
+
+    .login-form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(72, 92, 188, 0.1);
+    }
+
+    .login-form-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .login-password-toggle {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        font-size: 0.9rem;
+        z-index: 2;
+    }
+
+    .login-password-toggle:hover {
+        color: var(--primary);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        font-family: system-ui, sans-serif;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-btn:hover {
+        background: var(--secondary);
+        transform: translateY(-2px);
+    }
+
+    .login-forgot-password {
+        text-align: center;
+    }
+
+    .login-forgot-password a {
+        color: #475569;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .login-forgot-password a:hover {
+        color: var(--primary);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+        background: var(--dark);
+        color: white;
+        padding: 80px 0 30px;
+    }
+
+    .footer-links h5 {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .footer-links h5::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -8px;
+        width: 30px;
+        height: 2px;
+        background: var(--accent);
+    }
+
+    .footer-links ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+    }
+
+    .footer-links a:hover {
+        color: white;
+    }
+
+    .social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        margin-right: 0.5rem;
+        text-decoration: none;
+    }
+
+    .social-icons a:hover {
+        background: var(--accent);
+    }
+
+    .copyright {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .hero {
+            padding: 100px 0 60px;
         }
 
-        /* Base - hanya yang esensial */
-        body {
-            font-family: system-ui, sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-            margin: 0;
+        .display-3 {
+            font-size: 2.5rem;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 700;
-            margin: 0 0 1rem;
-        }
-
-        /* Buttons - tanpa animasi */
-        .btn {
-            font-weight: 600;
-            padding: 0.6rem 1.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* Navbar - minimal */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 0.8rem 0;
+        .display-5 {
+            font-size: 2rem;
         }
 
         .nav-link {
-            color: #475569;
-            font-weight: 500;
-            margin: 0 0.8rem;
-            text-decoration: none;
+            margin: 0 0.4rem;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--primary);
-        }
-
-        /* Hero - sangat sederhana */
-        .hero {
-            padding: 160px 0 100px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        /* Cards - tanpa hover effects */
-        .feature-card,
-        .step-card,
-        .testimonial-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            height: 100%;
-        }
-
-        .icon-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-bottom: 1.5rem;
-        }
-
-        .step-number {
-            position: absolute;
-            top: -15px;
-            left: -15px;
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-        }
-
-        .step-card {
-            position: relative;
-        }
-
-        .testimonial-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .rating {
-            color: var(--accent);
-        }
-
-        /* Accordion - minimal */
-        .accordion-item {
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            overflow: hidden;
-        }
-
-        .accordion-button {
-            background: white;
-            font-weight: 600;
-            box-shadow: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            padding: 1rem;
-        }
-
-        .accordion-button:not(.collapsed) {
-            color: var(--primary);
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--dark);
-            color: white;
-            padding: 80px 0 30px;
-        }
-
-        .footer-links h5 {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .footer-links h5::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -8px;
-            width: 30px;
-            height: 2px;
-            background: var(--accent);
-        }
-
-        .footer-links ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .social-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-right: 0.5rem;
-            text-decoration: none;
-        }
-
-        .social-icons a:hover {
-            background: var(--accent);
-        }
-
-        .copyright {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        /* Media queries - minimal */
-        @media (max-width: 768px) {
-            .hero {
-                padding: 100px 0 60px;
-            }
-
-            .display-3 {
-                font-size: 2.5rem;
-            }
-
-            .display-5 {
-                font-size: 2rem;
-            }
-
-            .nav-link {
-                margin: 0 0.4rem;
-            }
-        }
-
-        /* Mini stats cards - dioptimalkan */
-        .mini-stats-container {
-            width: 100%;
-        }
-
-        .mini-stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 10px;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .mini-stat-card .title {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 3px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .mini-stat-card .value {
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: white;
-        }
-
-        .mini-stat-card .subtitle {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @media (max-width: 576px) {
-            .hero {
-                padding: 90px 0 50px;
-            }
-
-            .display-3 {
-                font-size: 2rem;
-            }
-
-            .feature-card,
-            .step-card,
-            .testimonial-card {
-                padding: 1rem;
-            }
-
-            .mini-stat-card {
-                padding: 8px;
-            }
-
-            .mini-stat-card .title,
-            .mini-stat-card .subtitle {
-                font-size: 0.65rem;
-            }
-
-            .mini-stat-card .value {
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Login form styles - menggunakan CSS variables yang sudah ada */
         .login-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
+            margin: 1rem;
+            padding: 1.5rem;
         }
 
-        .login-header {
-            text-align: left;
-            margin-bottom: 2rem;
-        }
-
-        .btn-back {
-            background: none;
-            border: none;
-            color: #475569;
-            font-size: 1.2rem;
-            padding: 0.5rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-        }
-
-        .btn-back:hover {
-            background-color: var(--light);
-        }
-
-        .logo-circle {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .logo-text {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--dark);
+        .scale-down-mobile {
+            transform: scale(0.7);
         }
 
         .welcome-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero {
+            padding: 90px 0 50px;
         }
 
-        .welcome-subtitle {
-            color: #475569;
-            font-size: 0.9rem;
-            margin-bottom: 0;
+        .display-3 {
+            font-size: 2rem;
         }
 
-        .login-form {
-            width: 100%;
-        }
-
-        .login-form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .login-form-label {
-            display: block;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .login-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .login-input-icon {
-            position: absolute;
-            left: 1rem;
-            color: #475569;
-            font-size: 0.9rem;
-            z-index: 2;
-        }
-
-        .login-form-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 2.5rem;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 0.75rem;
-            font-size: 0.9rem;
-            background-color: var(--light);
-            font-family: system-ui, sans-serif;
-        }
-
-        .login-form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(72, 92, 188, 0.1);
-        }
-
-        .login-form-input::placeholder {
-            color: #94a3b8;
-        }
-
-        .login-password-toggle {
-            position: absolute;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: #475569;
-            cursor: pointer;
-            font-size: 0.9rem;
-            z-index: 2;
-        }
-
-        .login-password-toggle:hover {
-            color: var(--primary);
-        }
-
-        .login-btn {
-            width: 100%;
+        .feature-card,
+        .step-card,
+        .testimonial-card {
             padding: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-            font-family: system-ui, sans-serif;
         }
 
-        .login-btn:hover {
-            background: var(--secondary);
+        .mini-stat-card {
+            padding: 10px;
         }
 
-        .login-forgot-password {
-            text-align: center;
+        .mini-stat-card .title,
+        .mini-stat-card .subtitle {
+            font-size: 0.55rem;
         }
 
-        .login-forgot-password a {
-            color: #475569;
-            text-decoration: none;
-            font-size: 0.85rem;
+        .mini-stat-card .value {
+            font-size: 0.8rem;
         }
 
-        .login-forgot-password a:hover {
-            color: var(--primary);
+        .login-card {
+            padding: 1rem;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .login-card {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-
-            .scale-down-mobile {
-                transform: scale(0.7);
-            }
-
-            .welcome-title {
-                font-size: 1.3rem;
-            }
+        .welcome-title {
+            font-size: 1.2rem;
         }
-
-        @media (max-width: 576px) {
-            .login-card {
-                padding: 1rem;
-            }
-
-            .welcome-title {
-                font-size: 1.2rem;
-            }
-        }
-
-    </style>
+    }
+</style>
 </head>
 <body>
     <!-- Navbar -->
@@ -605,6 +618,7 @@
                                 </a>
                             </div>
                         </form>
+
                     </div>
                 </div>
 
@@ -624,32 +638,24 @@
                         Sistem tabungan digital terpercaya untuk SDN Sukarame yang memudahkan siswa, guru, dan orang tua.
                     </p>
 
-                    <!-- Mini Card Transparan -->
-                    <div class="mini-stats-container mb-4">
-                        <div class="row g-2">
-                            <div class="col-4">
-                                <div class="mini-stat-card">
-                                    <div class="title">Si Paling Banyak Nabung</div>
-                                    <div class="value">{{ $palingSering->nama ?? '-' }}</div>
-                                    <div class="subtitle">{{ $palingSering->value ?? '0' }}x</div>
-                                </div>
+                    <div class="mini-stats-container mb-1">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-12"> <!-- tetap setengah di semua layar -->
+                            <div class="mini-stat-card">
+                                <div class="title">Si Paling Sering Nabung</div>
+                                <div class="value">{{ $palingSering->nama ?? '-' }}</div>
+                                <div class="subtitle">{{ $palingSering->value ?? '0' }}x Nabung</div>
                             </div>
-                            <div class="col-4">
-                                <div class="mini-stat-card">
-                                    <div class="title">Si Paling Banyak Saldo</div>
-                                    <div class="value">{{ $palingGede->nama ?? '-' }}</div>
-                                    <div class="subtitle">Rp. {{ substr(number_format($palingGede->value ?? 0, 0, ',', '.'), 0, 7) }}</div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="mini-stat-card">
-                                    <div class="title">Si Paling Konsisten Nabung</div>
-                                    <div class="value">{{ $palingKonsisten->nama ?? '-' }}</div>
-                                    <div class="subtitle">{{ $palingKonsisten->value ?? '0' }} minggu</div>
-                                </div>
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <div class="mini-stat-card">
+                                <div class="title">Si Paling Banyak Saldo</div>
+                                <div class="value">{{ $palingGede->nama ?? '-' }}</div>
+                                <div class="subtitle">Rp. {{ substr(number_format($palingGede->value ?? 0, 0, ',', '.'), 0, 7) }} </div>
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -938,6 +944,23 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordInput = document.getElementById("passwordInput");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        togglePassword.addEventListener("click", function () {
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+
+            // Toggle icon class
+            eyeIcon.classList.toggle("fa-eye");
+            eyeIcon.classList.toggle("fa-eye-slash");
+        });
+    });
+</script>
 
     <script>
         if ("serviceWorker" in navigator) {

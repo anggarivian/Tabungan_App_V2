@@ -38,6 +38,10 @@ class CreateKelasSeeder extends Seeder
             [
                 'id' => 6,
                 'name' => '6'
+            ],
+            [
+                'id' => 7,
+                'name' => '7'
             ]
         ];
 

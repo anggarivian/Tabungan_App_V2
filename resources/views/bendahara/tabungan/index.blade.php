@@ -56,7 +56,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}} | {{$storKali}}x</h6>
                                 </div>
                                 <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
                                     <div class="stats-icon red mb-2">
@@ -65,7 +65,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}} | {{$tarikKali}}x</h6>
                                 </div>
                             </div>
                         </div>
@@ -161,48 +161,31 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="card-title">Transaksi Hari Ini</h5>
-                        {{-- <button type="button" class="btn btn-success">Print Mingguan</button> --}}
                     </div>
-                    <!-- Button Group -->
-                    <p>Pilih Kelas :</p>
+                    <p class="text-center">Pilih Kelas</p>
                     <div class="row justify-content-center g-2">
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(1)">Kelas 1</button>
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(2)">Kelas 2</button>
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(3)">Kelas 3</button>
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(4)">Kelas 4</button>
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(5)">Kelas 5</button>
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            <button class="btn btn-sm btn-secondary w-100" onclick="showTable(6)">Kelas 6</button>
-                        </div>
+                        @foreach(range(1,7) as $i)
+                            <div class="col-6 col-sm-4 col-md-1">
+                                <button
+                                    class="btn btn-sm btn-light w-100"
+                                    onclick="showTable({{ $i }})">
+                                    Kelas {{ $i }}
+                                </button>
+                            </div>
+                        @endforeach
                     </div>
 
 
                     <!-- Dropdown Table Section -->
-                    <div class="dropdown-table mt-3 w-100">
-                        @foreach (range(1,6) as $i)
-                            @php
-                                $kelasData = $kelasList['kelas'.$i];
-                            @endphp
+                    <div class="dropdown-table mt-5 w-100">
+                        @foreach(range(1,7) as $i)
+                            @php $kelasData = $kelasList['kelas'.$i]; @endphp
                             <div id="table{{ $i }}" class="table-responsive-lg" style="display: none;">
                                 <div class="mb-3">
                                     <div class="d-flex flex-wrap gap-3">
-                                        <h6 class="mb-0">{{ "Kelas $i" }} : </h6>
-                                        <div class="badge bg-success">
-                                            Stor: Rp. {{ number_format($kelasData['stor']) }}
-                                        </div>
-                                        <div class="badge bg-danger">
-                                            Tarik: Rp. {{ number_format($kelasData['tarik']) }}
-                                        </div>
+                                        <h6 class="mb-0">Kelas {{ $i }} :</h6>
+                                        <div class="badge bg-success">Stor: Rp. {{ number_format($kelasData['stor']) }}</div>
+                                        <div class="badge bg-danger">Tarik: Rp. {{ number_format($kelasData['tarik']) }}</div>
                                     </div>
                                 </div>
                                 <table class="table table-hover" style="width: 100%">
@@ -308,6 +291,17 @@
 @section('js')
 <script>
     function showTable(tableId) {
+        for (let i = 1; i <= 7; i++) {
+            const tbl = document.getElementById('table' + i);
+            if (tbl) tbl.style.display = 'none';
+        }
+        const sel = document.getElementById('table' + tableId);
+        if (sel) sel.style.display = 'block';
+    }
+    document.addEventListener("DOMContentLoaded", () => showTable(1));
+</script>
+{{-- <script>
+    function showTable(tableId) {
         for (let i = 1; i <= 9; i++) {
             const table = document.getElementById('table' + i);
             if (table) {
@@ -324,5 +318,5 @@
     document.addEventListener("DOMContentLoaded", function() {
         showTable(1);
     });
-</script>
+</script> --}}
 @endsection

@@ -79,8 +79,8 @@
                                 </div>
                             </div>
                         </ul>
-                        <a href="{{$invoice['invoice_url']}}" class="btn btn-primary mb-2" style="width: 100%">Lanjutkan</a>
-                        <button class="btn btn-danger w-100" onclick="openBatalModal({{ auth()->user()->id }})">
+                        <a href="{{$invoice['invoice_url']}}" class="btn btn-primary mb-2" style="width: 100%">Lanjutkan Pembayaran</a>
+                        <button class="btn btn-secondary w-100" onclick="openBatalModal({{ auth()->user()->id }})">
                             Batalkan
                         </button>
                     </div>
@@ -179,18 +179,22 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
 
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
                                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                         <div class="d-flex justify-content-between">
-                                            <button class="btn btn-primary" style="width: 100%" disabled>Segera Hadir ... !</button>
+                                            @if(auth()->user()->username == '722')
+                                                <button class="btn btn-primary" style="width: 100%" type="submit">Lanjut Bayar</button>
+                                            @else
+                                                <button class="btn btn-primary" style="width: 100%" disabled>Segera Hadir ... !</button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -57,9 +57,10 @@ class SiswaController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'jenis_kelamin' => 'required|in:L,P',
-            'kontak' => 'required|numeric|min:1000000000|max:999999999999999',
+            'kontak' => 'required|digits_between:10,15',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
+            'kelas' => 'required|integer|in:1,2,3,4,5,6,7',
         ], [
             'name.required' => 'Nama harus diisi.',
             'username.unique' => 'Username sudah digunakan.',
@@ -83,17 +84,17 @@ class SiswaController extends Controller
         $user->kelas_id = $request->kelas;
         $user->roles_id = 4;
 
-        $kelasMap = [1, 2, 3, 4, 5, 6];
+        $kelasMap = [1, 2, 3, 4, 5, 6, 7];
 
         $existingUser = User::where('username', 'like', $kelasMap[$request->kelas - 1] . '%')
             ->orderBy('username', 'desc')
             ->first();
 
         if ($existingUser) {
-            $nextNumber = (int)substr($existingUser->username, -3) + 1;
-            $user->username = $kelasMap[$request->kelas - 1] . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $nextNumber = (int)substr($existingUser->username, -2) + 1;
+            $user->username = $kelasMap[$request->kelas - 1] . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
         } else {
-            $user->username = $kelasMap[$request->kelas - 1] . '001';
+            $user->username = $kelasMap[$request->kelas - 1] . '01';
         }
 
         $user->save();
@@ -135,10 +136,10 @@ class SiswaController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $request->id,
             'jenis_kelamin' => 'required|in:L,P',
-            'kontak' => 'required|numeric|min:1000000000|max:999999999999999',
+            'kontak' => 'required|digits_between:10,15',
             'alamat' => 'required|string',
             'orang_tua' => 'required|string',
-            'kelas' => 'required|integer',
+            'kelas' => 'required|integer|in:1,2,3,4,5,6,7',
             'password' => 'nullable|string|min:8',
         ], [
             'name.required' => 'Nama harus diisi',
@@ -151,6 +152,10 @@ class SiswaController extends Controller
         ]);
 
         $user = User::findOrFail($request->id);
+
+        $oldKelas = $user->kelas_id;
+        $newKelas = $validatedData['kelas'];
+
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
@@ -158,6 +163,22 @@ class SiswaController extends Controller
         $user->alamat = $validatedData['alamat'];
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $validatedData['kelas'];
+
+        if ($oldKelas != $newKelas) {
+            $kelasMap = [1, 2, 3, 4, 5, 6, 7];
+            $prefix   = $kelasMap[$newKelas - 1];
+
+            $existingUser = User::where('username', 'like', $prefix . '%')
+                ->orderBy('username', 'desc')
+                ->first();
+
+            if ($existingUser) {
+                $nextNumber = (int)substr($existingUser->username, -2) + 1;
+                $user->username = $prefix . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+            } else {
+                $user->username = $prefix . '01';
+            }
+        }
 
         // Hanya update password jika diisi
         if (!empty($validatedData['password'])) {

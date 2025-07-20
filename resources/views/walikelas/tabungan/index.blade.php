@@ -56,7 +56,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}} | {{$storKali}}x</h6>
                                 </div>
                                 <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
                                     <div class="stats-icon red mb-2">
@@ -65,7 +65,7 @@
                                 </div>
                                 <div class=" col-6 col-md-4 col-sm-6">
                                     <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}} | {{$tarikKali}}x</h6>
                                 </div>
                             </div>
                         </div>

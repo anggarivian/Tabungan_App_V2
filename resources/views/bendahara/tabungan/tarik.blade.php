@@ -119,7 +119,7 @@
                                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                     <div class="input-group">
                                         <span class="input-group-text">Rp.</span>
-                                        <input type="text" class="form-control" id="premi" name="premi" placeholder="Masukkan Biaya Admin" autocomplete="off">
+                                        <input type="text" class="form-control" id="premi" name="premi" placeholder="Dihitung otomatis" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -167,6 +167,35 @@
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    function genapkanKeRibuan(angka) {
+        return Math.ceil(angka / 1000) * 1000;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const jumlahTarikInput = document.getElementById('jumlah_tarik');
+        const premiInput = document.getElementById('premi');
+
+        jumlahTarikInput.addEventListener('input', function () {
+            let value = jumlahTarikInput.value.replace(/\D/g, '');
+            let jumlahTarik = parseInt(value) || 0;
+
+            // Hitung 5% dan genapkan
+            let biayaAdmin = Math.ceil(jumlahTarik * 0.05);
+            let dibulatkan = genapkanKeRibuan(biayaAdmin);
+
+            // Tampilkan di input premi
+            premiInput.value = new Intl.NumberFormat('id-ID').format(dibulatkan);
+        });
+
+        // Format saat mengetik premi manual (jika dibolehkan)
+        premiInput.addEventListener('input', function () {
+            var value = premiInput.value.replace(/\D/g, '');
+            premiInput.value = new Intl.NumberFormat('id-ID').format(value);
+        });
+    });
+</script>
+
+<script>
     $(document).ready(function(){
         $('#searchForm').on('submit', function(e) {
             e.preventDefault();
@@ -196,7 +225,7 @@
                             $('#kelas').val('');
                             $('#jumlah_tabungan').val('');
                         }
-                        $('#premi').focus();
+                        $('#jumlah_tarik').focus();
                     } else {
                         alert('User tidak ditemukan');
                     }
@@ -209,7 +238,7 @@
 
         $('#username').on('keypress', function(e) {
             if(e.which === 13) {
-                $('#premi').focus();
+                $('#jumlah_tarik').focus();
             }
         });
     });
