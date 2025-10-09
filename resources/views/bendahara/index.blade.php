@@ -136,7 +136,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Hasil Penarikan | Perkiraan Hasil</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($bendahara->saldo)}} | ~Rp. {{ number_format($premi)}}</h6>
+                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($bendahara->saldo ?? 0 )}} | ~Rp. {{ number_format($premi)}}</h6>
                                 </div>
                             </div>
                         </div>

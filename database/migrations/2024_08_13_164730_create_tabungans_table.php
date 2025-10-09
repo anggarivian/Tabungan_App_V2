@@ -19,6 +19,7 @@ class CreateTabungansTable extends Migration
             $table->string('premi');
             $table->string('sisa');
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('buku_id')->constrained('bukus');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Kelas;
 use App\Models\Tabungan;
+use App\Models\Buku;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
@@ -19,6 +20,21 @@ class SiswaController extends Controller
      */
 
     public function index(Request $request){
+
+        $tahunSekarang = date('Y');
+
+        $buku = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
+
+        if (!$buku) {
+            $buku = Buku::where('status', 1)->first();
+        }
+
+        if (!$buku) {
+            session()->now('alert-type', 'warning');
+            session()->now('alert-message', 'Tidak ada pembukuan yang tersedia');
+            session()->now('alert-duration', 3000);
+        }
+
         $kelas = Kelas::all();
         $perPage = request('perPage', 10);
 
@@ -41,7 +57,7 @@ class SiswaController extends Controller
 
         $user = $query->paginate($perPage);
 
-        return view('bendahara.kelola_siswa', compact('user','kelas'));
+        return view('bendahara.kelola_siswa', compact('user','kelas', 'buku'));
     }
 
     /**

@@ -59,17 +59,8 @@
                     <button type="button" 
                         class="btn btn-primary" 
                         data-bs-toggle="modal" 
-                        data-bs-target="#tambahModal"
-                        {{ !$buku ? 'disabled' : '' }}
-                        title="{{ !$buku ? 'Tidak ada pembukuan aktif' : '' }}">
+                        data-bs-target="#tambahModal">
                         Tambah Data
-                    </button>
-                    <button type="button" 
-                        class="btn btn-success" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#importModal"
-                        {{ !$buku ? 'disabled' : '' }}>
-                        Import
                     </button>
                 </div>
                 <form action="/bendahara/kelola-siswa" method="GET">
@@ -95,15 +86,8 @@
                     <thead>
                         <tr>
                             <th class="text-center">No.</th>
-                            <th>Nama</th>
-                            <th class="text-center">Kode</th>
-                            {{-- <th>Email</th> --}}
-                            <th class="text-center">Kelas</th>
-                            <th class="text-center">Jenis Kelamin</th>
-                            <th class="text-center">Orang Tua</th>
-                            <th class="text-center">Kontak</th>
-                            <th>Alamat</th>
-                            {{-- <th class="text-center">Tanggal</th> --}}
+                            <th>Tahun</th>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>

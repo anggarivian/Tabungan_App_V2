@@ -29,9 +29,9 @@
 <div class="page-content">
     <div class=" card shadow-lg">
         <div class="card-body" style="margin-bottom: -20px">
-            @if(session('success'))
+            @if(session('alert-type'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="bi bi-{{ session('alert-type') === 'warning' ? 'exclamation-triangle' : 'check-circle' }}"></i>
                     {{ session('alert-message') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -56,14 +56,19 @@
             @endif
             <div class="d-flex justify-content-between">
                 <div class="input-group">
-                    <button type="button" class="btn  btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
+                    <button type="button" 
+                        class="btn  btn-primary" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#tambahModal" 
+                        {{ !$buku ? 'disabled' : '' }}
+                        title="{{ !$buku ? 'Tidak ada pembukuan aktif' : '' }}">
                         Tambah Data
                     </button>
                 </div>
                 <form action="/bendahara/kelola-walikelas" method="GET">
                     <div class="input-group">
-                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
-                        <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
+                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2" {{ !$buku ? 'disabled' : '' }}>
+                        <button class="btn btn-primary" type="submit" id="button-addon2" {{ !$buku ? 'disabled' : '' }}>Cari</button>
                     </div>
                 </form>
             </div>
@@ -166,7 +171,7 @@
                             <select id="walikelas-horizontal" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->name }} - {{ $k->rombel }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -204,6 +209,7 @@
                         <div class="col-md-8 form-group">
                             <textarea id="address-horizontal" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
                         </div>
+                        <input type="hidden" name="buku" value="{{ $buku->id ?? null }}">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -241,7 +247,7 @@
                             <select id="edit-kelas" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->name }} - {{ $k->rombel }}</option>
                                 @endforeach
                             </select>
                         </div>

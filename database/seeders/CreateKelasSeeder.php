@@ -14,36 +14,26 @@ class CreateKelasSeeder extends Seeder
      */
     public function run()
     {
-        $kelas = [
-            [
-                'id' => 1,
-                'name' => '1'
-            ],
-            [
-                'id' => 2,
-                'name' => '2'
-            ],
-            [
-                'id' => 3,
-                'name' => '3'
-            ],
-            [
-                'id' => 4,
-                'name' => '4'
-            ],
-            [
-                'id' => 5,
-                'name' => '5'
-            ],
-            [
-                'id' => 6,
-                'name' => '6'
-            ],
-            [
-                'id' => 7,
-                'name' => '7'
-            ]
-        ];
+        $kelas = [];
+        $id = 1;
+
+        for ($i = 1; $i <= 6; $i++) {
+            // A class
+            $kelas[] = [
+                'id' => $id++,
+                'name' => (string)$i,
+                'rombel' => 'A',
+                'buku_id' => 1
+            ];
+
+            // B class
+            $kelas[] = [
+                'id' => $id++,
+                'name' => (string)$i,
+                'rombel' => 'B',
+                'buku_id' => 1
+            ];
+        }
 
         foreach($kelas as $key => $kelas){
             Kelas::create($kelas);
