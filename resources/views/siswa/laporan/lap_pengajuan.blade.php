@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card shadow-lg">
+    <div class="card shadow">
         <div class="card-body" style="margin-bottom: -20px">
             <form action="/siswa/laporan/pengajuan" method="GET">
                 <div class="container">

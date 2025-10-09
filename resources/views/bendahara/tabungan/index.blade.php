@@ -3,21 +3,6 @@
 @section('title') Tabungan - SakuRame @endsection
 
 @section('content')
-<style>
-    .table-container {
-        display: none;
-        margin-top: 10px;
-    }
-    .trigger {
-        background-color: #007bff;
-        color: white;
-        padding: 10px;
-        cursor: pointer;
-        text-align: center;
-        margin-bottom: 5px;
-        width: 200px;
-    }
-</style>
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
@@ -46,7 +31,7 @@
         <div class="col-12 col-lg-12">
             <div class="row">
                 <div class="col-12 col-sm-12 col-lg-6 col-md-12">
-                    <div class="card shadow-lg">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-6 col-md-2 col-sm-6 mb-3 mb-sm-0 mb-md-0 mb-lg-0  d-flex justify-content-center ">
@@ -72,7 +57,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card shadow-lg">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
@@ -89,7 +74,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card shadow-lg">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
@@ -110,28 +95,29 @@
     </section>
     <div class="row justify-content-center">
         <div class="container">
-            <div class="card shadow-lg col-12">
+            <div class="card position-relative shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Input Transaksi</h5>
-                    <div class="row">
-                        <div class="d-flex flex-wrap flex-md-nowrap" role="group">
-                            <!-- Tombol Stor Per Orang -->
-                            <a href="{{ route('bendahara.tabungan.stor') }}" class="btn btn-primary w-100 m-1 p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                    <h5 class="card-title mb-4">Input Transaksi</h5>
+
+                    <!-- Responsive flex container -->
+                    <div class="d-flex flex-column flex-md-row gap-3">
+
+                        <!-- Tombol Stor Per Orang -->
+                        <div class="flex-fill">
+                            <a href="{{route('bendahara.tabungan.stor')}}" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512">
                                     <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
                                 </svg>
-                                Stor Per Orang
+                                <span>Stor Per Orang</span>
                             </a>
+                        </div>
 
-                            <!-- Tombol Stor Per Kelas dengan Dropdown -->
-                            <div class="btn-group w-100 m-1">
-                                <button type="button" class="btn btn-primary dropdown-toggle w-100 p-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
-                                        <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
-                                    </svg>
+                        <div class="flex-fill position-relative">
+                            <div class="dropdown h-100">
+                                <button class="btn btn-primary dropdown-toggle w-100 h-100 d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown">
                                     Stor Per Kelas
                                 </button>
-                                <ul class="dropdown-menu w-100">
+                                <ul class="dropdown-menu w-100" style="z-index: 1050;">
                                     <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/1">Kelas 1</a></li>
                                     <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/2">Kelas 2</a></li>
                                     <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/3">Kelas 3</a></li>
@@ -140,24 +126,31 @@
                                     <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/6">Kelas 6</a></li>
                                 </ul>
                             </div>
+                        </div>
 
-                            <!-- Tombol Tarik -->
-                            <a href="{{ route('bendahara.tabungan.tarik') }}" class="btn btn-danger w-100 m-1 p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 448 512">
+                        <!-- Tombol Tarik -->
+                        <div class="flex-fill">
+                            <a href="{{route('bendahara.tabungan.tarik')}}" class="btn btn-danger w-100 h-100 d-flex align-items-center justify-content-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512">
                                     <path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
                                 </svg>
-                                Tarik
+                                <span>Tarik</span>
                             </a>
-
-                            {{-- <a class="btn btn-success w-10 m-1 p-2" data-bs-toggle="modal" data-bs-target="#importModal">
-                                Import
-                            </a> --}}
                         </div>
-                    </div>
 
+                        <!-- Uncomment jika diperlukan -->
+                        <!--
+                        <div class="flex-fill">
+                            <button class="btn btn-success w-100 h-100" data-bs-toggle="modal" data-bs-target="#importModal">
+                                Import
+                            </button>
+                        </div>
+                        -->
+
+                    </div>
                 </div>
             </div>
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="card-title">Transaksi Hari Ini</h5>

@@ -39,7 +39,7 @@
     <div class="row">
         @if($invoice != null)
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="card shadow-lg mb-4">
+                <div class="card shadow mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold text-primary mb-3">
                             Lanjutkan Pembayaran Anda
@@ -89,7 +89,7 @@
         @else
             <!-- Card Form Stor Tabungan -->
             <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                <div class="card shadow-lg">
+                <div class="card shadow">
                     <div class="card-body">
                         @if(session('success'))
                             <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -185,7 +185,7 @@
                                     <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
                                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                         <div class="d-flex justify-content-between">
-                                            @if(auth()->user()->username == '722')
+                                            @if(auth()->user()->username == '999')
                                                 <button class="btn btn-primary" style="width: 100%" type="submit">Lanjut Bayar</button>
                                             @else
                                                 <button class="btn btn-primary" style="width: 100%" disabled>Segera Hadir ... !</button>
@@ -201,7 +201,7 @@
 
             <!-- Card Informasi Penting -->
             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                <div class="card shadow-lg">
+                <div class="card shadow">
                     <div class="card-body">
                         <h5 class="fw-bold text-primary mb-3">
                             <i class="bi bi-info-circle"></i> Informasi Penting

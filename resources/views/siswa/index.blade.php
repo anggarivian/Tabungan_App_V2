@@ -38,7 +38,7 @@
 <div class="page-content">
     <section class="row">
         <div class="col-12 col-lg-12">
-            <div class="card shadow-lg portrait-card d-none">
+            <div class="card shadow portrait-card d-none">
                 <div class="card-body py-3">
                     <p class="mb-0 d-flex align-items-center justify-content-between">
                         <span class="fw-medium">
@@ -49,8 +49,8 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-lg-4 col-md-6">
-                    <div class="card shadow-lg">
+                <div class="col-12 col-lg-3 col-md-6">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -66,8 +66,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card shadow-lg">
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -83,8 +83,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card shadow-lg">
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class=" col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -100,8 +100,8 @@
                         </div>
                     </div>
                 </div>
-                {{-- <div class="col-12 col-lg-3 col-md-6">
-                    <div class="card shadow-lg">
+                <div class="col-12 col-lg-3 col-md-6">
+                    <div class="card shadow">
                         <div class="card-body px-4 py-4-5">
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
@@ -116,10 +116,10 @@
                             </div>
                         </div>
                     </div>
-                </div> --}}
+                </div>
             </div>
             <h3 class="mb-3">Tabungan</h3>
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-body">
                     <h5 class="card-title">Buku Tabungan</h5>
                     <p class="text-muted fst-italic">Menampilkan transaksi terbaru di atas</p>
@@ -187,7 +187,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-body">
                     <h5 class="card-title">Statistik Tabungan</h5>
 

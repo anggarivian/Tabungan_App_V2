@@ -40,7 +40,7 @@
     <div class="row">
         <!-- Card Form Penarikan -->
         <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-body">
                     @if(session('success'))
                         <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -287,7 +287,7 @@
                                 </div>
                             </div>
                             <div class="form-group mb-3">
-                                @if(Auth()->user()->username == '722')
+                                @if(Auth()->user()->username == '999')
                                     <button class="btn btn-primary w-100" type="submit">Ajukan</button>
                                 @else
                                     <button class="btn btn-primary w-100" disabled>Segera Hadir ... !</button>
@@ -301,7 +301,7 @@
 
         <!-- Card Informasi Penting -->
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3 text-primary">
                         <i class="bi bi-info-circle"></i> Informasi Penting

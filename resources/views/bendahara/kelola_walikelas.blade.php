@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class=" card shadow-lg">
+    <div class=" card shadow">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('alert-type'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">

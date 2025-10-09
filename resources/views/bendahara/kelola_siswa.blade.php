@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card shadow-lg">
+    <div class="card shadow">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('alert-type'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -328,7 +328,7 @@
 {{-- Modal Konfirmasi Delete Yang Ditingkatkan --}}
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+        <div class="modal-content border-0 shadow" style="border-radius: 15px; overflow: hidden;">
             <div class="modal-header bg-danger text-white border-0">
                 <h5 class="modal-title" id="deleteModalLabel">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>

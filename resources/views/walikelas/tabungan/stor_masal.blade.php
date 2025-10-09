@@ -28,7 +28,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card shadow-lg pd-0">
+    <div class="card shadow pd-0">
         <div class="card-body">
             <div class="row">
                 @if(session('success'))
@@ -81,7 +81,7 @@
             </div>
         </div>
     </div>
-    <div class="card shadow-lg">
+    <div class="card shadow">
         <div class="card-body">
             <form method="post" action="{{ route('walikelas.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
                 @csrf

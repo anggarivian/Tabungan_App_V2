@@ -196,25 +196,28 @@ class PengajuanController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = User::where('username', $validatedData['username'])->firstOrFail();
-            $pengajuan = Pengajuan::where('user_id', $user->id)->where('status', 'Pending')->firstOrFail();
-            $tabungan = Tabungan::where('user_id', $user->id)->firstOrFail();
+            $user      = User::where('username', $validatedData['username'])->firstOrFail();
+            $pengajuan = Pengajuan::where('user_id', $user->id)
+                                ->where('status', 'Pending')
+                                ->firstOrFail();
+            $tabungan  = Tabungan::where('user_id', $user->id)->firstOrFail();
 
-            $jumlahTarik = $validatedData['jumlah_tarik'];
-            $biayaAdmin = ceil(($jumlahTarik * 0.05) / 1000) * 1000;
+            $jumlahTarikInput = $validatedData['jumlah_tarik'];
+            $biayaAdmin = ceil(($jumlahTarikInput * 0.05) / 1000) * 1000;
+            $totalTarik = $jumlahTarikInput + $biayaAdmin;
 
-            if ($jumlahTarik > $tabungan->saldo) {
+            if ($totalTarik > $tabungan->saldo) {
                 return redirect()->back()
-                    ->withErrors(['jumlah_tarik' => 'Penarikan melebihi saldo tabungan'])
+                    ->withErrors(['jumlah_tarik' => 'Penarikan (termasuk biaya admin) melebihi saldo tabungan'])
                     ->withInput();
             }
 
-            $pengajuan->status = 'Diterima';
-            $pengajuan->premi = $biayaAdmin;
+            $pengajuan->status       = 'Diterima';
+            $pengajuan->jumlah_tarik = $totalTarik;
             $pengajuan->save();
 
             if ($pengajuan->pembayaran === 'Digital') {
-                $this->processDigitalPayout($pengajuan, $user, $jumlahTarik);
+                $this->processDigitalPayout($pengajuan, $user, $totalTarik);
             }
 
             DB::commit();
