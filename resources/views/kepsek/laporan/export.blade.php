@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card shadow-lg">
+    <div class="card shadow">
         <div class="card-body">
             @if(session('success'))
                 <div class="alert alert-success">

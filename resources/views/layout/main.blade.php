@@ -257,12 +257,31 @@
         .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border-radius: 1rem;
+            position: relative; /* penting agar z-index dropdown bisa keluar */
+            overflow: visible !important; /* pastikan dropdown tidak terpotong */
         }
 
         .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             border-radius: 1rem;
+        }
+
+        .dropdown-menu {
+            z-index: 1050; /* lebih tinggi dari elemen biasa */
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Tambahan: biar dropdown tidak berkedip saat hover ke menu */
+        .dropdown-menu:hover {
+            display: block;
+        }
+
+        .position-relative {
+            z-index: 1;
         }
 
         .menu-link {
@@ -501,6 +520,14 @@
                                         </ul>
                                     </div>
                                 </div>
+                            </li>
+                            @endif
+                            {{-- Rombel Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
+                            @if( auth()->user()->roles_id == 2 )
+                            <li class="menu-item {{ request()->routeIs('rombel*') ? 'active' : '' }}">
+                                <a href="{{ route ('bendahara.rombel.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-people"></i><span>Rombel</span>
+                                </a>
                             </li>
                             @endif
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}

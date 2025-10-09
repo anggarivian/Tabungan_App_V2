@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\TabunganStoredMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\RombelController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TabunganController;
@@ -87,6 +88,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/bendahara/kelola-siswa/edit/{id}', [SiswaController::class, 'edit'])->name('bendahara.siswa.edit');
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('bendahara.siswa.delete');
         Route::post('/bendahara/kelola-siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
+
+        // Menangani pengelolaan Rombel (kelas).
+        Route::get('/bendahara/kelola-rombel', [RombelController::class, 'index'])->name('bendahara.rombel.index');
 
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
@@ -172,7 +176,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Menangani webhook dari Xendit dan CreatePayout.
     Route::post('/webhook/payout', [PengajuanController::class, 'handlePayoutWebhook']);
-    
+
     Route::get('/siswa/tabungan/success', [TabunganController::class, 'success'])->name('payment.success');
 
 route::get('/offline', function () {
