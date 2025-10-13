@@ -390,6 +390,13 @@
                                 </a>
                             </li>
                             @endif
+                             @if( auth()->user()->roles_id == 2 )
+                            <li class="menu-item {{ request()->routeIs('bendahara.pembukuan*') }}">
+                                <a href="{{ route ('bendahara.pembukuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-cash-stack"></i><span> Buku </span>
+                                </a>
+                            </li>
+                            @endif
                             {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.tabungan*') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
@@ -625,7 +632,7 @@
 
     @yield('js')
 
-    <script>
+    {{-- <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
             navigator.serviceWorker.register("/service-worker.js")
@@ -637,7 +644,7 @@
                 });
             });
         }
-    </script>
+    </script> --}}
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

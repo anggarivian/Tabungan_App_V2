@@ -962,7 +962,7 @@
     });
 </script>
 
-    <script>
+    {{-- <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
             navigator.serviceWorker.register("/service-worker.js")
@@ -974,7 +974,7 @@
                 });
             });
         }
-    </script>
+    </script> --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
