@@ -16,7 +16,7 @@ class CreateBukusTable extends Migration
         Schema::create('bukus', function (Blueprint $table) {
             $table->id();
             $table->string('tahun');
-            $table->string('status');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
