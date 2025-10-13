@@ -13,6 +13,7 @@ use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\WalikelasController;
+use App\Http\Controllers\BukuController;
 
 Route::get('/kirim-email', function () {
     Mail::to('gtalowsetpc@gmail.com')->send(new TabunganStoredMail());
@@ -74,6 +75,13 @@ Route::middleware(['auth'])->group(function () {
         // Menampilkan dashboard untuk Bendahara.
         Route::get('/bendahara/dashboard', [DashboardController::class, 'bendahara'])->name('bendahara.dashboard');
 
+        // Menangani pengelolaan pembukuan.
+        Route::get('/bendahara/kelola-pembukuan', [BukuController::class, 'index'])->name('bendahara.pembukuan.index');
+        Route::post('/bendahara/kelola-pembukuan/tambah', [BukuController::class, 'add'])->name('bendahara.pembukuan.add');
+        Route::put('/bendahara/kelola-pembukuan/edit/{id}', [BukuController::class, 'edit'])->name('bendahara.pembukuan.edit');
+        Route::put('/bendahara/kelola-pembukuan/tutup/{id}', [BukuController::class, 'tutup'])->name('bendahara.pembukuan.tutup');
+        Route::get('/bendahara/kelola-pembukuan/{id}/detail', [BukuController::class, 'detail'])->name('bendahara.pembukuan.detail');
+
         // Menangani pengelolaan Walikelas.
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('bendahara.walikelas.index');
         Route::post('/bendahara/kelola-walikelas/tambah', [WalikelasController::class, 'add'])->name('bendahara.walikelas.add');
@@ -90,7 +98,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bendahara/kelola-siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
 
         // Menangani pengelolaan Rombel (kelas).
-        Route::get('/bendahara/kelola-rombel', [RombelController::class, 'index'])->name('bendahara.rombel.index');
+        Route::prefix('bendahara/kelola-rombel')->name('bendahara.rombel.')->group(function () {
+            Route::get('/', [RombelController::class, 'index'])->name('index');
+            Route::post('/', [RombelController::class, 'store'])->name('store');
+            Route::get('/{id}', [RombelController::class, 'show'])->name('show');
+            Route::post('/{id}/update-anggota', [RombelController::class, 'updateAnggota'])->name('updateAnggota');
+            Route::delete('/{id}', [RombelController::class, 'destroy'])->name('delete');
+        });
+
 
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
