@@ -16,4 +16,9 @@ class Kelas extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class, 'id', 'kelas_id');
+    }
 }

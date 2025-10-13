@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CreateBukuSeeder::class,
             CreateRoleSeeder::class,
             CreateKelasSeeder::class,
+            CreateRombelSeeder::class,
             CreateUserSeeder::class,
             // CreateTabunganSeeder::class,
         ]);

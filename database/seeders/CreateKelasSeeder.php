@@ -22,15 +22,6 @@ class CreateKelasSeeder extends Seeder
             $kelas[] = [
                 'id' => $id++,
                 'name' => (string)$i,
-                'rombel' => 'A',
-                'buku_id' => 1
-            ];
-
-            // B class
-            $kelas[] = [
-                'id' => $id++,
-                'name' => (string)$i,
-                'rombel' => 'B',
                 'buku_id' => 1
             ];
         }
