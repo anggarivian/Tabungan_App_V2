@@ -16,8 +16,8 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('username')->unique();
-            $table->string('email')->unique();
+            $table->string('username');
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('jenis_kelamin')->nullable();
             $table->string('kontak')->nullable();
@@ -32,11 +32,11 @@ class CreateUsersTable extends Migration
             $table->foreignId('kelas_id')
                 ->nullable()
                 ->constrained('kelas')
-                ->nullOnDelete();;
+                ->nullOnDelete();
             $table->foreignId('roles_id')
                 ->nullable()
                 ->constrained('roles')
-                ->nullOnDelete();;;
+                ->nullOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

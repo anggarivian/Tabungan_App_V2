@@ -59,16 +59,13 @@
                     <button type="button" 
                         class="btn btn-primary" 
                         data-bs-toggle="modal" 
-                        data-bs-target="#tambahModal"
-                        {{ !$buku ? 'disabled' : '' }}
-                        title="{{ !$buku ? 'Tidak ada pembukuan aktif' : '' }}">
+                        data-bs-target="#tambahModal">
                         Tambah Data
                     </button>
                     <button type="button" 
                         class="btn btn-success" 
                         data-bs-toggle="modal" 
-                        data-bs-target="#importModal"
-                        {{ !$buku ? 'disabled' : '' }}>
+                        data-bs-target="#importModal">
                         Import
                     </button>
                 </div>
@@ -79,10 +76,8 @@
                             style="padding-right: 1px" 
                             name="search" 
                             id="search" 
-                            value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2"
-                            {{ !$buku ? 'disabled' : '' }}>
-                        <button class="btn btn-primary" type="submit" id="button-addon2"
-                            {{ !$buku ? 'disabled' : '' }}>
+                            value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
+                        <button class="btn btn-primary" type="submit" id="button-addon2">
                             Cari
                     </button>
                     </div>
@@ -186,7 +181,7 @@
                             <select id="siswa-horizontal" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }} {{ $k->rombel }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -224,7 +219,6 @@
                         <div class="col-md-8 form-group">
                             <input type="text" id="orang-tua-horizontal" class="form-control" name="orang_tua" placeholder="Orang Tua" required>
                         </div>
-                        <input type="hidden" name="buku" value="{{ $buku->id ?? null }}">
                     </div>
                 </div>
                 <div class="modal-footer">

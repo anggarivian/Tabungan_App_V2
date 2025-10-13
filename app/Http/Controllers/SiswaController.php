@@ -25,20 +25,24 @@ class SiswaController extends Controller
 
         $buku = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
 
-        if (!$buku) {
-            $buku = Buku::where('status', 1)->first();
+        $bukuExsist = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
+
+        if (!$bukuExsist) {
+            $bukuExsist = Buku::where('status', 1)->first();
         }
 
-        if (!$buku) {
-            session()->now('alert-type', 'warning');
-            session()->now('alert-message', 'Tidak ada pembukuan yang tersedia');
-            session()->now('alert-duration', 3000);
+        if (!$bukuExsist) {
+            return redirect()
+                    ->route('bendahara.pembukuan.index')
+                    ->with('alert-type', 'warning')
+                    ->with('alert-message', 'Tidak ada pembukuan yang tersedia')
+                    ->with('alert-duration', 3000);
         }
 
-        $kelas = Kelas::all();
+        $kelas = Kelas::where('buku_id', $bukuExsist->id)->get();
         $perPage = request('perPage', 10);
 
-        $query = User::query()->where('roles_id', 4);
+        $query = User::query()->where('roles_id', 4)->where('buku_id', $bukuExsist->id);
         $query->select('id','name','email','username','jenis_kelamin','kontak','password','orang_tua','alamat','kelas_id','roles_id','created_at','updated_at');
         $searchTerm = $request->input('search');
 
@@ -57,7 +61,7 @@ class SiswaController extends Controller
 
         $user = $query->paginate($perPage);
 
-        return view('bendahara.kelola_siswa', compact('user','kelas', 'buku'));
+        return view('bendahara.kelola_siswa', compact('user','kelas'));
     }
 
     /**
@@ -89,6 +93,12 @@ class SiswaController extends Controller
             'orang_tua.required' => 'Nama orang tua harus diisi.',
         ]);
 
+        $tahunSekarang = date('Y');
+        $bukuExsist = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
+        if (!$bukuExsist) {
+            $bukuExsist = Buku::where('status', 1)->first();
+        }
+
         $user = new User();
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
@@ -98,6 +108,7 @@ class SiswaController extends Controller
         $user->alamat = $validatedData['alamat'];
         $user->orang_tua = $validatedData['orang_tua'];
         $user->kelas_id = $request->kelas;
+        $user->buku_id = $bukuExsist->id;
         $user->roles_id = 4;
 
         $kelasMap = [1, 2, 3, 4, 5, 6, 7];
@@ -119,6 +130,7 @@ class SiswaController extends Controller
         $tabungan->saldo = 0 ;
         $tabungan->premi = 0 ;
         $tabungan->sisa = 0 ;
+        $tabungan->buku_id =  $bukuExsist->id;
         $tabungan->user_id = User::latest()->first()->id;
 
         $tabungan->save();

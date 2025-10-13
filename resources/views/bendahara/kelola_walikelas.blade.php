@@ -59,16 +59,14 @@
                     <button type="button" 
                         class="btn  btn-primary" 
                         data-bs-toggle="modal" 
-                        data-bs-target="#tambahModal" 
-                        {{ !$buku ? 'disabled' : '' }}
-                        title="{{ !$buku ? 'Tidak ada pembukuan aktif' : '' }}">
+                        data-bs-target="#tambahModal">
                         Tambah Data
                     </button>
                 </div>
                 <form action="/bendahara/kelola-walikelas" method="GET">
                     <div class="input-group">
-                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2" {{ !$buku ? 'disabled' : '' }}>
-                        <button class="btn btn-primary" type="submit" id="button-addon2" {{ !$buku ? 'disabled' : '' }}>Cari</button>
+                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
+                        <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
                     </div>
                 </form>
             </div>
@@ -96,7 +94,7 @@
                                 <td>{{ Str::limit($users->name, 20, '...') }}</td>
                                 <td>{{ $users->username }}</td>
                                 <td>{{ Str::limit($users->email, 20, '...') }}</td>
-                                <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
+                                <td class="text-center"> {{ $users->kelas->name ?? '-' }} {{ $users->rombel->name ?? '-' }} </td>
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ Str::limit($users->alamat, 20, '...') }}</td>
                                 {{-- <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td> --}}
@@ -171,7 +169,7 @@
                             <select id="walikelas-horizontal" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }} - {{ $k->rombel }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -209,7 +207,6 @@
                         <div class="col-md-8 form-group">
                             <textarea id="address-horizontal" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
                         </div>
-                        <input type="hidden" name="buku" value="{{ $buku->id ?? null }}">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -247,7 +244,7 @@
                             <select id="edit-kelas" class="form-select" name="kelas" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }} - {{ $k->rombel }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>

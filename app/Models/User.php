@@ -25,7 +25,17 @@ class User extends Authenticatable
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class, 'rombel_id');
+    }
+
+    public function isWaliKelas()
+    {
+        return $this->roles_id == 3;
     }
 
     public function tabungan()

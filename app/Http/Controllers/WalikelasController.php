@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Kelas;
+use App\Models\Rombel;
 use App\Models\Buku;
 use Illuminate\Http\Request;
 
@@ -20,23 +21,25 @@ class WalikelasController extends Controller
         
         $tahunSekarang = date('Y');
 
-        $buku = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
+        $bukuExsist = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
 
-        if (!$buku) {
-            $buku = Buku::where('status', 1)->first();
+        if (!$bukuExsist) {
+            $bukuExsist = Buku::where('status', 1)->first();
         }
 
-        if (!$buku) {
-            session()->now('alert-type', 'warning');
-            session()->now('alert-message', 'Tidak ada pembukuan yang tersedia');
-            session()->now('alert-duration', 3000);
+        if (!$bukuExsist) {
+            return redirect()
+                    ->route('bendahara.pembukuan.index')
+                    ->with('alert-type', 'warning')
+                    ->with('alert-message', 'Tidak ada pembukuan yang tersedia')
+                    ->with('alert-duration', 3000);
         }
+        
+        $kelas = Kelas::where('buku_id', $bukuExsist->id)->get();;
 
-        $kelas = Kelas::all();
         $perPage = request('perPage', 10);
-
-        $query = User::query()->where('roles_id', 3);
-        $query->select('id','name','email','username','jenis_kelamin','kontak','password','orang_tua','alamat','kelas_id','roles_id','created_at','updated_at');
+        $query = User::with(['kelas', 'rombel'])->where('roles_id', 3)->where('buku_id', $bukuExsist->id);
+        $query->select('id','name','email','username','jenis_kelamin','kontak','password','orang_tua','alamat','kelas_id','rombel_id','roles_id','created_at','updated_at');
         $searchTerm = $request->input('search');
 
         if (!empty($searchTerm)) {
@@ -53,8 +56,7 @@ class WalikelasController extends Controller
         $query->orderBy('created_at','desc');
 
         $user = $query->paginate($perPage);
-
-        return view('bendahara.kelola_walikelas', compact('user','kelas', 'buku'));
+        return view('bendahara.kelola_walikelas', compact('user', 'kelas'));
     }
 
     /**
@@ -89,6 +91,12 @@ class WalikelasController extends Controller
             'alamat.required' => 'Alamat harus diisi.',
         ]);
 
+        $tahunSekarang = date('Y');
+        $bukuExsist = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first();
+        if (!$bukuExsist) {
+            $bukuExsist = Buku::where('status', 1)->first();
+        }
+
         $user = new User();
         $user->name = $validatedData['name'];
         $user->username = $validatedData['username'];
@@ -98,7 +106,7 @@ class WalikelasController extends Controller
         $user->kontak = $validatedData['kontak'];
         $user->alamat = $validatedData['alamat'];
         $user->kelas_id = $request->kelas;
-        $user->buku_id = $request->buku;
+        $user->buku_id = $bukuExsist->id;
         $user->roles_id = 3;
         $user->save();
 
