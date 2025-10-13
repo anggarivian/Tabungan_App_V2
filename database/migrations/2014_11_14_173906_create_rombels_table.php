@@ -16,9 +16,10 @@ class CreateRombelsTable extends Migration
         Schema::create('rombels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('walikelas');
-            $table->string('anggota')->nullable();
-            $table->foreignId('kelas_id')->constrained()->onDelete('cascade');
+            $table->foreignId('kelas_id')
+                    ->nullable()
+                    ->constrained('kelas')
+                    ->nullOnDelete();
             $table->timestamps();
         });
     }
