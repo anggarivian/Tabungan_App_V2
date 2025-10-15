@@ -27,4 +27,9 @@ class Tabungan extends Model
     {
         return $this->belongsTo(Pengajuan::class, 'pengajuan_id');
     }
+
+    public function buku()
+    {
+        return $this->belongsTo(Buku::class);
+    }
 }

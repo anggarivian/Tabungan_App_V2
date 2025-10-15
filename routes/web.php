@@ -81,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/bendahara/kelola-pembukuan/edit/{id}', [BukuController::class, 'edit'])->name('bendahara.pembukuan.edit');
         Route::put('/bendahara/kelola-pembukuan/tutup/{id}', [BukuController::class, 'tutup'])->name('bendahara.pembukuan.tutup');
         Route::get('/bendahara/kelola-pembukuan/{id}/detail', [BukuController::class, 'detail'])->name('bendahara.pembukuan.detail');
+        Route::get('/bendahara/kelola-pembukuan/{id}/filter-siswa', [BukuController::class, 'filterSiswa'])
+            ->name('bendahara.pembukuan.filterSiswa');
+        Route::get('/bendahara/kelola-pembukuan/{id}/rekap-tahunan', [BukuController::class, 'rekapTahunan'])
+            ->name('bendahara.pembukuan.rekapTahunan');
 
         // Menangani pengelolaan Walikelas.
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('bendahara.walikelas.index');

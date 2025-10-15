@@ -7,7 +7,10 @@ use App\Models\Kelas;
 use App\Models\Tabungan;
 use App\Models\Rombel;
 use App\Models\User;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class BukuController extends Controller
 {
@@ -192,11 +195,13 @@ class BukuController extends Controller
             ->with('alert-duration', 3000);
     }
 
-    public function detail($id)
+    public function detail($id, Request $request)
     {
         $buku = Buku::findOrFail($id);
+        $selectedKelas = $request->get('kelas_id');
 
-        // Load all related data filtered by buku_id
+        $kelasList = Kelas::where('buku_id', $buku->id)->orderBy('name')->get();
+
         $rombels = Rombel::with(['kelas', 'walikelas'])
             ->whereHas('kelas', fn($q) => $q->where('buku_id', $buku->id))
             ->withCount(['users as total_siswa' => function ($q) use ($buku) {
@@ -210,12 +215,112 @@ class BukuController extends Controller
             ->where('buku_id', $buku->id)
             ->get();
 
-        $siswa = User::with(['kelas', 'rombel'])
+        $siswaQuery = User::with(['kelas', 'rombel'])
             ->where('roles_id', 4)
-            ->where('buku_id', $buku->id)
+            ->where('buku_id', $buku->id);
+
+        if ($selectedKelas) {
+            $siswaQuery->where('kelas_id', $selectedKelas);
+        }
+
+        $siswa = $siswaQuery->get();
+
+        $tabungans = Kelas::where('buku_id', $buku->id)
+            ->with(['users.tabungan' => function ($q) use ($buku) {
+                $q->where('buku_id', $buku->id);
+            }])
+            ->orderBy('name')
             ->get();
 
-        return view('bendahara.pembukuan.detail', compact('buku', 'rombels', 'walikelas', 'siswa'));
+        return view('bendahara.pembukuan.detail', compact(
+            'buku',
+            'rombels',
+            'walikelas',
+            'siswa',
+            'kelasList',
+            'selectedKelas',
+            'tabungans',
+        ));
+    }
+
+    public function filterSiswa($id, Request $request)
+    {
+        $buku = Buku::findOrFail($id);
+        $kelasId = $request->get('kelas_id');
+
+        $query = User::with(['kelas', 'rombel'])
+            ->where('roles_id', 4)
+            ->where('buku_id', $buku->id);
+
+        if ($kelasId) {
+            $query->where('kelas_id', $kelasId);
+        }
+
+        $siswa = $query->get();
+
+        // Return partial view (only table rows)
+        return response()->json([
+            'html' => view('bendahara.pembukuan.partials._siswa_table_body', compact('siswa'))->render()
+        ]);
+    }
+
+    public function rekapTahunan($id)
+    {
+        $buku = Buku::findOrFail($id);
+
+        // Ambil periode dari waktu buku dibuat dan terakhir diupdate
+        $periodeStart = Carbon::parse($buku->created_at)->translatedFormat('d F Y');
+        $periodeEnd = Carbon::parse($buku->updated_at)->translatedFormat('d F Y');
+
+        // Total siswa
+        $totalSiswa = User::where('roles_id', 4)->where('buku_id', $buku->id)->count();
+
+        // Total saldo keseluruhan
+        $totalSaldo = Tabungan::where('buku_id', $buku->id)->sum('saldo');
+
+        // Total masuk & keluar dari transaksi
+        $totalMasuk = Transaksi::whereHas('tabungan', function($q) use($buku){
+                            $q->where('buku_id', $buku->id);
+                        })
+                        ->where('tipe_transaksi', 'masuk')
+                        ->sum('jumlah_transaksi');
+
+        $totalKeluar = Transaksi::whereHas('tabungan', function($q) use($buku){
+                            $q->where('buku_id', $buku->id);
+                        })
+                        ->where('tipe_transaksi', 'keluar')
+                        ->sum('jumlah_transaksi');
+
+        // Breakdown per kelas
+        $kelasData = Kelas::where('buku_id', $buku->id)
+            ->with(['users.tabungan'])
+            ->get()
+            ->map(function($kelas){
+                $totalSaldo = $kelas->users->sum(fn($u) => $u->tabungan->saldo ?? 0);
+                $jumlahSiswa = $kelas->users->count();
+                $rataRata = $jumlahSiswa > 0 ? round($totalSaldo / $jumlahSiswa) : 0;
+                return [
+                    'kelas' => $kelas->name,
+                    'jumlah_siswa' => $jumlahSiswa,
+                    'total_saldo' => $totalSaldo,
+                    'rata_rata' => $rataRata,
+                ];
+            });
+
+        // Generate PDF
+        $pdf = Pdf::loadView('bendahara.pembukuan.pdf.rekap_tahunan', [
+            'buku' => $buku,
+            'periodeStart' => $periodeStart,
+            'periodeEnd' => $periodeEnd,
+            'totalSiswa' => $totalSiswa,
+            'totalSaldo' => $totalSaldo,
+            'totalMasuk' => $totalMasuk,
+            'totalKeluar' => $totalKeluar,
+            'kelasData' => $kelasData,
+            'pembuat' => auth()->user()->name ?? 'Operator Sekolah'
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Rekap-Tahun-' . $buku->tahun . '.pdf');
     }
 
 }

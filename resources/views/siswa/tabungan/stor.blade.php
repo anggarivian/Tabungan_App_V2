@@ -185,11 +185,11 @@
                                     <div class="col-12 col-sm-12 col-md-4 col-lg-4"></div>
                                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                         <div class="d-flex justify-content-between">
-                                            @if(auth()->user()->username == '999')
-                                                <button class="btn btn-primary" style="width: 100%" type="submit">Lanjut Bayar</button>
+                                            <button class="btn btn-primary" style="width: 100%" type="submit">Lanjut Bayar</button>
+                                            {{-- @if(auth()->user()->username == '999')
                                             @else
                                                 <button class="btn btn-primary" style="width: 100%" disabled>Segera Hadir ... !</button>
-                                            @endif
+                                            @endif --}}
                                         </div>
                                     </div>
                                 </div>
