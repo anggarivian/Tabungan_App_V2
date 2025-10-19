@@ -20,7 +20,7 @@ class Tabungan extends Model
 
     public function transaksi()
     {
-        return $this->belongsTo(Transaksi::class, 'transaksi_id');
+        return $this->hasMany(Transaksi::class);
     }
 
     public function pengajuan()

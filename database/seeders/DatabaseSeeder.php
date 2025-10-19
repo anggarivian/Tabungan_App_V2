@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CreateKelasSeeder::class,
             CreateRombelSeeder::class,
             CreateUserSeeder::class,
+            TransaksiSeeder::class,
             // CreateTabunganSeeder::class,
         ]);
     }
