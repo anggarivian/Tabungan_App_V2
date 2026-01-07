@@ -229,6 +229,72 @@
                 </div>
             </div>
         @endif
+
+        <!-- Tabel Riwayat Stor Tabungan -->
+        <div class="col-12 mt-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="fw-bold text-primary mb-3">
+                        Riwayat Stor Tabungan Digital
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center" style="width:5%">No</th>
+                                    <th>Tanggal dan Waktu</th>
+                                    <th class="text-center">Nominal</th>
+                                    <th class="text-center">Saldo Awal</th>
+                                    <th class="text-center">Saldo Akhir</th>
+                                    <th class="text-center">Pembayaran</th>
+                                    <th class="text-center">Bukti Transaksi</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($transaksis as $i => $trx)
+                                    <tr>
+                                        <td class="text-center">{{ $i + 1 }}</td>
+                                        <td>{{ $trx->created_at->translatedFormat('d M Y, H:i') }}</td>
+                                        <td class="text-center fw-bold text-success">Rp {{ number_format($trx->jumlah_transaksi, 0, ',', '.') }}</td>
+                                        <td class="text-center">Rp {{ number_format($trx->saldo_awal, 0, ',', '.') }}</td>
+                                        <td class="text-center">Rp {{ number_format($trx->saldo_akhir, 0, ',', '.') }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">{{ $trx->pembayaran }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($trx->bukti_transaksi)
+                                                <a href="{{ asset('storage/' . $trx->bukti_transaksi) }}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+                                                    <i class="bi bi-eye"></i> Lihat
+                                                </a>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="openUploadModal({{ $trx->id }})">
+                                                    <i class="bi bi-upload"></i> Ganti
+                                                </button>
+                                            @else
+                                                <button class="btn btn-sm btn-outline-success" onclick="openUploadModal({{ $trx->id }})">
+                                                    <i class="bi bi-upload"></i> Upload
+                                                </button>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success">{{ ucfirst($trx->status) }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">Belum ada riwayat transaksi digital.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        {{-- <div class="d-flex justify-content-center mt-3">
+                            {{ $transaksis->links() }}
+                        </div> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -254,6 +320,33 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Upload Bukti Transaksi --}}
+<div class="modal fade modal-borderless" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload Bukti Transaksi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="bukti_transaksi" class="form-label">Pilih Gambar Bukti</label>
+                        <input class="form-control" type="file" name="bukti_transaksi" id="bukti_transaksi" accept="image/*" required>
+                        <small class="text-muted">Format yang diperbolehkan: JPG, JPEG, PNG. Maks 2MB.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('js')
@@ -264,6 +357,14 @@
 
         var myModal = new bootstrap.Modal(document.getElementById('batalModal'));
         myModal.show();
+    }
+
+     function openUploadModal(id) {
+        const form = document.getElementById('uploadForm')
+        form.action = '/siswa/tabungan/stor/upload-bukti/' + id
+        
+        const modal = new bootstrap.Modal(document.getElementById('uploadModal'))
+        modal.show()
     }
 </script>
 @endsection

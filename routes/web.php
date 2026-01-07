@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
         // Menangani siswa stor tabungan Digital.
         Route::get('/siswa/tabungan/stor', [TabunganController::class, 'siswa_stor'])->name('siswa.tabungan.stor');
         Route::post('/siswa/tabungan/stor', [TabunganController::class, 'createInvoice'])->name('siswa.tabungan.store');
+        Route::post('/siswa/tabungan/stor/upload-bukti/{id}', [TabunganController::class, 'uploadBukti'])->name('siswa.tabungan.uploadBukti');
         Route::delete('/siswa/tabungan/stor/batal/{id}', [TabunganController::class, 'batal'])->name('siswa.batal.stor');
 
         // Menangani pengajuan penarikan tabungan Tunai / Digital.

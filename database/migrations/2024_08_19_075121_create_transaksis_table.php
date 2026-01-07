@@ -21,6 +21,7 @@ class CreateTransaksisTable extends Migration
             $table->string('tipe_transaksi');
             $table->string('pembayaran');
             $table->string('pembuat');
+            $table->string('bukti_transaksi')->nullable();
             $table->string('checkout_link')->nullable();
             $table->string('external_id')->nullable();
             $table->string('status')->default('pending');

@@ -118,12 +118,15 @@
                                     Stor Per Kelas
                                 </button>
                                 <ul class="dropdown-menu w-100" style="z-index: 1050;">
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/1">Kelas 1</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/2">Kelas 2</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/3">Kelas 3</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/4">Kelas 4</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/5">Kelas 5</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/6">Kelas 6</a></li>
+                                    @forelse($kelasAktif as $kelas)
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url('/bendahara/tabungan/stor/kelas/' . $kelas->id) }}">
+                                                {{ $kelas->name }}
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li><span class="dropdown-item text-muted">Tidak ada kelas aktif</span></li>
+                                    @endforelse
                                 </ul>
                             </div>
                         </div>

@@ -9,6 +9,7 @@ use App\Models\User;
 use Xendit\Invoices;
 use App\Models\Kelas;
 use App\Models\Tabungan;
+use App\Models\Buku;
 use App\Models\Pengajuan;
 use App\Models\Transaksi;
 use Xendit\Configuration;
@@ -52,76 +53,115 @@ class TabunganController extends Controller
     {
         $perPage = request('perPage', 10);
         $kelasList = [];
+        $tahunSekarang = date('Y');
+
+        $bukuExsist = Buku::where('tahun', $tahunSekarang)->where('status', 1)->first()
+            ?? Buku::where('status', 1)->first();
+
+        if (!$bukuExsist) {
+            return redirect()
+                ->route('bendahara.pembukuan.index')
+                ->with('alert-type', 'warning')
+                ->with('alert-message', 'Tidak ada pembukuan yang tersedia')
+                ->with('alert-duration', 3000);
+        }
 
         for ($i = 1; $i <= 7; $i++) {
             $transaksi = Transaksi::whereHas('user.kelas', fn($q) => $q->where('kelas_id', $i))
+                ->whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
                 ->whereDate('created_at', Carbon::today())
                 ->where('status', 'success')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 
             $stor = Transaksi::whereHas('user.kelas', fn($q) => $q->where('kelas_id', $i))
+                ->whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
                 ->where('tipe_transaksi', 'Stor')
                 ->where('status', 'success')
                 ->whereDate('created_at', Carbon::today())
                 ->sum('jumlah_transaksi');
 
             $tarik = Transaksi::whereHas('user.kelas', fn($q) => $q->where('kelas_id', $i))
+                ->whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
                 ->where('tipe_transaksi', 'Tarik')
                 ->where('status', 'success')
                 ->whereDate('created_at', Carbon::today())
                 ->sum('jumlah_transaksi');
 
             $kelasList["kelas$i"] = [
-                'data' => $transaksi,
-                'stor' => $stor,
-                'tarik'=> $tarik,
+                'data'  => $transaksi,
+                'stor'  => $stor,
+                'tarik' => $tarik,
             ];
         }
 
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
+        $transaksi_masuk = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Stor')
             ->where('status', 'success')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi');
 
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
+        $transaksi_keluar = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Tarik')
             ->where('status', 'success')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi');
 
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')
+        $jumlah_saldo_tunai = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Stor')
             ->where('status', 'success')
             ->where('pembayaran', 'Tunai')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi')
-            - Transaksi::where('tipe_transaksi', 'Tarik')
+            - Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Tarik')
             ->where('status', 'success')
             ->where('pembayaran', 'Tunai')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi');
 
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')
+        $jumlah_saldo_digital = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Stor')
             ->where('status', 'success')
             ->where('pembayaran', 'Digital')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi')
-            - Transaksi::where('tipe_transaksi', 'Tarik')
+            - Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Tarik')
             ->where('status', 'success')
             ->where('pembayaran', 'Digital')
             ->whereDate('created_at', Carbon::today())
             ->sum('jumlah_transaksi');
 
-        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
-            ->where('created_at', '>=', Carbon::today()->startOfDay())
-            ->count();
-        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+        $storKali = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Stor')
             ->where('status', 'success')
             ->where('created_at', '>=', Carbon::today()->startOfDay())
             ->count();
 
-        return view('bendahara.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelasList', 'storKali', 'tarikKali'));
+        $tarikKali = Transaksi::whereHas('tabungan', fn($t) => $t->where('buku_id', $bukuExsist->id))
+            ->where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->where('created_at', '>=', Carbon::today()->startOfDay())
+            ->count();
+
+        $kelasAktif = Kelas::whereHas('users.tabungan', function ($q) use ($bukuExsist) {
+                $q->where('buku_id', $bukuExsist->id);
+            })->get();
+
+        // dd($kelasAktif);
+        return view('bendahara.tabungan.index', compact(
+            'transaksi_masuk',
+            'transaksi_keluar',
+            'jumlah_saldo_tunai',
+            'jumlah_saldo_digital',
+            'kelasList',
+            'storKali',
+            'tarikKali',
+            'kelasAktif'
+        ));
     }
+
 
     /**
     * Import Data Transaksi Tabungan oleh Bendahara.
@@ -788,8 +828,50 @@ class TabunganController extends Controller
             }
         }
 
-        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice'));
+        $transaksis = Transaksi::where('user_id', $user->id)
+            ->where('tipe_transaksi', 'Stor')
+            ->where('pembayaran', 'Digital')
+            ->where('status', 'success')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice', 'transaksis'));
     }
+
+    /**
+    * Upload Bukti Transaksi Digital.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
+   public function uploadBukti(Request $request, $id)
+    {
+        $request->validate([
+            'bukti_transaksi' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'bukti_transaksi.required' => 'Harap pilih gambar bukti transaksi.',
+            'bukti_transaksi.image' => 'File harus berupa gambar.',
+            'bukti_transaksi.mimes' => 'Format gambar harus JPG, JPEG, atau PNG.',
+            'bukti_transaksi.max' => 'Ukuran gambar maksimal 2MB.',
+        ]);
+
+        $transaksi = Transaksi::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Simpan gambar ke storage
+        if ($request->hasFile('bukti_transaksi')) {
+            $path = $request->file('bukti_transaksi')->store('bukti_transaksi', 'public');
+            $transaksi->bukti_transaksi = $path;
+            $transaksi->save();
+        }
+
+        return back()->with([
+            'alert-message' => 'Bukti transaksi berhasil diunggah!',
+            'alert-type' => 'success'
+        ]);
+    }
+
 
     /**
     * Menampilkan Batal Stor Tabungan oleh Siswa.
