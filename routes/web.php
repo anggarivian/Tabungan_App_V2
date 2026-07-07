@@ -7,6 +7,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\RombelController;
+use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TabunganController;
@@ -88,6 +89,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/bendahara/kelola-siswa/edit/{id}', [SiswaController::class, 'edit'])->name('bendahara.siswa.edit');
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('bendahara.siswa.delete');
         Route::post('/bendahara/kelola-siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
+
+        // Menangani pengelolaan Periode.
+        Route::resource('bendahara/periode', PeriodeController::class );
+        Route::put( 'bendahara/periode/{periode}/aktifkan', [PeriodeController::class,'aktifkan'])->name('bendahara.periode.aktifkan');
+        Route::get('/bendahara/kelola-periode', [PeriodeController::class, 'index'])->name('bendahara.periode.index');
+        Route::post('/bendahara/kelola-periode/store', [PeriodeController::class, 'store'])->name('bendahara.periode.store');
+        Route::put('/bendahara/kelola-periode/{periode}/update', [PeriodeController::class, 'update'])->name('bendahara.periode.update');
+        Route::put('/bendahara/kelola-periode/{periode}/aktifkan', [PeriodeController::class, 'aktifkan'])->name('bendahara.periode.aktifkan');
 
         // Menangani pengelolaan Rombel (kelas).
         Route::get('/bendahara/kelola-rombel', [RombelController::class, 'index'])->name('bendahara.rombel.index');

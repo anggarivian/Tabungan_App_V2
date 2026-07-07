@@ -20,6 +20,7 @@ class CreateTabunganSeeder extends Seeder
             'premi' => 0,
             'sisa' => 0,
             'user_id' => 2,
+            'periode_id' => 1,
         ]);
     }
 }

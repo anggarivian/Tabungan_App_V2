@@ -16,6 +16,7 @@ use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Helpers\RupiahHelper;
+use App\Helpers\PeriodeHelper;
 use Xendit\Invoice\InvoiceApi;
 use App\Mail\TabunganTarikMail;
 use App\Mail\TabunganStoredMail;
@@ -255,7 +256,7 @@ class TabunganController extends Controller
         ]);
 
         $user = User::where('username', $validated['username'])->firstOrFail();
-        $tabungan = $user->tabungan;
+        $tabungan = Tabungan::where('user_id',$user->id)->where('periode_id',PeriodeHelper::id())->first();
 
         $awal = $tabungan->saldo;
         $stor = $validated['jumlah_stor'];
@@ -273,6 +274,7 @@ class TabunganController extends Controller
             'status'           => 'success',
             'pembuat'          => auth()->user()->name,
             'token_stor'       => Str::random(10),
+            'periode_id'       => \App\Helpers\PeriodeHelper::id(),
         ]);
         $transaksi->user()->associate($user);
         $transaksi->tabungan()->associate($tabungan);
@@ -406,7 +408,7 @@ class TabunganController extends Controller
         ]);
 
         $user     = User::where('username', $validated['username'])->firstOrFail();
-        $tabungan = $user->tabungan;
+        $tabungan = Tabungan::where('user_id',$user->id)->where('periode_id',PeriodeHelper::id())->first();
         $awal     = $tabungan->saldo;
 
         $tarik = $validated['jumlah_tarik'];

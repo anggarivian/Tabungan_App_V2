@@ -12,13 +12,13 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
                     @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('kepsek.dashboard') }}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('bendahara.dashboard') }}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('walikelas.dashboard') }}">Dashboard</a></li>
                     @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('siswa.dashboard') }}">Dashboard</a></li>
                     @endif
                     <li class="breadcrumb-item active" aria-current="page">Laporan Transaksi</li>
                 </ol>
@@ -26,79 +26,187 @@
         </div>
     </div>
 </div>
+
 <div class="page-content">
-    <div class="card shadow">
-        <div class="card-body" style="margin-bottom: -20px">
-            <form action="/kepsek/laporan/transaksi" method="GET">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <p class="card-title" style="margin-bottom: 20px">Filter :</p>
+    <div class="card shadow mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-funnel"></i> Filter Laporan</h6>
+                <button class="btn btn-sm btn-outline-primary" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#filterCollapse"
+                    aria-expanded="false" aria-controls="filterCollapse"
+                    id="filterToggleBtn">
+                    <span class="toggle-text">Tampilkan Filter</span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </button>
+            </div>
+
+            {{-- Default collapsed, otomatis kebuka kalau ada filter aktif --}}
+            <div class="collapse {{ request()->anyFilled(['search', 'kelas', 'tipe_transaksi', 'tipe_pembayaran', 'start_date', 'end_date']) ? 'show' : '' }} mt-3"
+                id="filterCollapse">
+                <form action="{{ url()->current() }}" method="GET" id="filterForm">
+                    <div class="row g-3 align-items-end">
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="search" class="form-label small text-muted mb-1">Cari</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="bi bi-search" style="margin-top:-10px"></i></span>
+                                <input type="text" class="form-control" name="search" id="search"
+                                    value="{{ request('search') }}" placeholder="Nama / Username">
+                            </div>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <input type="text" class="form-control" style="margin-bottom: 20px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari Nama / ID Tabungan...">
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" style="margin-bottom: 20px" name="kelas" id="kelas">
-                                <option value="">Kelas</option>
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="kelas" class="form-label small text-muted mb-1">Kelas</label>
+                            <select class="form-select" name="kelas" id="kelas">
+                                <option value="">Semua Kelas</option>
                                 @foreach ($kelasList as $kelas)
                                     <option value="{{ $kelas->id }}"
-                                        {{ request('kelas') == $kelas->id ? 'selected' : '' }}>
+                                        {{ (string) request('kelas') === (string) $kelas->id ? 'selected' : '' }}>
                                         {{ $kelas->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" style="margin-bottom: 20px" name="tipe_transaksi" id="tipe_transaksi">
-                                <option value="">Transaksi</option>
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="tipe_transaksi" class="form-label small text-muted mb-1">Transaksi</label>
+                            <select class="form-select" name="tipe_transaksi" id="tipe_transaksi">
+                                <option value="">Semua</option>
                                 <option value="stor" {{ request('tipe_transaksi') == 'stor' ? 'selected' : '' }}>Stor</option>
                                 <option value="tarik" {{ request('tipe_transaksi') == 'tarik' ? 'selected' : '' }}>Tarik</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" style="margin-bottom: 20px" name="sort_tanggal" id="sort_tanggal">
-                                <option value="">Urutkan Tanggal</option>
-                                <option value="desc" {{ request('sort_tanggal') == 'desc' ? 'selected' : '' }}>Terbaru</option>
-                                <option value="asc" {{ request('sort_tanggal') == 'asc' ? 'selected' : '' }}>Terlama</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <select class="form-select" style="margin-bottom: 20px" name="tipe_pembayaran" id="tipe_pembayaran">
-                                <option value="">Pembayaran</option>
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="tipe_pembayaran" class="form-label small text-muted mb-1">Pembayaran</label>
+                            <select class="form-select" name="tipe_pembayaran" id="tipe_pembayaran">
+                                <option value="">Semua</option>
                                 <option value="online" {{ request('tipe_pembayaran') == 'online' ? 'selected' : '' }}>Online</option>
                                 <option value="offline" {{ request('tipe_pembayaran') == 'offline' ? 'selected' : '' }}>Offline</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-6 mb-2 mb-lg-0">
-                            <p class="card-title text-end" style="margin-top: 7px">Dari :</p>
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="sort_tanggal" class="form-label small text-muted mb-1">Urutkan Tanggal</label>
+                            <select class="form-select" name="sort_tanggal" id="sort_tanggal">
+                                <option value="desc" {{ request('sort_tanggal', 'desc') == 'desc' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="asc" {{ request('sort_tanggal') == 'asc' ? 'selected' : '' }}>Terlama</option>
+                            </select>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <input type="date" class="form-control" name="start_date" value="{{ request('start_date') }}" placeholder="Tanggal Mulai">
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="start_date" class="form-label small text-muted mb-1">Dari Tanggal</label>
+                            <input type="date" class="form-control" name="start_date" id="start_date"
+                                value="{{ request('start_date') }}">
                         </div>
-                        <div class="col-12 col-md-6 col-lg-1 mb-2 mb-lg-0">
-                            <p class="card-title text-end" style="margin-top: 7px">s/d :</p>
+
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label for="end_date" class="form-label small text-muted mb-1">Sampai Tanggal</label>
+                            <input type="date" class="form-control" name="end_date" id="end_date"
+                                value="{{ request('end_date') }}">
                         </div>
-                        <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                            <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" placeholder="Tanggal Akhir">
-                        </div>
-                        <div class="col-12 col-md-12 col-lg-1 mb-2 mb-lg-0">
-                            <button type="submit" class="btn btn-primary w-100">
-                                Cari
+
+                        <div class="col-6 col-md-3 col-lg-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="bi bi-search"></i> Cari
                             </button>
+                            <a href="{{ url()->current() }}" class="btn btn-outline-secondary" title="Reset Filter">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
                         </div>
                     </div>
+
+                    <input type="hidden" name="perPage" value="{{ request('perPage', 10) }}">
+                </form>
+            </div>
+
+            {{-- Badge filter aktif, tetap keliatan walau form disembunyiin --}}
+            @if (request()->anyFilled(['search', 'kelas', 'tipe_transaksi', 'tipe_pembayaran', 'start_date', 'end_date']))
+                <div class="mt-3 d-flex align-items-center flex-wrap gap-2">
+                    <span class="text-muted small">Filter aktif:</span>
+
+                    @if (request('search'))
+                        <span class="badge bg-light text-dark border">Cari: "{{ request('search') }}"</span>
+                    @endif
+
+                    @if (request('kelas'))
+                        <span class="badge bg-light text-dark border">
+                            Kelas: {{ $kelasList->firstWhere('id', request('kelas'))->name ?? '-' }}
+                        </span>
+                    @endif
+
+                    @if (request('tipe_transaksi'))
+                        <span class="badge bg-light text-dark border">
+                            Transaksi: {{ ucfirst(request('tipe_transaksi')) }}
+                        </span>
+                    @endif
+
+                    @if (request('tipe_pembayaran'))
+                        <span class="badge bg-light text-dark border">
+                            Pembayaran: {{ ucfirst(request('tipe_pembayaran')) }}
+                        </span>
+                    @endif
+
+                    @if (request('start_date'))
+                        <span class="badge bg-light text-dark border">Dari: {{ request('start_date') }}</span>
+                    @endif
+
+                    @if (request('end_date'))
+                        <span class="badge bg-light text-dark border">Sampai: {{ request('end_date') }}</span>
+                    @endif
+
+                    <a href="{{ url()->current() }}" class="badge bg-danger text-decoration-none">
+                        <i class="bi bi-x-circle"></i> Reset
+                    </a>
                 </div>
-            </form>
-
+            @endif
         </div>
+    </div>
 
+    {{-- Summary cards --}}
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-lg-4">
+            <div class="card shadow-sm border-start border-primary border-4">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Total Transaksi</div>
+                    <div class="fs-5 fw-semibold">{{ number_format($totalTransaksi) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-4">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Total Stor</div>
+                    <div class="fs-5 fw-semibold">Rp {{ number_format($totalStor) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-4">
+            <div class="card shadow-sm border-start border-danger border-4">
+                <div class="card-body py-3">
+                    <div class="text-muted small">Total Tarik</div>
+                    <div class="fs-5 fw-semibold">Rp {{ number_format($totalTarik) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
         <div class="card-body pb-1 pt-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small">
+                    Menampilkan {{ $transaksi->firstItem() ?? 0 }}–{{ $transaksi->lastItem() ?? 0 }}
+                    dari {{ $transaksi->total() }} transaksi
+                </span>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover" style="width: 100%">
+                <table class="table table-hover align-middle" style="width: 100%">
                     <thead>
                         <tr>
-                            <th colspan="1" class="text-center">No.</th>
+                            <th class="text-center">No.</th>
                             <th class="text-center">ID</th>
                             <th>Nama</th>
                             <th class="text-center">Kelas</th>
@@ -113,59 +221,86 @@
                     <tbody>
                         @forelse ($transaksi as $transaksis)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $transaksi->firstItem() + $loop->index }}</td>
                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                 <td>{{ Str::limit($transaksis->user->name, 20, '...') }}</td>
                                 <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
-                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0 ) }}</td>
-                                <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0 ) }}</td>
-                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0 ) }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0) }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</td>
+                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
                                 <td class="text-center">
-                                    @if ($transaksis->tipe_transaksi == 'Stor')
+                                    @if (strtolower($transaksis->tipe_transaksi) == 'stor')
                                         <span class="badge bg-success">Stor</span>
-                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
-                                    @elseif ($transaksis->tipe_transaksi == 'Tarik')
+                                        <span class="badge bg-light text-dark">{{ $transaksis->pembayaran ?? '-' }}</span>
+                                    @elseif (strtolower($transaksis->tipe_transaksi) == 'tarik')
                                         <span class="badge bg-danger">Tarik</span>
-                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
+                                        <span class="badge bg-light text-dark">{{ $transaksis->pembayaran ?? '-' }}</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
-                                        <span class="badge bg-light">-</span>
+                                        <span class="badge bg-light text-dark">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ Str::limit($transaksis->pembuat, 10, '...')}}</td>
+                                <td class="text-center">{{ Str::limit($transaksis->pembuat, 10, '...') }}</td>
                                 <td class="text-center">{{ \Carbon\Carbon::parse($transaksis->created_at)->format('d M Y H:i') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center">Data Kosong</td>
+                                <td colspan="10" class="text-center py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2 text-muted"></i>
+                                    Tidak ada data yang cocok dengan filter.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-between">
-                    <form method="GET" action="{{ request()->url() }}">
-                        <div class="d-flex justify-content-end mb-3">
-                            <label for="perPage" style="margin-top: 3px">Show</label>
-                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
-                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
-                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <form method="GET" action="{{ url()->current() }}" id="perPageForm">
+                        @foreach (request()->except(['perPage', 'page']) as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+
+                        <div class="d-flex align-items-center mb-3">
+                            <label for="perPage" class="me-2 mb-0">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm"
+                                style="width: auto" onchange="this.form.submit()">
+                                @foreach ([10, 25, 50, 75, 100] as $option)
+                                    <option value="{{ $option }}" {{ request('perPage', 10) == $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </form>
-                    <div class="justify-content-end">
-                        {{ $transaksi->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+
+                    <div>
+                        {{ $transaksi->links('layout.pagination.bootstrap-5') }}
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 @endsection
 
 @section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const filterCollapse = document.getElementById('filterCollapse');
+    const toggleBtn = document.getElementById('filterToggleBtn');
+    const toggleText = toggleBtn.querySelector('.toggle-text');
+    const toggleIcon = toggleBtn.querySelector('.toggle-icon');
 
+    function updateBtnState(isOpen) {
+        toggleText.textContent = isOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter';
+        toggleIcon.classList.toggle('bi-chevron-down', !isOpen);
+        toggleIcon.classList.toggle('bi-chevron-up', isOpen);
+    }
+
+    updateBtnState(filterCollapse.classList.contains('show'));
+
+    filterCollapse.addEventListener('shown.bs.collapse', () => updateBtnState(true));
+    filterCollapse.addEventListener('hidden.bs.collapse', () => updateBtnState(false));
+});
+</script>
 @endsection

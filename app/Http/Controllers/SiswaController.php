@@ -103,7 +103,8 @@ class SiswaController extends Controller
         $tabungan->saldo = 0 ;
         $tabungan->premi = 0 ;
         $tabungan->sisa = 0 ;
-        $tabungan->user_id = User::latest()->first()->id;
+        $tabungan->user_id = $user->id;
+        $tabungan->periode_id = \App\Helpers\PeriodeHelper::id();
 
         $tabungan->save();
 

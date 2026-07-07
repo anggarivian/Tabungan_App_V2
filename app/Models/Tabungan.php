@@ -23,8 +23,18 @@ class Tabungan extends Model
         return $this->belongsTo(Transaksi::class, 'transaksi_id');
     }
 
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class, 'tabungan_id');
+    }
+
     public function pengajuan()
     {
         return $this->belongsTo(Pengajuan::class, 'pengajuan_id');
+    }
+
+    public function periode()
+    {
+        return $this->belongsTo(Periode::class);
     }
 }

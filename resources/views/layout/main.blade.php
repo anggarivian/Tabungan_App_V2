@@ -319,46 +319,16 @@
             <header class="mb-5">
                 <div class="header-top shadow-sm">
                     <div class="container">
-                        <a class="d-flex" href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
-                            <img id="logo-img" src="{{ asset('Logo Normal.svg') }}" height="40px" width="190px" alt="Logo">
-                        </a>
-                        <div class="header-top-right">
-                            <div class="d-none d-md-flex">
-                                <div class="text text-end">
-                                    <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6>
-                                    @php
-                                        $roles = [
-                                            1 => 'Kepala Sekolah',
-                                            2 => 'Bendahara',
-                                            3 => 'Walikelas',
-                                            4 => 'Siswa'
-                                        ];
-                                    @endphp
-                                    <p class="user-dropdown-status text-sm text-muted">
-                                        {{ $roles[auth()->user()->roles_id] }}
-                                        @if(auth()->user()->roles_id == 3)
-                                            {{ auth()->user()->kelas->name }}
-                                        @elseif(auth()->user()->roles_id == 4)
-                                            Kelas
-                                            {{ auth()->user()->kelas->name }}
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="avatar avatar-md2" style="margin-left: 20px">
-                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
-                                </div>
-                            </div>
-                            <div class="d-md-none">
-                                <div class="avatar avatar-md2">
-                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
-                                </div>
-                            </div>
-
-                            <!-- Burger button responsive -->
-                            <a href="#" class="burger-btn d-block d-xl-none">
-                                <i class="bi bi-justify fs-3"></i>
+                        <div class="row"  style="margin-bottom: -10px">
+                            <a class="d-flex" href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}">
+                                <img id="logo-img" src="{{ asset('Logo Normal.svg') }}" height="35px" width="170px" alt="Logo">
                             </a>
+                            <small class="text-muted ms-1" style="font-size: 12px">
+                                Periode :
+                                <span class="fw-semibold text-primary">{{ App\Helpers\PeriodeHelper::nama() }}</span>
+                            </small>
                         </div>
+                        <div class="header-top-right"> <div class="d-none d-md-flex"> <div class="text text-end"> <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6> @php $roles = [ 1 => 'Kepala Sekolah', 2 => 'Bendahara', 3 => 'Walikelas', 4 => 'Siswa' ]; @endphp <p class="user-dropdown-status text-sm text-muted"> {{ $roles[auth()->user()->roles_id] }} @if(auth()->user()->roles_id == 3) {{ auth()->user()->kelas->name }} @elseif(auth()->user()->roles_id == 4) Kelas {{ auth()->user()->kelas->name }} @endif </p> </div> <div class="avatar avatar-md2" style="margin-left: 20px"> <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar"> </div> </div> <div class="d-md-none"> <div class="avatar avatar-md2"> <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar"> </div> </div> <!-- Burger button responsive --> <a href="#" class="burger-btn d-block d-xl-none"> <i class="bi bi-justify fs-3"></i> </a> </div>
                     </div>
                 </div>
                 <nav class="main-navbar shadow-sm">
@@ -387,6 +357,22 @@
                             <li class="menu-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                                 <a href="{{ route ('siswa.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-speedometer2"></i><span>Dashboard</span>
+                                </a>
+                            </li>
+                            @endif
+                            {{-- Periode Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
+                            @if( auth()->user()->roles_id == 2 )
+                            <li class="menu-item {{ request()->routeIs('bendahara.periode*') ? 'active' : '' }}">
+                                <a href="{{ route ('bendahara.periode.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi bi-calendar2-week" style="margin-top: -6px"></i><span>Periode</span>
+                                </a>
+                            </li>
+                            @endif
+                            {{-- Rombel Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
+                            @if( auth()->user()->roles_id == 2 )
+                            <li class="menu-item {{ request()->routeIs('bendahara.rombel*') ? 'active' : '' }}">
+                                <a href="{{ route ('bendahara.rombel.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-people"></i><span>Rombel</span>
                                 </a>
                             </li>
                             @endif
@@ -520,14 +506,6 @@
                                         </ul>
                                     </div>
                                 </div>
-                            </li>
-                            @endif
-                            {{-- Rombel Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('rombel*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.rombel.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi-people"></i><span>Rombel</span>
-                                </a>
                             </li>
                             @endif
                             {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}

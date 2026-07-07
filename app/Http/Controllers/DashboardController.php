@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Tabungan;
 use App\Models\Transaksi;
+use App\Helpers\PeriodeHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -71,14 +72,14 @@ class DashboardController extends Controller
 
     public function kepsek(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
-            ->where('tipe_transaksi', 'stor')
+            ->where('tipe_transaksi', 'stor')->where('periode_id',PeriodeHelper::id())
             ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
@@ -91,7 +92,7 @@ class DashboardController extends Controller
             });
 
         $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -105,10 +106,10 @@ class DashboardController extends Controller
             }, collect());
 
         $storKali = Transaksi::where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->count();
         $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->count();
 
         return view('kepsek.index', compact(
@@ -136,16 +137,16 @@ class DashboardController extends Controller
 
     public function bendahara(){
         $jumlah_penabung = User::where('roles_id', 4)->count();
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
-        $premi = Tabungan::sum('premi');
+        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $premi = Tabungan::where('periode_id',PeriodeHelper::id())->sum('premi');
         $bendahara = Tabungan::where('user_id', 2)->first();
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
-            ->where('tipe_transaksi', 'stor')
+            ->where('tipe_transaksi', 'stor')->where('periode_id',PeriodeHelper::id())
             ->where('status', 'success')
             ->groupBy('date')
             ->orderBy('date', 'asc')
@@ -158,7 +159,7 @@ class DashboardController extends Controller
             });
 
         $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get()
@@ -172,10 +173,10 @@ class DashboardController extends Controller
             }, collect());
 
         $storKali = Transaksi::where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->count();
         $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->count();
 
         return view('bendahara.index', compact(

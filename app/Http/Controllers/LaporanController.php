@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Kelas;
 use App\Models\Pengajuan;
 use App\Models\Transaksi;
+use App\Helpers\PeriodeHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,37 +20,57 @@ class LaporanController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function lap_kepsek_tabungan(Request $request){
-        $search = $request->input('search');
-        $kelas = $request->input('kelas');
+    public function lap_kepsek_tabungan(Request $request)
+    {
+        $search    = $request->input('search');
+        $kelas     = $request->input('kelas');
         $sortSaldo = $request->input('sort_saldo');
-        $perPage = request('perPage', 10);
+        $minSaldo  = $request->input('min_saldo');
+        $maxSaldo  = $request->input('max_saldo');
+        $perPage   = $request->input('perPage', 10);
+        $periodeId = PeriodeHelper::id();
 
-        $user = User::with(['tabungan', 'kelas'])
-            ->whereHas('tabungan')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('username', 'like', '%' . $search . '%')
-                    ->orWhereHas('tabungan', function ($q) use ($search) {
-                        $q->where('id', 'like', '%' . $search . '%');
-                    });
+        $query = User::with(['kelas', 'tabungan' => function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            }])
+            ->whereHas('tabungan', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($kelas, function ($query) use ($kelas) {
-                $query->whereHas('kelas', function ($q) use ($kelas) {
-                    $q->where('name', $kelas);
-                });
+            ->when($kelas, function ($q) use ($kelas) {
+                $q->where('kelas_id', $kelas);
             })
-            ->withSum('tabungan as total_saldo', 'saldo');
+            ->withSum(['tabungan as total_saldo' => function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            }], 'saldo')
+            ->when($minSaldo !== null && $minSaldo !== '', function ($q) use ($minSaldo) {
+                $q->having('total_saldo', '>=', $minSaldo);
+            })
+            ->when($maxSaldo !== null && $maxSaldo !== '', function ($q) use ($maxSaldo) {
+                $q->having('total_saldo', '<=', $maxSaldo);
+            });
 
-        if ($sortSaldo === 'asc' || $sortSaldo === 'desc') {
-            $user->orderBy('total_saldo', $sortSaldo);
+        if (in_array($sortSaldo, ['asc', 'desc'])) {
+            $query->orderBy('total_saldo', $sortSaldo);
+        } else {
+            $query->orderBy('name', 'asc');
         }
 
-        $user = $user->paginate($perPage);
+        $totalSantri = (clone $query)->count();
+        $totalSaldoKeseluruhan = (clone $query)->get()->sum('total_saldo');
+
+        $user = $query->paginate($perPage)->withQueryString();
+
         $kelasList = Kelas::orderBy('name')->get();
-        return view('kepsek.laporan.lap_tabungan', compact('user', 'kelasList'));
+
+        return view('kepsek.laporan.lap_tabungan', compact(
+            'user', 'kelasList', 'totalSantri', 'totalSaldoKeseluruhan'
+        ));
     }
 
     /**
@@ -59,50 +80,63 @@ class LaporanController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function lap_kepsek_transaksi(Request $request) {
-        $search = $request->input('search');
-        $kelas = $request->input('kelas');
-        $tipeTransaksi = $request->input('tipe_transaksi');
+    public function lap_kepsek_transaksi(Request $request)
+    {
+        $search         = $request->input('search');
+        $kelas          = $request->input('kelas');
+        $tipeTransaksi  = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
-        $sortTanggal = $request->input('sort_tanggal');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        $sortTanggal    = $request->input('sort_tanggal', 'desc');
+        $startDate      = $request->input('start_date');
+        $endDate        = $request->input('end_date');
+        $perPage        = $request->input('perPage', 10);
+        $periodeId      = PeriodeHelper::id();
 
-        $perPage = request('perPage', 10);
-
-        $transaksi = Transaksi::with(['user.kelas'])
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('user', function ($q) use ($search) {
-                    $q->where('name', 'LIKE', '%' . $search . '%')
-                      ->orWhere('username', 'LIKE', '%' . $search . '%');
-                });
-            })
-            ->when($kelas, function ($query) use ($kelas) {
-                $query->whereHas('user.kelas', function ($q) use ($kelas) {
-                    $q->where('name', $kelas);
-                });
-            })
-            ->when($tipeTransaksi, function ($query) use ($tipeTransaksi) {
-                $query->where('tipe_transaksi', $tipeTransaksi);
-            })
-            ->when($tipePembayaran, function ($query) use ($tipePembayaran) {
-                $query->where('pembayaran', $tipePembayaran);
-            })
-            ->when($startDate, function ($query) use ($startDate) {
-                $query->whereDate('created_at', '>=', $startDate);
-            })
-            ->when($endDate, function ($query) use ($endDate) {
-                $query->whereDate('created_at', '<=', $endDate);
-            })
-            ->when($sortTanggal, function ($query) use ($sortTanggal) {
-                $query->orderBy('created_at', $sortTanggal);
-            })
+        $query = Transaksi::with(['user.kelas'])
+            ->where('periode_id', $periodeId)
             ->where('status', 'success')
-            ->paginate($perPage)
-            ->appends($request->all());
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('user', function ($qq) use ($search) {
+                    $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
+                });
+            })
+            ->when($kelas, function ($q) use ($kelas) {
+                $q->whereHas('user', function ($qq) use ($kelas) {
+                    $qq->where('kelas_id', $kelas); // fix: filter langsung by kelas_id
+                });
+            })
+            ->when($tipeTransaksi, function ($q) use ($tipeTransaksi) {
+                $q->where('tipe_transaksi', $tipeTransaksi);
+            })
+            ->when($tipePembayaran, function ($q) use ($tipePembayaran) {
+                $q->where('pembayaran', $tipePembayaran);
+            })
+            ->when($startDate, function ($q) use ($startDate) {
+                $q->whereDate('created_at', '>=', $startDate);
+            })
+            ->when($endDate, function ($q) use ($endDate) {
+                $q->whereDate('created_at', '<=', $endDate);
+            });
+
+        if (in_array($sortTanggal, ['asc', 'desc'])) {
+            $query->orderBy('created_at', $sortTanggal);
+        } else {
+            $query->orderBy('created_at', 'desc'); // fallback aman
+        }
+
+        // Summary sesuai filter yang aktif
+        $totalTransaksi = (clone $query)->count();
+        $totalStor  = (clone $query)->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $totalTarik = (clone $query)->where('tipe_transaksi', 'tarik')->sum('jumlah_transaksi');
+
+        $transaksi = $query->paginate($perPage)->withQueryString();
 
         $kelasList = Kelas::orderBy('name')->get();
-        return view('kepsek.laporan.lap_transaksi', compact('transaksi', 'kelasList'));
+
+        return view('kepsek.laporan.lap_transaksi', compact(
+            'transaksi', 'kelasList', 'totalTransaksi', 'totalStor', 'totalTarik'
+        ));
     }
 
     /**
@@ -112,49 +146,67 @@ class LaporanController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function lap_kepsek_pengajuan(Request $request){
-        $search = $request->input('search');
-        $kelas = $request->input('kelas');
-        $status = $request->input('status');
+    public function lap_kepsek_pengajuan(Request $request)
+    {
+        $search        = $request->input('search');
+        $kelas         = $request->input('kelas');
+        $status        = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
-        $sortDate = $request->input('sort_date'); // Tambahkan ini
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        $sortDate      = $request->input('sort_date', 'desc');
+        $startDate     = $request->input('start_date');
+        $endDate       = $request->input('end_date');
+        $perPage       = $request->input('perPage', 10);
+        $periodeId     = PeriodeHelper::id();
 
-        $perPage = request('perPage', 10);
-
-        $pengajuan = Pengajuan::with(['user', 'user.kelas'])
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('user', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('username', 'like', '%' . $search . '%');
+        $query = Pengajuan::with(['user.kelas', 'user.tabungan' => function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            }])
+            ->where('periode_id', $periodeId)
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('user', function ($qq) use ($search) {
+                    $qq->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($kelas, function ($query) use ($kelas) {
-                $query->whereHas('user.kelas', function ($q) use ($kelas) {
-                    $q->where('name', $kelas);
+            ->when($kelas, function ($q) use ($kelas) {
+                $q->whereHas('user', function ($qq) use ($kelas) {
+                    $qq->where('kelas_id', $kelas); // fix: filter langsung by kelas_id
                 });
             })
-            ->when($status, function ($query) use ($status) {
-                $query->where('status', $status);
+            ->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
             })
-            ->when($startDate, function ($query) use ($startDate) {
-                $query->whereDate('created_at', '>=', $startDate);
+            ->when($startDate, function ($q) use ($startDate) {
+                $q->whereDate('created_at', '>=', $startDate);
             })
-            ->when($endDate, function ($query) use ($endDate) {
-                $query->whereDate('created_at', '<=', $endDate);
+            ->when($endDate, function ($q) use ($endDate) {
+                $q->whereDate('created_at', '<=', $endDate);
             })
-            ->when($sortPenarikan, function ($query) use ($sortPenarikan) {
-                $query->orderBy('jumlah_penarikan', $sortPenarikan);
-            })
-            ->when($sortDate, function ($query) use ($sortDate) {
+            ->when($sortPenarikan, function ($q) use ($sortPenarikan) {
+                $q->orderBy('jumlah_penarikan', $sortPenarikan);
+            });
+
+        if (!$sortPenarikan) {
+            if (in_array($sortDate, ['asc', 'desc'])) {
                 $query->orderBy('created_at', $sortDate);
-            })
-            ->paginate($perPage)
-            ->withQueryString();
+            } else {
+                $query->orderBy('created_at', 'desc'); // fallback aman
+            }
+        }
+
+        // Summary sesuai filter aktif
+        $totalPengajuan = (clone $query)->count();
+        $totalPending   = (clone $query)->where('status', 'Pending')->count();
+        $totalDiterima  = (clone $query)->whereIn('status', ['Terima', 'Diterima', 'SUCCEEDED'])->count();
+        $totalDitolak   = (clone $query)->whereIn('status', ['Tolak', 'tolak'])->count();
+
+        $pengajuan = $query->paginate($perPage)->withQueryString();
 
         $kelasList = Kelas::orderBy('name')->get();
-        return view('kepsek.laporan.lap_pengajuan', compact('pengajuan', 'kelasList'));
+
+        return view('kepsek.laporan.lap_pengajuan', compact(
+            'pengajuan', 'kelasList', 'totalPengajuan', 'totalPending', 'totalDiterima', 'totalDitolak'
+        ));
     }
 
     /**

@@ -15,7 +15,7 @@ class Transaksi extends Model
 
     protected $table = 'transaksis';
 
-    public function tabungan()
+    public function tabungan()  
     {
         return $this->belongsTo(Tabungan::class, 'tabungan_id');
     }
@@ -23,6 +23,11 @@ class Transaksi extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function periode()
+    {
+        return $this->belongsTo(Periode::class);
     }
 
 }

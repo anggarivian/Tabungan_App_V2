@@ -28,9 +28,15 @@ class User extends Authenticatable
         return $this->belongsTo(Kelas::class);
     }
 
+    public function tabungans()
+    {
+        return $this->hasMany(Tabungan::class, 'user_id');
+    }
+
     public function tabungan()
     {
-        return $this->hasOne(Tabungan::class, 'user_id');
+        return $this->hasOne(Tabungan::class)
+            ->where('periode_id', \App\Helpers\PeriodeHelper::id());
     }
 
     public function transaksi()

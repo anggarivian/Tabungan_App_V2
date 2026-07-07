@@ -136,6 +136,7 @@ class PengajuanController extends Controller
         $pengajuan->alasan            = $validatedData['alasan'];
         $pengajuan->pembayaran        = $validatedData['jenis_pembayaran'];
         $pengajuan->status            = 'Pending';
+        $pengajuan->periode_id        = \App\Helpers\PeriodeHelper::id();
 
         if ($validatedData['jenis_pembayaran'] === 'Digital') {
             $pengajuan->metode_digital = $validatedData['metode_digital'];
