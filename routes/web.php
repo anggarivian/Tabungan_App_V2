@@ -85,10 +85,11 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Siswa.
         Route::get('/bendahara/kelola-siswa', [SiswaController::class, 'index'])->name('bendahara.siswa.index');
         Route::post('/bendahara/kelola-siswa/tambah', [SiswaController::class, 'add'])->name('bendahara.siswa.add');
-        Route::get('/bendahara/kelola-siswa/get-data/{id}', [SiswaController::class, 'getSiswaData'])->name('bendahara.siswa.getData');
         Route::put('/bendahara/kelola-siswa/edit/{id}', [SiswaController::class, 'edit'])->name('bendahara.siswa.edit');
         Route::delete('/bendahara/kelola-siswa/hapus/{id}', [SiswaController::class, 'delete'])->name('bendahara.siswa.delete');
         Route::post('/bendahara/kelola-siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
+        Route::put('bendahara/kelola-siswa/status/{id}', [SiswaController::class, 'ubahStatus'])->name('bendahara.siswa.ubahStatus');
+        Route::get('bendahara/kelola-siswa/data/{id}', [SiswaController::class, 'getSiswaData'])->name('bendahara.siswa.data');
 
         // Menangani pengelolaan Periode.
         Route::resource('bendahara/periode', PeriodeController::class );
@@ -97,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bendahara/kelola-periode/store', [PeriodeController::class, 'store'])->name('bendahara.periode.store');
         Route::put('/bendahara/kelola-periode/{periode}/update', [PeriodeController::class, 'update'])->name('bendahara.periode.update');
         Route::put('/bendahara/kelola-periode/{periode}/aktifkan', [PeriodeController::class, 'aktifkan'])->name('bendahara.periode.aktifkan');
+        Route::put('bendahara/kelola-siswa/toggle-status/{id}', [SiswaController::class, 'toggleStatus'])->name('bendahara.siswa.toggleStatus');
 
         // Menangani pengelolaan Rombel.
         Route::resource('bendahara/rombel', RombelController::class);

@@ -85,7 +85,7 @@
                         <tr>
                             <td class="text-center">{{ $rombels->firstItem() + $index }}</td>
                             <td>{{ $rombel->name }}</td>
-                            <td class="text-center">Kelas {{ $rombel->kelas->name ?? '-' }}</td>
+                            <td class="text-center">{{ $rombel->kelas->name ?? '-' }}</td>
                             <td class="text-center">{{ $rombel->walikelas->name ?? 'Belum Ditentukan' }}</td>
                             <td class="text-center">{{ $rombel->users_count }} Siswa</td>
                             <td class="text-center">

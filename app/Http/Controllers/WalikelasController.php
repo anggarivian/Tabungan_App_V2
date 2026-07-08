@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Kelas;
 use Illuminate\Http\Request;
 
 class WalikelasController extends Controller
@@ -14,31 +13,29 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
-
-    public function index(Request $request){
-        $kelas = Kelas::all();
-        $perPage = request('perPage', 10);
-
-        $query = User::query()->where('roles_id', 3);
-        $query->select('id','name','email','username','jenis_kelamin','kontak','password','orang_tua','alamat','kelas_id','roles_id','created_at','updated_at');
+    public function index(Request $request)
+    {
+        $perPage = $request->input('perPage', 10);
         $searchTerm = $request->input('search');
 
+        // Hanya mengambil data dengan role walikelas (roles_id = 3)
+        $query = User::where('roles_id', 3);
+
         if (!empty($searchTerm)) {
-            $query->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('email', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('alamat', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('username', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('kontak', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('alamat', 'LIKE', '%'.$searchTerm.'%');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('alamat', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('username', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('kontak', 'LIKE', '%' . $searchTerm . '%');
             });
         }
 
-        $query->orderBy('created_at','desc');
+        $query->orderBy('created_at', 'desc');
 
-        $user = $query->paginate($perPage);
+        $users = $query->paginate($perPage)->appends($request->except('page'));
 
-        return view('bendahara.kelola_walikelas', compact('user','kelas'));
+        return view('bendahara.kelola_walikelas', compact('users'));
     }
 
     /**
@@ -47,7 +44,6 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-
     public function add(Request $request)
     {
         $validatedData = $request->validate([
@@ -70,7 +66,7 @@ class WalikelasController extends Controller
             'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
             'kontak.required' => 'Kontak harus diisi.',
             'kontak.max' => 'Kontak maksimal 15 karakter.',
-            'alamat.required' => 'Alamat harus diisi.',
+            'alamat.required' => 'Alamat harus diisi.'
         ]);
 
         $user = new User();
@@ -81,11 +77,11 @@ class WalikelasController extends Controller
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
         $user->kontak = $validatedData['kontak'];
         $user->alamat = $validatedData['alamat'];
-        $user->kelas_id = $request->kelas;
+        $user->status_siswa = 'aktif'; // Default value dari database untuk user
         $user->roles_id = 3;
         $user->save();
 
-        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil ditambahkan')->with('alert-type', 'success')->with('alert-message', 'Data walikelas berhasil ditambahkan')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil ditambahkan!');
     }
 
     /**
@@ -94,7 +90,6 @@ class WalikelasController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-
     public function getWalikelasData($id)
     {
         $walikelas = User::findOrFail($id);
@@ -107,7 +102,6 @@ class WalikelasController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-
     public function edit(Request $request)
     {
         $validatedData = $request->validate([
@@ -123,7 +117,7 @@ class WalikelasController extends Controller
             'email.required' => 'Email harus diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
             'kontak.required' => 'Kontak harus diisi.',
-            'alamat.required' => 'Alamat harus diisi.',
+            'alamat.required' => 'Alamat harus diisi.'
         ]);
 
         $user = User::findOrFail($request->id);
@@ -133,7 +127,6 @@ class WalikelasController extends Controller
         $user->jenis_kelamin = $validatedData['jenis_kelamin'];
         $user->kontak = $validatedData['kontak'];
         $user->alamat = $validatedData['alamat'];
-        $user->kelas_id = $request->kelas;
 
         if ($request->filled('password')) {
             $request->validate([
@@ -144,7 +137,7 @@ class WalikelasController extends Controller
 
         $user->save();
 
-        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil diperbarui')->with('alert-type', 'warning')->with('alert-message', 'Data walikelas berhasil diperbarui')->with('alert-duration', 3000);
+        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil diperbarui!');
     }
 
     /**
@@ -153,16 +146,11 @@ class WalikelasController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-
     public function delete($id)
     {
         $walikelas = User::findOrFail($id);
         $walikelas->delete();
 
-        return redirect()->route('bendahara.walikelas.index')
-            ->with('success', 'Data walikelas berhasil dihapus')
-            ->with('alert-type', 'danger')
-            ->with('alert-message', 'Data walikelas berhasil dihapus')
-            ->with('alert-duration', 3000);
+        return redirect()->route('bendahara.walikelas.index')->with('success', 'Data walikelas berhasil dihapus!');
     }
 }

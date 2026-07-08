@@ -3,65 +3,122 @@
 namespace App\Imports;
 
 use App\Models\User;
-use App\Models\Tabungan;  // Pastikan model Tabungan diimport
+use App\Models\Tabungan;
+use App\Helpers\PeriodeHelper;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
 
-class UsersImport implements ToModel, WithHeadingRow
+class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsOnError
 {
-    protected $kelasMap = [
-        '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6 , '7' => 7,
-    ];
+    use SkipsFailures, SkipsErrors;
+
+    protected ?int $periodeId;
+
+    public function __construct()
+    {
+        $this->periodeId = PeriodeHelper::id();
+    }
+
+    /**
+     * Validasi tiap baris sebelum diproses.
+     * Baris yang gagal validasi otomatis di-skip (gak bikin proses berhenti total)
+     * dan bisa ditampilkan lewat $import->failures().
+     */
+    public function rules(): array
+    {
+        return [
+            'name'          => 'required|string|max:255',
+            'jenis_kelamin' => 'nullable|in:L,P,l,p',
+            'orang_tua'     => 'nullable|string|max:255',
+            'alamat'        => 'nullable|string',
+        ];
+    }
 
     public function model(array $row)
     {
-        $kelasId = $this->kelasMap[$row['kelas']] ?? null;
-
-        if (!$kelasId) {
+        // kalau gak ada periode aktif, semua baris gak bisa diproses --
+        // mending gagal jelas daripada tabungan ke-create tanpa periode
+        if (!$this->periodeId) {
             return null;
         }
 
-        // Generate username sesuai aturan
-        $existingUser = User::where('username', 'like', $row['kelas'] . '__') // dua digit setelah kelas
-                    ->orderBy('username', 'desc')
-                    ->first();
-        if ($existingUser) {
-            $lastDigits = substr($existingUser->username, strlen($row['kelas']));
-            $nextNumber = (int)$lastDigits + 1;
-            $username = $row['kelas'] . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
-        } else {
-            $username = $row['kelas'] . '01';
+        if (empty($row['name'])) {
+            return null;
         }
 
-        // Generate email berdasarkan username
+        $username = $this->generateUsername($row['name']);
         $email = $username . '@mail.com';
 
-        // Buat user baru
-        $user = new User([
-            'name'          => $row['name'],
-            'username'      => $username,
-            'email'         => $email,
-            'password'      => Hash::make('12345'),
-            'jenis_kelamin' => $row['jenis_kelamin'] ?? null,
-            'kontak'        => $row['kontak'] ?? null,
-            'orang_tua'     => $row['orang_tua'] ?? null,
-            'alamat'        => $row['alamat'] ?? null,
-            'kelas_id'      => $kelasId,
-            'roles_id'      => 4,
-        ]);
+        // wrap dalam transaction: kalau Tabungan gagal dibuat, User ikut di-rollback
+        // biar gak ada siswa "yatim" tanpa tabungan
+        return DB::transaction(function () use ($row, $username, $email) {
+            $user = User::create([
+                'name'          => trim($row['name']),
+                'username'      => $username,
+                'email'         => $email,
+                'password'      => Hash::make('12345'),
+                'jenis_kelamin' => !empty($row['jenis_kelamin']) ? strtoupper(trim($row['jenis_kelamin'])) : null,
+                'kontak'        => isset($row['kontak']) ? (string) $row['kontak'] : null,
+                'orang_tua'     => $row['orang_tua'] ?? null,
+                'alamat'        => $row['alamat'] ?? null,
+                'status_siswa'  => 'aktif',
+                'roles_id'      => 4,
+            ]);
 
-        // Simpan user
-        $user->save();
+            Tabungan::create([
+                'saldo'      => 0,
+                'premi'      => 0,
+                'sisa'       => 0,
+                'user_id'    => $user->id,
+                'periode_id' => $this->periodeId,
+            ]);
 
-        // Setelah user disimpan, buat entri di model Tabungan
-        $tabungan = new Tabungan();
-        $tabungan->saldo = 0;
-        $tabungan->premi = 0;
-        $tabungan->sisa = 0;
-        $tabungan->user_id = $user->id;  // Mengambil ID user yang baru saja disimpan
-        $tabungan->save();
+            return $user;
+        });
+    }
 
-        return $user;
+    /**
+     * Sama persis dengan logic di SiswaController::add(),
+     * biar username konsisten mau daftar manual atau lewat import.
+     */
+    private function generateUsername(string $nama): string
+    {
+        $namaRaw = strtolower(trim($nama));
+        $namaClean = preg_replace('/[^a-z\s]/', '', $namaRaw);
+        $words = array_values(array_filter(explode(' ', $namaClean)));
+
+        $count = count($words);
+        $username = '';
+
+        if ($count == 1) {
+            $username = $words[0] . $words[0];
+        } elseif ($count == 2) {
+            $username = $words[0] . $words[1];
+        } elseif ($count >= 3) {
+            $username = $words[0] . $words[1];
+            for ($i = 2; $i < $count; $i++) {
+                $username .= substr($words[$i], 0, 1);
+            }
+        }
+
+        if (empty($username)) {
+            $username = 'siswa';
+        }
+
+        $baseUsername = $username;
+        $counter = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
     }
 }

@@ -27,115 +27,183 @@
     </div>
 </div>
 <div class="page-content">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form action="{{ route('bendahara.siswa.index') }}" method="GET">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small text-muted mb-1">Cari</label>
+                        <input type="text" class="form-control" name="search" value="{{ request('search') }}"
+                            placeholder="Nama, email, kontak, orang tua, alamat...">
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-muted mb-1">Status</label>
+                        <select name="status_siswa" class="form-select">
+                            <option value="">Semua Status</option>
+                            <option value="aktif" {{ request('status_siswa') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="nonaktif" {{ request('status_siswa') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                            <option value="lulus" {{ request('status_siswa') == 'lulus' ? 'selected' : '' }}>Lulus</option>
+                            <option value="pindah" {{ request('status_siswa') == 'pindah' ? 'selected' : '' }}>Pindah</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-muted mb-1">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" class="form-select">
+                            <option value="">Semua</option>
+                            <option value="L" {{ request('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="P" {{ request('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-muted mb-1">Urutkan</label>
+                        <select name="sort_by" class="form-select">
+                            <option value="terbaru" {{ request('sort_by', 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+                            <option value="terlama" {{ request('sort_by') == 'terlama' ? 'selected' : '' }}>Terlama</option>
+                            <option value="nama_az" {{ request('sort_by') == 'nama_az' ? 'selected' : '' }}>Nama A-Z</option>
+                            <option value="nama_za" {{ request('sort_by') == 'nama_za' ? 'selected' : '' }}>Nama Z-A</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-2 d-flex gap-1">
+                        <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-search"></i> Cari</button>
+                        @if(request()->anyFilled(['search', 'status_siswa', 'jenis_kelamin']))
+                            <a href="{{ route('bendahara.siswa.index') }}" class="btn btn-outline-secondary" title="Reset">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+                <input type="hidden" name="perPage" value="{{ request('perPage', 10) }}">
+            </form>
+        </div>
+    </div>
+
     <div class="card shadow">
-        <div class="card-body" style="margin-bottom: -20px">
+        <div class="card-body pb-1 pt-3">
+            
+            {{-- Alert Success --}}
             @if(session('success'))
-                <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i>
-                    {{ session('alert-message') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-            <script>
-                @if(session('alert-duration'))
-                    setTimeout(function() {
-                        document.getElementById('alert').style.display = 'none';
-                    }, {{ session('alert-duration') }});
-                @endif
-            </script>
+
+            {{-- Alert Error Validation --}}
             @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-x-circle-fill me-2"></i>
                     <strong>Terjadi Kesalahan!</strong>
-                    <ul>
+                    <ul class="mb-0 mt-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-            <div class="d-flex justify-content-between">
-                <div class="input-group">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
-                        Tambah Data
+
+            {{-- Action Buttons & Search --}}
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+                <div class="btn-group">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
+                        <i class="bi bi-plus-circle"></i> Tambah Data
                     </button>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
-                        Import
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="bi bi-file-earmark-excel"></i> Import
                     </button>
                 </div>
-                <form action="/bendahara/kelola-siswa" method="GET">
-                    <div class="input-group">
-                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
-                        <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
-                    </div>
-                </form>
             </div>
-        </div>
-        <div class="card-body pb-1 pt-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small">
+                    Menampilkan {{ $user->firstItem() ?? 0 }}–{{ $user->lastItem() ?? 0 }}
+                    dari {{ $user->total() }} siswa
+                </span>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover" style="width: 100%">
+                <table class="table table-hover align-middle" style="width: 100%">
                     <thead>
                         <tr>
-                            <th class="text-center">No.</th>
+                            <th class="text-center" width="50">No</th>
                             <th>Nama</th>
-                            <th class="text-center">Kode</th>
-                            {{-- <th>Email</th> --}}
-                            <th class="text-center">Kelas</th>
-                            <th class="text-center">Jenis Kelamin</th>
-                            <th class="text-center">Orang Tua</th>
+                            <th>Username</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">L/P</th>
+                            <th>Orang Tua</th>
                             <th class="text-center">Kontak</th>
                             <th>Alamat</th>
-                            {{-- <th class="text-center">Tanggal</th> --}}
-                            <th class="text-center">Action</th>
+                            <th class="text-center" width="220">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($user as $users)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">{{ $user->firstItem() + $loop->index }}</td>
                                 <td>{{ Str::limit($users->name, 25, '...') }}</td>
-                                <td class="text-center">{{ $users->username }}</td>
-                                {{-- <td>{{ $users->email }}</td> --}}
-                                <td class="text-center">{{ $users->kelas->name ?? '-' }}</td>
-                                <td class="text-center">{{ $users->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
-                                <td >{{ Str::limit($users->orang_tua, 10, '...') }}</td>
-                                <td class="text-center">{{ $users->kontak }}</td>
-                                <td>{{ Str::limit($users->alamat, 10, '...') }}</td>
-                                {{-- <td class="text-center">{{ \Carbon\Carbon::parse($users->created_at)->format('d M Y H:i') }}</td> --}}
+                                <td>{{ $users->username }}</td>
                                 <td class="text-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-warning" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
-                                            <i class="bi bi-pencil-square"></i>
+                                    @php
+                                        $badge = [
+                                            'aktif' => 'bg-success', 'nonaktif' => 'bg-secondary',
+                                            'lulus' => 'bg-primary', 'pindah' => 'bg-warning',
+                                        ][$users->status_siswa] ?? 'bg-secondary';
+                                    @endphp
+                                    <span class="badge {{ $badge }}">{{ ucfirst($users->status_siswa) }}</span>
+                                </td>
+                                <td class="text-center">{{ $users->jenis_kelamin }}</td>
+                                <td>{{ Str::limit($users->orang_tua, 15, '...') }}</td>
+                                <td class="text-center">{{ $users->kontak }}</td>
+                                <td>{{ Str::limit($users->alamat, 20, '...') }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-warning btn-edit btn-sm" data-id="{{ $users->id }}">Edit</button>
+                                    <form method="POST" action="{{ route('bendahara.siswa.toggleStatus', $users->id) }}" class="d-inline">
+                                        @csrf @method('PUT')
+                                        <button type="submit" class="btn {{ $users->status_siswa == 'aktif' ? 'btn-secondary' : 'btn-success' }} btn-sm">
+                                            {{ $users->status_siswa == 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger" data-id="{{ $users->id }}" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete({{ $users->id }})">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
+                                    </form>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $users->id }}, '{{ addslashes($users->name) }}')">
+                                        Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">Data Kosong</td>
+                                <td colspan="9" class="text-center py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2 text-muted"></i>
+                                    Belum ada data siswa.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-between">
-                    <form method="GET" action="{{ request()->url() }}">
-                        <div class="d-flex justify-content-end mb-3">
-                            <label for="perPage" style="margin-top: 3px">Show</label>
-                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
-                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
-                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                                <option value="1000" {{ request('perPage') == 100 ? 'selected' : '' }}>Semua</option>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <form method="GET" action="{{ url()->current() }}" id="perPageForm">
+                        @foreach (request()->except(['perPage', 'page']) as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+
+                        <div class="d-flex align-items-center mb-3">
+                            <label for="perPage" class="me-2 mb-0">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm" style="width: auto" onchange="this.form.submit()">
+                                @foreach ([10, 25, 50, 75, 100] as $option)
+                                    <option value="{{ $option }}" {{ request('perPage', 10) == $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </form>
-                    <div class="justify-content-end">
-                        {{ $user->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
+
+                    <div>
+                        {{ $user->links('layout.pagination.bootstrap-5') }}
                     </div>
                 </div>
             </div>
@@ -144,73 +212,58 @@
 </div>
 
 {{-- Modal Tambah --}}
-<div class="modal fade modal-borderless" id="tambahModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
+<div class="modal fade" id="tambahModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="tambahModalLabel">Tambah Data Siswa</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('bendahara.siswa.add') }}" method="POST">
+            <form method="POST" action="{{ route('bendahara.siswa.add') }}">
                 @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Siswa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle"></i> Username & tabungan otomatis terbuat. Password bawaan: 12345. Kelas diatur belakangan di menu Rombel.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="contoh@email.com" required>
+                    </div>
+
                     <div class="row">
-                        <div class="col-md-4">
-                            <label for="name-horizontal">Nama</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="name-horizontal" class="form-control" name="name" placeholder="Nama" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="siswa-horizontal">Kelas</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="siswa-horizontal" class="form-select" name="kelas" required>
-                                <option value="">Pilih Kelas</option>
-                                @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="email-horizontal">Email</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="email" id="email-horizontal" class="form-control" name="email" placeholder="Email" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="gender-horizontal">Jenis Kelamin</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <select id="gender-horizontal" class="form-select" name="jenis_kelamin" required>
-                                <option value="">Pilih Jenis Kelamin</option>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select" required>
+                                <option value="">Pilih</option>
                                 <option value="L">Laki-laki</option>
                                 <option value="P">Perempuan</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label for="contact-info-horizontal">Kontak</label>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nama Orang Tua</label>
+                            <input type="text" name="orang_tua" class="form-control" placeholder="Nama ayah/ibu/wali" required>
                         </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="contact-info-horizontal" class="form-control" name="kontak" placeholder="Kontak" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="address-horizontal">Alamat</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <textarea id="address-horizontal" class="form-control" name="alamat" placeholder="Alamat" rows="3" required></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="orang-tua-horizontal">Orang Tua</label>
-                        </div>
-                        <div class="col-md-8 form-group">
-                            <input type="text" id="orang-tua-horizontal" class="form-control" name="orang_tua" placeholder="Orang Tua" required>
-                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">No. Kontak (WA)</label>
+                        <input type="number" name="kontak" class="form-control" placeholder="Contoh: 081234567890" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Alamat Lengkap</label>
+                        <textarea name="alamat" class="form-control" rows="2" placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Tambah</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
@@ -218,131 +271,91 @@
 </div>
 
 {{-- Modal Edit --}}
-<div class="modal fade modal-borderless" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Siswa</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                {{-- Form --}}
-                <form id="editForm" method="POST" action="{{ route('bendahara.siswa.edit', '') }}">
-                    @csrf
-                    @method('PUT')
-
-                    {{-- Tabs --}}
-                    <ul class="nav nav-tabs" id="editTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#dataTab" type="button" role="tab">Edit Data</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#passwordTab" type="button" role="tab">Ganti Password</button>
-                        </li>
-                    </ul>
-
-                    {{-- Tab Content --}}
-                    <div class="tab-content p-3">
-                        {{-- Tab 1: Edit Data --}}
-                        <div class="tab-pane fade show active" id="dataTab" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-4"><label for="edit-name">Nama</label></div>
-                                <div class="col-md-8 mb-2"><input type="text" id="edit-name" class="form-control" name="name" required></div>
-
-                                <div class="col-md-4"><label for="edit-kelas">Kelas</label></div>
-                                <div class="col-md-8 mb-2">
-                                    <select id="edit-kelas" class="form-select" name="kelas" required>
-                                        <option value="">Pilih Kelas</option>
-                                        @foreach($kelas as $k)
-                                            <option value="{{ $k->id }}">{{ $k->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-4"><label for="edit-email">Email</label></div>
-                                <div class="col-md-8 mb-2"><input type="email" id="edit-email" class="form-control" name="email" required></div>
-
-                                <div class="col-md-4"><label for="edit-jenis_kelamin">Jenis Kelamin</label></div>
-                                <div class="col-md-8 mb-2">
-                                    <select id="edit-jenis_kelamin" class="form-select" name="jenis_kelamin" required>
-                                        <option value="">Pilih Jenis Kelamin</option>
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-4"><label for="edit-kontak">Kontak</label></div>
-                                <div class="col-md-8 mb-2"><input type="text" id="edit-kontak" class="form-control" name="kontak" required></div>
-
-                                <div class="col-md-4"><label for="edit-alamat">Alamat</label></div>
-                                <div class="col-md-8 mb-2"><textarea id="edit-alamat" class="form-control" name="alamat" rows="3" required></textarea></div>
-
-                                <div class="col-md-4"><label for="edit-orang-tua">Orang Tua</label></div>
-                                <div class="col-md-8 mb-2"><input type="text" id="edit-orang_tua" class="form-control" name="orang_tua" required></div>
-                            </div>
-                        </div>
-
-                        {{-- Tab 2: Ganti Password --}}
-                        <div class="tab-pane fade" id="passwordTab" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-4"><label for="edit-password">Password Baru</label></div>
-                                <div class="col-md-8 mb-2">
-                                    <input type="password" id="edit-password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
-                                </div>
-                            </div>
-                        </div>
+            <form id="editForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Siswa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" id="edit-name" name="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="edit-email" name="email" class="form-control" required>
                     </div>
 
-                    {{-- Footer --}}
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select id="edit-jenis_kelamin" name="jenis_kelamin" class="form-select" required>
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nama Orang Tua</label>
+                            <input type="text" id="edit-orang_tua" name="orang_tua" class="form-control" required>
+                        </div>
                     </div>
-                </form>
-            </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">No. Kontak (WA)</label>
+                        <input type="number" id="edit-kontak" name="kontak" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Alamat Lengkap</label>
+                        <textarea id="edit-alamat" name="alamat" class="form-control" rows="2" required></textarea>
+                    </div>
+
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Password Baru <small class="text-muted">(Opsional)</small></label>
+                        <input type="password" id="edit-password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin diubah">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning">Update</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-
-{{-- Modal Konfirmasi Delete Yang Ditingkatkan --}}
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+{{-- Modal Konfirmasi Delete --}}
+<div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius: 15px; overflow: hidden;">
-            <div class="modal-header bg-danger text-white border-0">
-                <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    Konfirmasi Hapus
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+                    Konfirmasi Hapus Data
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
-                <div class="text-center mb-4">
-                    <div class="mb-3 text-danger">
-                    <i class="bi bi-trash-fill" style="font-size: 3rem;"></i>
-                    </div>
-                    <h4 class="mb-3">Anda yakin ingin menghapus?</h4>
-                    <p class="text-muted">
-                    Perihatikan bahwa menghapus data siswa akan menghapus semua data yang terkait dengan
-                    <span class="fw-bold text-danger">tabungan</span>.
-                    </p>
-                    <div class="alert alert-warning d-flex align-items-center mt-3">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <div>Tindakan ini tidak dapat dibatalkan setelah dilakukan.</div>
-                    </div>
-                </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    Menghapus data siswa <strong id="hapusNamaSiswa"></strong> akan menghapus
+                    <strong>SELURUH riwayat tabungan, transaksi, dan pengajuan</strong> siswa ini
+                    secara <strong>permanen dan tidak bisa dikembalikan</strong>.
+                    Apakah Anda yakin ingin melanjutkan?
+                </p>
             </div>
-            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
-                <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i> Batal
-                </button>
-                <form id="deleteForm" method="POST" action="{{ route('bendahara.siswa.delete', '') }}">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form id="deleteForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger px-4 py-2">
-                    <i class="bi bi-trash me-1"></i> Hapus Data
-                    </button>
+                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
                 </form>
             </div>
         </div>
@@ -350,24 +363,24 @@
 </div>
 
 {{-- Modal Import --}}
-<div class="modal fade modal-borderless" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="importModalLabel">Import Data Siswa</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Data Siswa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="formFile" class="form-label">Pilih File ( Format : .xls .xlsx)</label>
-                        <input class="form-control" type="file" name="file" id="formFile">
+                        <label class="form-label">Pilih File Excel (.xls, .xlsx)</label>
+                        <input class="form-control" type="file" name="file" required accept=".xls,.xlsx">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Proses Import</button>
                 </div>
             </form>
         </div>
@@ -378,64 +391,66 @@
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // Script untuk animasi tambahan saat membuka modal
-    document.addEventListener('DOMContentLoaded', function() {
-        const deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function() {
-            const trashIcon = this.querySelector('.bi-trash-fill');
-            trashIcon.style.transform = 'scale(0)';
-            setTimeout(() => {
-            trashIcon.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                trashIcon.style.transform = 'scale(1)';
-            }, 200);
-            }, 300);
-        });
-
-        // Script untuk animasi saat form delete disubmit
-        const deleteForm = document.getElementById('deleteForm');
-        deleteForm.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Menghapus...';
-            submitBtn.disabled = true;
-        });
-    });
-</script>
-<script>
     $(document).ready(function() {
-        $('.btn-warning').on('click', function() {
+        $('.btn-edit').on('click', function() {
             var id = $(this).data('id');
-            var timestamp = new Date().getTime(); // Tambahkan timestamp
+            var timestamp = new Date().getTime();
 
             $.ajax({
-                url: "{{ route('bendahara.siswa.getData', '') }}/" + id + "?t=" + timestamp,
+                url: "{{ url('bendahara/kelola-siswa/data') }}/" + id + "?t=" + timestamp,
                 type: 'GET',
                 success: function(response) {
-                    if(response) {
+                    if (response) {
                         $('#edit-name').val(response.name);
                         $('#edit-email').val(response.email);
                         $('#edit-jenis_kelamin').val(response.jenis_kelamin);
                         $('#edit-kontak').val(response.kontak);
                         $('#edit-alamat').val(response.alamat);
                         $('#edit-orang_tua').val(response.orang_tua);
-                        $('#edit-kelas').val(response.kelas_id);
+                        $('#edit-password').val('');
 
-                        $('#editModal form').attr('action', "{{ route('bendahara.siswa.edit', '') }}/" + id);
+                        $('#editForm').attr('action', "{{ url('bendahara/kelola-siswa/edit') }}/" + id);
                         $('#editModal').modal('show');
                     } else {
                         alert('Gagal mengambil data');
                     }
                 },
                 error: function() {
-                    alert('Terjadi kesalahan saat mengambil data');
+                    alert('Terjadi kesalahan saat mengambil data dari server');
                 }
             });
         });
     });
 
-    function confirmDelete(id) {
-        $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
+    function confirmDelete(id, nama) {
+        $('#hapusNamaSiswa').text(nama);
+        $('#deleteForm').attr('action', "{{ url('bendahara/kelola-siswa/hapus') }}/" + id);
         $('#deleteModal').modal('show');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function() {
+                const icon = this.querySelector('.bi-exclamation-triangle-fill'); // fix: icon yang benar-benar ada di HTML
+                if (icon) {
+                    icon.style.transform = 'scale(0)';
+                    setTimeout(() => {
+                        icon.style.transform = 'scale(1.2)';
+                        setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+                    }, 300);
+                }
+            });
+        }
+
+        const deleteForm = document.getElementById('deleteForm');
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menghapus...';
+                btn.disabled = true;
+            });
+        }
+    });
 </script>
 @endsection
