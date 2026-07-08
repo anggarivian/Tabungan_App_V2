@@ -157,16 +157,23 @@
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-4"><label for="name" class="col-form-label">Nama</label></div>
-                        <div class="col-md-8"><input type="text" id="name" class="form-control" name="name" required></div>
-                        
+                        <div class="col-md-8">
+                            <input type="text" id="name" class="form-control" name="name" placeholder="Masukkan nama lengkap" required>
+                        </div>
                         <div class="col-md-4"><label for="username" class="col-form-label">Username</label></div>
-                        <div class="col-md-8"><input type="text" id="username" class="form-control" name="username" required></div>
+                        <div class="col-md-8">
+                            <input type="text" id="username" class="form-control" name="username" placeholder="Masukkan username (tanpa spasi)" required>
+                        </div>
                         
                         <div class="col-md-4"><label for="email" class="col-form-label">Email</label></div>
-                        <div class="col-md-8"><input type="email" id="email" class="form-control" name="email" required></div>
+                        <div class="col-md-8">
+                            <input type="email" id="email" class="form-control" name="email" placeholder="contoh@email.com" required>
+                        </div>
                         
                         <div class="col-md-4"><label for="password" class="col-form-label">Password</label></div>
-                        <div class="col-md-8"><input type="password" id="password" class="form-control" name="password" required></div>
+                        <div class="col-md-8">
+                            <input type="password" id="password" class="form-control" name="password" placeholder="Minimal 8 karakter" required>
+                        </div>
                         
                         <div class="col-md-4"><label for="gender" class="col-form-label">Jenis Kelamin</label></div>
                         <div class="col-md-8">
@@ -178,10 +185,14 @@
                         </div>
                         
                         <div class="col-md-4"><label for="kontak" class="col-form-label">Kontak</label></div>
-                        <div class="col-md-8"><input type="text" id="kontak" class="form-control" name="kontak" required></div>
+                        <div class="col-md-8">
+                            <input type="text" id="kontak" class="form-control" name="kontak" placeholder="Contoh: 081234567890" required>
+                        </div>
                         
                         <div class="col-md-4"><label for="alamat" class="col-form-label">Alamat</label></div>
-                        <div class="col-md-8"><textarea id="alamat" class="form-control" name="alamat" rows="3" required></textarea></div>
+                        <div class="col-md-8">
+                            <textarea id="alamat" class="form-control" name="alamat" rows="3" placeholder="Masukkan alamat lengkap..." required></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top-0">

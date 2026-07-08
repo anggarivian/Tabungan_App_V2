@@ -12,10 +12,14 @@ class CreateRombelUserTable extends Migration
             $table->id();
             $table->foreignId('rombel_id')->constrained('rombels')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->unsignedTinyInteger('no_absen')->nullable();
+            $table->foreignId('periode_id')->constrained('periodes')->onDelete('cascade');
+            $table->string('kode', 20)->nullable();
             $table->timestamps();
 
             $table->unique(['rombel_id', 'user_id']);
+            // jaminan DB-level: 1 siswa cuma boleh 1 rombel dalam 1 periode
+            $table->unique(['user_id', 'periode_id']);
+            $table->unique(['rombel_id', 'kode']);
         });
     }
 

@@ -78,7 +78,7 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Walikelas.
         Route::get('/bendahara/kelola-walikelas', [WalikelasController::class, 'index'])->name('bendahara.walikelas.index');
         Route::post('/bendahara/kelola-walikelas/tambah', [WalikelasController::class, 'add'])->name('bendahara.walikelas.add');
-        Route::get('/bendahara/kelola-walikelas/get-data/{id}', [WalikelasController::class, 'getWalikelasData'])->name('bendahara.walikelas.getData');
+        Route::get('/bendahara/kelola-walikelas/data/{id}', [WalikelasController::class, 'getWalikelasData'])->name('bendahara.walikelas.getData');
         Route::put('/bendahara/kelola-walikelas/edit/{id}', [WalikelasController::class, 'edit'])->name('bendahara.walikelas.edit');
         Route::delete('/bendahara/kelola-walikelas/hapus/{id}', [WalikelasController::class, 'delete'])->name('bendahara.walikelas.delete');
 

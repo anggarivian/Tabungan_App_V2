@@ -55,11 +55,32 @@ class User extends Authenticatable
     }
     
     public function rombels()
-        {
-            return $this->belongsToMany(Rombel::class, 'rombel_user', 'user_id', 'rombel_id')
-                        ->withPivot('no_absen')
-                        ->withTimestamps();
-        }
+    {
+        return $this->belongsToMany(Rombel::class, 'rombel_user', 'user_id', 'rombel_id')
+            ->withPivot('kode')
+            ->withTimestamps();
+    }
+
+    public function rombel()
+    {
+        return $this->belongsToMany(Rombel::class, 'rombel_user', 'user_id', 'rombel_id')
+            ->withPivot('kode')
+            ->withTimestamps();
+    }
+
+    /**
+     * Cari siswa berdasarkan kode (misal "1A05") di periode tertentu.
+     * Berguna buat nunjuk data tabungan/transaksi/pengajuan dari kode.
+     */
+    public static function findByKode(string $kode, ?int $periodeId = null): ?self
+    {
+        $periodeId = $periodeId ?? \App\Helpers\PeriodeHelper::id();
+
+        return static::whereHas('rombel', function ($q) use ($kode, $periodeId) {
+            $q->where('rombels.periode_id', $periodeId)
+            ->where('rombel_user.kode', strtoupper(trim($kode)));
+        })->first();
+    }
 
     /**
      * Atribut yang harus disembunyikan untuk serialisasi.

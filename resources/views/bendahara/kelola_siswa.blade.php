@@ -366,21 +366,36 @@
 <div class="modal fade" id="importModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
                 @csrf
+
                 <div class="modal-header">
                     <h5 class="modal-title">Import Data Siswa</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Pilih File Excel (.xls, .xlsx)</label>
                         <input class="form-control" type="file" name="file" required accept=".xls,.xlsx">
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Proses Import</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnBatal">
+                        Batal
+                    </button>
+
+                    <button type="submit" class="btn btn-success" id="btnImport">
+                        <span class="btn-text">
+                            <i class="bi bi-upload"></i> Proses Import
+                        </span>
+
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Mengimpor...
+                        </span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -390,6 +405,21 @@
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+document.getElementById('importForm').addEventListener('submit', function () {
+
+    const btnImport = document.getElementById('btnImport');
+    const btnBatal = document.getElementById('btnBatal');
+
+    // Disable tombol
+    btnImport.disabled = true;
+    btnBatal.disabled = true;
+
+    // Ganti teks menjadi loading
+    btnImport.querySelector('.btn-text').classList.add('d-none');
+    btnImport.querySelector('.btn-loading').classList.remove('d-none');
+});
+</script>
 <script>
     $(document).ready(function() {
         $('.btn-edit').on('click', function() {
