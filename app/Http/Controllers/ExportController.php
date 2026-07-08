@@ -25,10 +25,6 @@ class ExportController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    /**
-     * Helper: hitung saldo bersih (stor - tarik) untuk metode pembayaran tertentu,
-     * dibatasi ke periode aktif dan opsional ke kelas tertentu.
-     */
     private function hitungSaldoBersih(?int $kelasId, string $pembayaran, ?int $periodeId = null): int
     {
         $baseQuery = function ($tipe) use ($kelasId, $pembayaran, $periodeId) {
@@ -38,8 +34,13 @@ class ExportController extends Controller
                 ->when($periodeId, function ($q) use ($periodeId) {
                     $q->where('periode_id', $periodeId);
                 })
-                ->when($kelasId, function ($q) use ($kelasId) {
-                    $q->whereHas('user', fn ($qq) => $qq->where('kelas_id', $kelasId));
+                ->when($kelasId, function ($q) use ($kelasId, $periodeId) {
+                    $q->whereHas('user.rombels', function ($qq) use ($kelasId, $periodeId) {
+                        $qq->where('kelas_id', $kelasId);
+                        if ($periodeId) {
+                            $qq->where('periode_id', $periodeId);
+                        }
+                    });
                 })
                 ->sum('jumlah_transaksi');
         };
@@ -68,20 +69,32 @@ class ExportController extends Controller
             $query->where('user_id', $siswaId);
         }
         if ($kelasId) {
-            // fix: filter langsung ke user, bukan nested user.kelas dengan kolom yang salah
-            $query->whereHas('user', fn ($q) => $q->where('kelas_id', $kelasId));
+            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
+                $q->where('kelas_id', $kelasId)
+                  ->where('periode_id', $periodeId);
+            });
         }
 
         $siswas = $query->get();
         $user   = $siswaId ? User::find($siswaId) : null;
 
         $jumlahPenabung = User::where('roles_id', 4)
-            ->when($kelasId, fn ($q) => $q->where('kelas_id', $kelasId)) // fix: null-safe
+            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
+                $q->where('periode_id', $periodeId);
+                if ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                }
+            })
             ->count();
-        $jumlahPenabungAll = User::where('roles_id', 4)->count();
+            
+        $jumlahPenabungAll = User::where('roles_id', 4)
+            ->whereHas('rombels', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            })
+            ->count();
 
-        $jumlahSaldoTunai   = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
+        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
+        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
         $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
         $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
 
@@ -121,13 +134,13 @@ class ExportController extends Controller
         $endDate   = null;
 
         if ($dateRange) {
-            // split hanya di " - " (strip dikelilingi spasi), bukan di strip internal tanggal (YYYY-MM-DD)
             $parts = preg_split('/\s+-\s+/', trim($dateRange), 2);
             if (count($parts) === 2) {
                 $startDate = trim($parts[0]);
                 $endDate   = trim($parts[1]);
             }
         }
+        
         $query = Transaksi::query()
             ->where('periode_id', $periodeId)
             ->where('status', 'success');
@@ -136,7 +149,10 @@ class ExportController extends Controller
             $query->where('user_id', $siswaId);
         }
         if ($kelasId) {
-            $query->whereHas('user', fn ($q) => $q->where('kelas_id', $kelasId));
+            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
+                $q->where('kelas_id', $kelasId)
+                  ->where('periode_id', $periodeId);
+            });
         }
         if ($startDate) {
             $query->whereDate('created_at', '>=', $startDate);
@@ -149,12 +165,22 @@ class ExportController extends Controller
         $user = $siswaId ? User::find($siswaId) : null;
 
         $jumlahPenabung = User::where('roles_id', 4)
-            ->when($kelasId, fn ($q) => $q->where('kelas_id', $kelasId))
+            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
+                $q->where('periode_id', $periodeId);
+                if ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                }
+            })
             ->count();
-        $jumlahPenabungAll = User::where('roles_id', 4)->count();
+            
+        $jumlahPenabungAll = User::where('roles_id', 4)
+            ->whereHas('rombels', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            })
+            ->count();
 
-        $jumlahSaldoTunai   = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
+        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
+        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
         $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
         $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
 
@@ -194,7 +220,6 @@ class ExportController extends Controller
         $endDate   = null;
 
         if ($dateRange) {
-            // split hanya di " - " (strip dikelilingi spasi), bukan di strip internal tanggal (YYYY-MM-DD)
             $parts = preg_split('/\s+-\s+/', trim($dateRange), 2);
             if (count($parts) === 2) {
                 $startDate = trim($parts[0]);
@@ -208,7 +233,10 @@ class ExportController extends Controller
             $query->where('user_id', $siswaId);
         }
         if ($kelasId) {
-            $query->whereHas('user', fn ($q) => $q->where('kelas_id', $kelasId));
+            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
+                $q->where('kelas_id', $kelasId)
+                  ->where('periode_id', $periodeId);
+            });
         }
         if ($startDate) {
             $query->whereDate('created_at', '>=', $startDate);
@@ -221,13 +249,22 @@ class ExportController extends Controller
         $user = $siswaId ? User::find($siswaId) : null;
 
         $jumlahPenabung = User::where('roles_id', 4)
-            ->when($kelasId, fn ($q) => $q->where('kelas_id', $kelasId))
+            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
+                $q->where('periode_id', $periodeId);
+                if ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                }
+            })
             ->count();
-        $jumlahPenabungAll = User::where('roles_id', 4)->count();
+            
+        $jumlahPenabungAll = User::where('roles_id', 4)
+            ->whereHas('rombels', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            })
+            ->count();
 
-        // fix: konsisten pakai status success di tunai maupun digital
-        $jumlahSaldoTunai   = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
+        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
+        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
         $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
         $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
 

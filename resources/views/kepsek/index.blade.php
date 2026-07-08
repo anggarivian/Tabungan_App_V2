@@ -49,7 +49,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Jumlah Penabung</h6>
+                                    <h6 class="text-muted font-semibold">Penabung (Aktif)</h6>
                                     <h6 class="font-extrabold mb-0">{{$jumlah_penabung}} Orang</h6>
                                 </div>
                             </div>

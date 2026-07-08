@@ -30,11 +30,11 @@ class LaporanController extends Controller
         $perPage   = $request->input('perPage', 10);
         $periodeId = PeriodeHelper::id();
 
-        $query = User::with(['kelas', 'tabungan' => function ($q) use ($periodeId) {
-                $q->where('periode_id', $periodeId);
+        $query = User::with(['rombels.kelas', 'tabungan' => function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId)->where('roles_id', 4);
             }])
             ->whereHas('tabungan', function ($q) use ($periodeId) {
-                $q->where('periode_id', $periodeId);
+                $q->where('periode_id', $periodeId)->where('roles_id', 4);
             })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($qq) use ($search) {
@@ -42,8 +42,11 @@ class LaporanController extends Controller
                     ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($kelas, function ($q) use ($kelas) {
-                $q->where('kelas_id', $kelas);
+            ->when($kelas, function ($q) use ($kelas, $periodeId) {
+                $q->whereHas('rombels', function ($qq) use ($kelas, $periodeId) {
+                    $qq->where('kelas_id', $kelas)
+                    ->where('periode_id', $periodeId);
+                });
             })
             ->withSum(['tabungan as total_saldo' => function ($q) use ($periodeId) {
                 $q->where('periode_id', $periodeId);
@@ -61,7 +64,7 @@ class LaporanController extends Controller
             $query->orderBy('name', 'asc');
         }
 
-        $totalSantri = (clone $query)->count();
+        $totalSiswa = (clone $query)->count();
         $totalSaldoKeseluruhan = (clone $query)->get()->sum('total_saldo');
 
         $user = $query->paginate($perPage)->withQueryString();
@@ -69,7 +72,7 @@ class LaporanController extends Controller
         $kelasList = Kelas::orderBy('name')->get();
 
         return view('kepsek.laporan.lap_tabungan', compact(
-            'user', 'kelasList', 'totalSantri', 'totalSaldoKeseluruhan'
+            'user', 'kelasList', 'totalSiswa', 'totalSaldoKeseluruhan'
         ));
     }
 
@@ -92,7 +95,7 @@ class LaporanController extends Controller
         $perPage        = $request->input('perPage', 10);
         $periodeId      = PeriodeHelper::id();
 
-        $query = Transaksi::with(['user.kelas'])
+        $query = Transaksi::with(['user.rombels.kelas'])
             ->where('periode_id', $periodeId)
             ->where('status', 'success')
             ->when($search, function ($q) use ($search) {
@@ -101,9 +104,10 @@ class LaporanController extends Controller
                     ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($kelas, function ($q) use ($kelas) {
-                $q->whereHas('user', function ($qq) use ($kelas) {
-                    $qq->where('kelas_id', $kelas); // fix: filter langsung by kelas_id
+            ->when($kelas, function ($q) use ($kelas, $periodeId) {
+                $q->whereHas('user.rombels', function ($qq) use ($kelas, $periodeId) {
+                    $qq->where('kelas_id', $kelas)
+                    ->where('periode_id', $periodeId);
                 });
             })
             ->when($tipeTransaksi, function ($q) use ($tipeTransaksi) {
@@ -122,10 +126,9 @@ class LaporanController extends Controller
         if (in_array($sortTanggal, ['asc', 'desc'])) {
             $query->orderBy('created_at', $sortTanggal);
         } else {
-            $query->orderBy('created_at', 'desc'); // fallback aman
+            $query->orderBy('created_at', 'desc');
         }
 
-        // Summary sesuai filter yang aktif
         $totalTransaksi = (clone $query)->count();
         $totalStor  = (clone $query)->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
         $totalTarik = (clone $query)->where('tipe_transaksi', 'tarik')->sum('jumlah_transaksi');
@@ -158,7 +161,7 @@ class LaporanController extends Controller
         $perPage       = $request->input('perPage', 10);
         $periodeId     = PeriodeHelper::id();
 
-        $query = Pengajuan::with(['user.kelas', 'user.tabungan' => function ($q) use ($periodeId) {
+        $query = Pengajuan::with(['user.rombels.kelas', 'user.tabungan' => function ($q) use ($periodeId) {
                 $q->where('periode_id', $periodeId);
             }])
             ->where('periode_id', $periodeId)
@@ -168,9 +171,10 @@ class LaporanController extends Controller
                     ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->when($kelas, function ($q) use ($kelas) {
-                $q->whereHas('user', function ($qq) use ($kelas) {
-                    $qq->where('kelas_id', $kelas); // fix: filter langsung by kelas_id
+            ->when($kelas, function ($q) use ($kelas, $periodeId) {
+                $q->whereHas('user.rombels', function ($qq) use ($kelas, $periodeId) {
+                    $qq->where('kelas_id', $kelas)
+                    ->where('periode_id', $periodeId);
                 });
             })
             ->when($status, function ($q) use ($status) {
@@ -218,8 +222,16 @@ class LaporanController extends Controller
 
     public function lap_kepsek_export(Request $request)
     {
-        $siswas = User::where('roles_id', 4)->get();
-        $kelas = Kelas::all();
+        $periodeId = PeriodeHelper::id();
+
+        $siswas = User::where('roles_id', 4)
+            ->whereHas('rombels', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId);
+            })
+            ->orderBy('name')
+            ->get();
+
+        $kelas = Kelas::orderBy('name')->get();
 
         return view('kepsek.laporan.export', compact('siswas', 'kelas'));
     }

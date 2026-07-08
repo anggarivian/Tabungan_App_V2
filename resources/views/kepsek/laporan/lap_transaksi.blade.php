@@ -41,7 +41,6 @@
                 </button>
             </div>
 
-            {{-- Default collapsed, otomatis kebuka kalau ada filter aktif --}}
             <div class="collapse {{ request()->anyFilled(['search', 'kelas', 'tipe_transaksi', 'tipe_pembayaran', 'start_date', 'end_date']) ? 'show' : '' }} mt-3"
                 id="filterCollapse">
                 <form action="{{ url()->current() }}" method="GET" id="filterForm">
@@ -121,7 +120,6 @@
                 </form>
             </div>
 
-            {{-- Badge filter aktif, tetap keliatan walau form disembunyiin --}}
             @if (request()->anyFilled(['search', 'kelas', 'tipe_transaksi', 'tipe_pembayaran', 'start_date', 'end_date']))
                 <div class="mt-3 d-flex align-items-center flex-wrap gap-2">
                     <span class="text-muted small">Filter aktif:</span>
@@ -164,7 +162,6 @@
         </div>
     </div>
 
-    {{-- Summary cards --}}
     <div class="row g-3 mb-3">
         <div class="col-6 col-lg-4">
             <div class="card shadow-sm border-start border-primary border-4">
@@ -224,7 +221,7 @@
                                 <td class="text-center">{{ $transaksi->firstItem() + $loop->index }}</td>
                                 <td class="text-center">{{ $transaksis->user->username }}</td>
                                 <td>{{ Str::limit($transaksis->user->name, 20, '...') }}</td>
-                                <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td>
+                                <td class="text-center">{{ $transaksis->user->rombels->first()->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0) }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</td>
                                 <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>

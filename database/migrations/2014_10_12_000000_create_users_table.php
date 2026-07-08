@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
@@ -24,18 +19,13 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('orang_tua')->nullable();
             $table->string('alamat')->nullable();
-            $table->foreignId('kelas_id')->constrained();
+            $table->enum('status_siswa', ['aktif', 'lulus', 'pindah', 'nonaktif'])->default('aktif');
             $table->foreignId('roles_id')->constrained();
             $table->rememberToken();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('users');

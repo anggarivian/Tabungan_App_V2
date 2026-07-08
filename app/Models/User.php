@@ -53,7 +53,13 @@ class User extends Authenticatable
     {
         return Cache::has('user-is-online-' . $this->id);
     }
-
+    
+    public function rombels()
+        {
+            return $this->belongsToMany(Rombel::class, 'rombel_user', 'user_id', 'rombel_id')
+                        ->withPivot('no_absen')
+                        ->withTimestamps();
+        }
 
     /**
      * Atribut yang harus disembunyikan untuk serialisasi.

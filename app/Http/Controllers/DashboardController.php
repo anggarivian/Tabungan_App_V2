@@ -71,7 +71,7 @@ class DashboardController extends Controller
     */
 
     public function kepsek(){
-        $jumlah_penabung = User::where('roles_id', 4)->count();
+        $jumlah_penabung = User::where('roles_id', 4)->where('status_siswa', 'aktif')->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
@@ -204,119 +204,136 @@ class DashboardController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function walikelas(){
-        $kelas_id = auth()->user()->kelas_id;
+    public function walikelas()
+    {
+        $walikelas = auth()->user();
+        $kelas_id = $walikelas->kelas_id;
 
         $jumlah_penabung = User::where('roles_id', 4)
             ->where('kelas_id', $kelas_id)
             ->count();
 
-        $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')
+        $transaksi_masuk = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->where('tipe_transaksi', 'Stor')
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
             })
             ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
-        $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')
+        $transaksi_keluar = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->where('tipe_transaksi', 'Tarik')
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
             })
             ->where('status', 'success')
             ->sum('jumlah_transaksi');
-
-        $jumlah_saldo = Tabungan::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->sum('saldo');
-
-        // Chart -----------------------------------------------------------------------------------------------
-        $walikelas = auth()->user();
 
         $jumlah_penabung = User::where('roles_id', 4)
             ->where('kelas_id', $walikelas->kelas_id)
             ->count();
 
-        $transaksi_masuk = Transaksi::whereHas('user', function($query) use ($walikelas) {
-                    $query->where('kelas_id', $walikelas->kelas_id);
+        $transaksi_masuk = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->whereHas('user', function ($query) use ($walikelas) {
+                $query->where('kelas_id', $walikelas->kelas_id);
+            })
+            ->where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->sum('jumlah_transaksi');
+
+        $transaksi_keluar = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->whereHas('user', function ($query) use ($walikelas) {
+                $query->where('kelas_id', $walikelas->kelas_id);
+            })
+            ->where('tipe_transaksi', 'Tarik')
+            ->where('status', 'success')
+            ->sum('jumlah_transaksi');
+
+        $jumlah_saldo_tunai =
+            Transaksi::where('periode_id', PeriodeHelper::id())
+                ->whereHas('user', function ($query) use ($kelas_id) {
+                    $query->where('kelas_id', $kelas_id);
                 })
                 ->where('tipe_transaksi', 'Stor')
                 ->where('status', 'success')
-                ->sum('jumlah_transaksi');
-
-        $transaksi_keluar = Transaksi::whereHas('user', function($query) use ($walikelas) {
-                    $query->where('kelas_id', $walikelas->kelas_id);
+                ->where('pembayaran', 'Tunai')
+                ->sum('jumlah_transaksi')
+            -
+            Transaksi::where('periode_id', PeriodeHelper::id())
+                ->whereHas('user', function ($query) use ($kelas_id) {
+                    $query->where('kelas_id', $kelas_id);
                 })
                 ->where('tipe_transaksi', 'Tarik')
                 ->where('status', 'success')
-                ->sum('jumlah_transaksi');
-
-        $jumlah_saldo_tunai = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-                    $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Stor')
-                ->where('status', 'success')
-                ->where('pembayaran', 'Tunai')
-                ->sum('jumlah_transaksi')
-                - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-                    $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Tarik')
-                ->where('status', 'success')
                 ->where('pembayaran', 'Tunai')
                 ->sum('jumlah_transaksi');
 
-        $jumlah_saldo_digital = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+        $jumlah_saldo_digital =
+            Transaksi::where('periode_id', PeriodeHelper::id())
+                ->whereHas('user', function ($query) use ($kelas_id) {
                     $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Stor')
+                })
+                ->where('tipe_transaksi', 'Stor')
                 ->where('status', 'success')
                 ->where('pembayaran', 'Digital')
                 ->sum('jumlah_transaksi')
-                - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
+            -
+            Transaksi::where('periode_id', PeriodeHelper::id())
+                ->whereHas('user', function ($query) use ($kelas_id) {
                     $query->where('kelas_id', $kelas_id);
-                })->where('tipe_transaksi', 'Tarik')
+                })
+                ->where('tipe_transaksi', 'Tarik')
                 ->where('status', 'success')
                 ->where('pembayaran', 'Digital')
                 ->sum('jumlah_transaksi');
 
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
-                ->whereHas('user', function($query) use ($walikelas) {
-                    $query->where('kelas_id', $walikelas->kelas_id);
-                })
-                ->where('tipe_transaksi', 'stor')
-                ->where('status', 'success')
-                ->groupBy('date')
-                ->orderBy('date', 'asc')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => $item->date,
-                        'y' => $item->total
-                    ];
-                });
+            ->where('periode_id', PeriodeHelper::id())
+            ->whereHas('user', function ($query) use ($walikelas) {
+                $query->where('kelas_id', $walikelas->kelas_id);
+            })
+            ->where('tipe_transaksi', 'Stor')
+            ->where('status', 'success')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'x' => $item->date,
+                    'y' => $item->total
+                ];
+            });
 
-        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "stor" THEN jumlah_transaksi WHEN tipe_transaksi = "tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
-                ->whereHas('user', function($query) use ($walikelas) {
-                    $query->where('kelas_id', $walikelas->kelas_id);
-                })
-                ->where('status', 'success')
-                ->groupBy('date')
-                ->orderBy('date', 'asc')
-                ->get()
-                ->reduce(function ($carry, $item) {
-                    $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
-                    $carry->push([
-                        'x' => $item->date,
-                        'y' => (string) ($lastTotal + $item->daily_total)
-                    ]);
-                    return $carry;
-                }, collect());
+        $total = Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "Stor" THEN jumlah_transaksi WHEN tipe_transaksi = "Tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+            ->where('periode_id', PeriodeHelper::id())
+            ->whereHas('user', function ($query) use ($walikelas) {
+                $query->where('kelas_id', $walikelas->kelas_id);
+            })
+            ->where('status', 'success')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->reduce(function ($carry, $item) {
+                $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
 
-        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
+                $carry->push([
+                    'x' => $item->date,
+                    'y' => (string) ($lastTotal + $item->daily_total)
+                ]);
+
+                return $carry;
+            }, collect());
+
+        $storKali = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->where('tipe_transaksi', 'Stor')
             ->where('status', 'success')
             ->whereHas('user.kelas', function ($query) use ($kelas_id) {
                 $query->where('id', $kelas_id);
             })
             ->count();
 
-        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
+        $tarikKali = Transaksi::where('periode_id', PeriodeHelper::id())
+            ->where('tipe_transaksi', 'Tarik')
             ->where('status', 'success')
             ->whereHas('user.kelas', function ($query) use ($kelas_id) {
                 $query->where('id', $kelas_id);

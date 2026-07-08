@@ -471,14 +471,14 @@ class TabunganController extends Controller
         $transaksi_masuk = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Stor')
-        ->where('status', 'success')
+        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
         $transaksi_keluar = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Tarik')
-        ->where('status', 'success')
+        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
@@ -486,14 +486,14 @@ class TabunganController extends Controller
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Stor')
         ->where('status', 'success')
-        ->where('pembayaran', 'Tunai')
+        ->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi')
         - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Tarik')
         ->where('status', 'success')
-        ->where('pembayaran', 'Tunai')
+        ->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
@@ -501,25 +501,25 @@ class TabunganController extends Controller
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Stor')
         ->where('status', 'success')
-        ->where('pembayaran', 'Digital')
+        ->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi')
         - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->where('tipe_transaksi', 'Tarik')
         ->where('status', 'success')
-        ->where('pembayaran', 'Digital')
+        ->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())
         ->whereDate('created_at', Carbon::today())
         ->sum('jumlah_transaksi');
 
         $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
             $query->where('kelas_id', $kelas_id);
         })->whereDate('created_at', Carbon::today())
-        ->where('status', 'success')
+        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
         ->paginate($perPage);
 
         $storKali = Transaksi::where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->where('created_at', '>=', Carbon::today()->startOfDay())
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
@@ -527,7 +527,7 @@ class TabunganController extends Controller
             ->count();
 
         $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')
+            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
             ->where('created_at', '>=', Carbon::today()->startOfDay())
             ->whereHas('user', function ($query) use ($kelas_id) {
                 $query->where('kelas_id', $kelas_id);
@@ -557,7 +557,14 @@ class TabunganController extends Controller
     public function walikelas_storMasal()
     {
         $kelas = auth()->user()->kelas;
-        $siswa = User::where('kelas_id', $kelas->id)->where('roles_id', 4)->get();
+        dd($kelas);
+        $siswa = Tabungan::where('periode_id', PeriodeHelper::id())
+            ->whereHas('user', function ($query) use ($kelas) {
+                $query->where('kelas_id', $kelas->id)
+                    ->where('roles_id', 4);
+            })
+            ->with('user')
+            ->get();
         $walikelas = User::where('kelas_id', $kelas->id)->where('roles_id', 3)->first();
         $kemarin = Carbon::yesterday()->toDateString();
 
@@ -579,36 +586,36 @@ class TabunganController extends Controller
     */
 
     public function walikelas_search(Request $request)
-{
-    $username = $request->get('username');
-    $kelasIdWali = auth()->user()->kelas_id; // ambil kelas_id dari walikelas yang login
+    {
+        $username = $request->get('username');
+        $kelasIdWali = auth()->user()->kelas_id; // ambil kelas_id dari walikelas yang login
 
-    $user = DB::table('users')
-        ->join('tabungans', 'tabungans.user_id', '=', 'users.id')
-        ->join('kelas', 'kelas.id', '=', 'users.kelas_id')
-        ->where('users.username', $username)
-        ->where('users.kelas_id', $kelasIdWali) // batasi hanya siswa di kelas walikelas
-        ->select(
-            'users.name as user_name',
-            'kelas.name as kelas_name',
-            'tabungans.saldo as tabungan_saldo'
-        )
-        ->first();
+        $user = DB::table('users')
+            ->join('tabungans', 'tabungans.user_id', '=', 'users.id')
+            ->join('kelas', 'kelas.id', '=', 'users.kelas_id')
+            ->where('users.username', $username)
+            ->where('users.kelas_id', $kelasIdWali) // batasi hanya siswa di kelas walikelas
+            ->select(
+                'users.name as user_name',
+                'kelas.name as kelas_name',
+                'tabungans.saldo as tabungan_saldo'
+            )
+            ->first();
 
-    if ($user) {
-        return response()->json([
-            'name' => $user->user_name,
-            'kelas' => $user->kelas_name,
-            'tabungan' => number_format($user->tabungan_saldo, 0, ',', '.'),
-        ]);
-    } else {
-        return response()->json([
-            'name' => 'Tidak Ada',
-            'kelas' => 'Tidak Ada',
-            'tabungan' => 'Tidak Ada',
-        ]);
+        if ($user) {
+            return response()->json([
+                'name' => $user->user_name,
+                'kelas' => $user->kelas_name,
+                'tabungan' => number_format($user->tabungan_saldo, 0, ',', '.'),
+            ]);
+        } else {
+            return response()->json([
+                'name' => 'Tidak Ada',
+                'kelas' => 'Tidak Ada',
+                'tabungan' => 'Tidak Ada',
+            ]);
+        }
     }
-}
 
 
     /**

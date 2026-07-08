@@ -8,17 +8,10 @@ use Illuminate\Support\Facades\Hash;
 
 class CreateUserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        // Password default yang sudah di-hash
         $defaultPassword = Hash::make('12345');
 
-        // Data awal pengguna
         $users = [
             [
                 'name' => 'isKepsek',
@@ -28,8 +21,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'kepsek@mail.com',
                 'password' => $defaultPassword,
-                'kelas_id' => 1,
-                'roles_id' => 1
+                'roles_id' => 1,
             ],
             [
                 'name' => 'Operator Bendahara',
@@ -39,8 +31,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'bendahara@mail.com',
                 'password' => Hash::make('Agobet1213'),
-                'kelas_id' => 1,
-                'roles_id' => 2
+                'roles_id' => 2,
             ],
             [
                 'name' => 'Nia Marliana',
@@ -50,8 +41,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'niamarliana08@guru.sd.belajar.id',
                 'password' => $defaultPassword,
-                'kelas_id' => 1,
-                'roles_id' => 3
+                'roles_id' => 3,
             ],
             [
                 'name' => 'Rika Mayasari',
@@ -61,8 +51,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'rikamayasari43264@gmail.com',
                 'password' => $defaultPassword,
-                'kelas_id' => 2,
-                'roles_id' => 3
+                'roles_id' => 3,
             ],
             [
                 'name' => 'Mardi Alamsyah',
@@ -72,8 +61,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'mardialamsyah43264@gmail.com',
                 'password' => $defaultPassword,
-                'kelas_id' => 3,
-                'roles_id' => 3
+                'roles_id' => 3,
             ],
             [
                 'name' => 'Ai Nurhayati',
@@ -83,8 +71,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'ainurhayati61@guru.sd.belajar.id',
                 'password' => $defaultPassword,
-                'kelas_id' => 4,
-                'roles_id' => 3
+                'roles_id' => 3,
             ],
             [
                 'name' => 'Rohmayati',
@@ -94,8 +81,7 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'rohmayati039@gmail.com',
                 'password' => $defaultPassword,
-                'kelas_id' => 5,
-                'roles_id' => 3
+                'roles_id' => 3,
             ],
             [
                 'name' => 'Tresna Komala',
@@ -105,12 +91,10 @@ class CreateUserSeeder extends Seeder
                 'alamat' => 'Cianjur',
                 'email' => 'ktresna82@gmail.com',
                 'password' => $defaultPassword,
-                'kelas_id' => 6,
-                'roles_id' => 3
-            ]
+                'roles_id' => 3,
+            ],
         ];
 
-        // Loop untuk membuat pengguna
         foreach ($users as $userData) {
             User::create($userData);
         }

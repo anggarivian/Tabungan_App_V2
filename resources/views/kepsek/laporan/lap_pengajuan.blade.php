@@ -225,25 +225,25 @@
                                 <td class="text-center">{{ $pengajuan->firstItem() + $loop->index }}</td>
                                 <td class="text-center">{{ $pengajuans->user->username }}</td>
                                 <td>{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
-                                <td class="text-center">{{ $pengajuans->user->kelas->name ?? '-' }}</td>
+                                <td class="text-center">{{ $pengajuans->user->rombels->first()->name ?? '-' }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->user->tabungan->saldo ?? 0) }}</td>
                                 <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0) }}</td>
                                 <td class="text-center">
                                     @if (in_array($pengajuans->status, ['Pending', 'pending']))
                                         <span class="badge bg-warning">Pending</span>
-                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                        <span class="badge bg-light text-dark">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @elseif (in_array($pengajuans->status, ['Batal', 'batal']))
                                         <span class="badge bg-danger">Batal</span>
-                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                        <span class="badge bg-light text-dark">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @elseif (in_array($pengajuans->status, ['Tolak', 'tolak']))
                                         <span class="badge bg-danger">Tolak</span>
-                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                        <span class="badge bg-light text-dark">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @elseif (in_array($pengajuans->status, ['Terima', 'Diterima', 'SUCCEEDED']))
                                         <span class="badge bg-success">Terima</span>
-                                        <span class="badge bg-light">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                        <span class="badge bg-light text-dark">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
-                                        <span class="badge bg-light">-</span>
+                                        <span class="badge bg-light text-dark">-</span>
                                     @endif
                                 </td>
                                 <td>{{ Str::limit($pengajuans->alasan, 20, '...') }}</td>

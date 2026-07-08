@@ -26,6 +26,7 @@
         </div>
     </div>
 </div>
+{{-- BLADE --}}
 <div class="page-content">
     <div class="card shadow mb-3">
         <div class="card-body">
@@ -42,7 +43,6 @@
                 </button>
             </div>
 
-            {{-- default collapsed (sembunyi), otomatis kebuka kalau ada filter aktif --}}
             <div class="collapse {{ request()->anyFilled(['search', 'kelas', 'sort_saldo', 'min_saldo', 'max_saldo']) ? 'show' : '' }} mt-3"
                 id="filterCollapse">
                 <form action="{{ route('laporan.kepsek.tabungan') }}" method="GET" id="filterForm">
@@ -56,7 +56,7 @@
                             </div>
                         </div>
 
-                        <div class="col-6 col-lg-2">
+                        <div class="col-6 col-lg-1">
                             <label class="form-label small text-muted mb-1">Kelas</label>
                             <select class="form-select" name="kelas" id="kelas">
                                 <option value="">Semua Kelas</option>
@@ -90,16 +90,18 @@
                                 value="{{ request('max_saldo') }}" placeholder="Tak terbatas">
                         </div>
 
-                        <div class="col-12 col-lg-1 d-flex gap-1">
-                            <button type="submit" class="btn btn-primary w-100" title="Cari">
-                                <i class="bi bi-funnel-fill"></i>
+                        <div class="col-6 col-md-3 col-lg-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="bi bi-search"></i> Cari
                             </button>
+                            <a href="{{ url()->current() }}" class="btn btn-outline-secondary" title="Reset Filter">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
                         </div>
                     </div>
                 </form>
             </div>
 
-            {{-- Badge filter aktif, taruh di luar collapse biar tetap keliatan walau filter disembunyiin --}}
             @if (request()->anyFilled(['search', 'kelas', 'sort_saldo', 'min_saldo', 'max_saldo']))
                 <div class="mt-3 d-flex align-items-center flex-wrap gap-2">
                     <span class="text-muted small">Filter aktif:</span>
@@ -136,13 +138,12 @@
         </div>
     </div>
 
-    {{-- Summary cards --}}
     <div class="row g-3 mb-3">
         <div class="col-6 col-lg-3">
             <div class="card shadow-sm border-start border-primary border-4">
                 <div class="card-body py-3">
-                    <div class="text-muted small">Total Santri</div>
-                    <div class="fs-5 fw-semibold">{{ number_format($totalSantri) }}</div>
+                    <div class="text-muted small">Total Siswa</div>
+                    <div class="fs-5 fw-semibold">{{ number_format($totalSiswa) }}</div>
                 </div>
             </div>
         </div>
@@ -185,7 +186,7 @@
                                 <td>{{ $users->name }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-secondary-subtle text-dark">
-                                        {{ $users->kelas->name ?? '-' }}
+                                        {{ $users->rombels->first()->name ?? '-' }}
                                     </span>
                                 </td>
                                 <td class="text-end">Rp {{ number_format($users->tabungan->saldo ?? 0) }}</td>

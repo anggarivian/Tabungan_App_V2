@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 
 class PeriodeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $periodes = Periode::latest()->get();
+        $perPage = $request->get('perPage', 10);
+
+        $periodes = Periode::latest()
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         return view(
             'bendahara.periode.index',
@@ -50,6 +54,23 @@ class PeriodeController extends Controller
 
         return back()
         ->with('success','Periode berhasil dibuat.');
+    }
+
+    public function update(Request $request, Periode $periode)
+    {
+        $request->validate([
+            'nama' => 'required|unique:periodes,nama,' . $periode->id,
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+        ]);
+
+        $periode->update([
+            'nama' => $request->nama,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
+        ]);
+
+        return back()->with('success', 'Periode berhasil diperbarui.');
     }
 
     public function aktifkan(Periode $periode)

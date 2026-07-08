@@ -98,8 +98,13 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/bendahara/kelola-periode/{periode}/update', [PeriodeController::class, 'update'])->name('bendahara.periode.update');
         Route::put('/bendahara/kelola-periode/{periode}/aktifkan', [PeriodeController::class, 'aktifkan'])->name('bendahara.periode.aktifkan');
 
-        // Menangani pengelolaan Rombel (kelas).
+        // Menangani pengelolaan Rombel.
+        Route::resource('bendahara/rombel', RombelController::class);
         Route::get('/bendahara/kelola-rombel', [RombelController::class, 'index'])->name('bendahara.rombel.index');
+        Route::post('/bendahara/kelola-rombel/store', [RombelController::class, 'store'])->name('bendahara.rombel.store');
+        Route::get('/bendahara/kelola-rombel/{rombel}/students', [RombelController::class, 'getStudents'])->name('bendahara.rombel.students');
+        Route::put('/bendahara/kelola-rombel/{rombel}/update', [RombelController::class, 'update'])->name('bendahara.rombel.update');
+        Route::delete('/bendahara/kelola-rombel/{rombel}/delete', [RombelController::class, 'destroy'])->name('bendahara.rombel.delete');
 
         // Menangani pengelolaan Tabungan.
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');

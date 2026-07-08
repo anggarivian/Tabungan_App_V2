@@ -6,28 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRombelsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('rombels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('walikelas');
-            $table->string('anggota')->nullable();
+            $table->unsignedBigInteger('walikelas_id')->nullable(); // FK ditambahin belakangan, users belum ada di titik ini
             $table->foreignId('kelas_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('rombels');
