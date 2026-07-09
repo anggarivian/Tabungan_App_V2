@@ -1,279 +1,329 @@
 @extends('layout.main')
 
-@section('title') Tabungan - SakuRame @endsection
+@section('title', 'Tabungan - SakuRame')
 
 @section('content')
-<div class="page-heading mb-3">
+<style>
+    /* Styling Animasi Teks Header */
+    .page-heading h3 {
+        font-size: 1.8rem;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientMove 3s ease-in-out infinite;
+        font-weight: 800;
+        margin-bottom: 0.2rem;
+    }
+
+    .page-heading h4 {
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+
+    @keyframes gradientMove {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Styling Custom Card & Hover Effect */
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+
+    .icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-box svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Custom Colors for Icons */
+    .bg-blue-light { background-color: #e0f2fe; color: #0284c7; }
+    .bg-green-light { background-color: #dcfce7; color: #16a34a; }
+    .bg-purple-light { background-color: #f3e8ff; color: #9333ea; }
+    .bg-red-light { background-color: #fee2e2; color: #dc2626; }
+    .bg-orange-light { background-color: #ffedd5; color: #ea580c; }
+    
+    /* Custom Tabs */
+    .custom-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .custom-tabs .nav-link.active {
+        color: #764ba2;
+        border-bottom-color: #764ba2;
+        background: transparent;
+    }
+</style>
+
+<div class="page-heading mb-4">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h3 class="mt-3">Informasi Tabungan Hari Ini</h3>
+            <h3 class="m-0 fw-bold text-dark">Informasi Tabungan</h3>
         </div>
         <div class="col-12 col-md-6 text-md-end">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
-                    @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
-                    @endif
-                    <li class="breadcrumb-item active" aria-current="page">Tabungan</li>
-                </ol>
-            </nav>
+            <span class="badge text-secondary border px-3 py-2 fs-6 fw-medium shadow-sm">
+                <i class="bi bi-calendar3 me-2"></i>{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+            </span>
         </div>
     </div>
 </div>
+
 <div class="page-content">
-    <section class="row">
-        <div class="col-12 col-lg-12">
-            <div class="row">
-                <div class="col-12 col-sm-12 col-lg-6 col-md-12">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class=" col-6 col-md-2 col-sm-6 mb-3 mb-sm-0 mb-md-0 mb-lg-0  d-flex justify-content-center ">
-                                    <div class="stats-icon green mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -230 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M352 96l64 0c17.7 0 32 14.3 32 32l0 256c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0c53 0 96-43 96-96l0-256c0-53-43-96-96-96l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32zm-9.4 182.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L242.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg>
-                                    </div>
-                                </div>
-                                <div class=" col-6 col-md-4 col-sm-6">
-                                    <h6 class="text-muted font-semibold">Uang Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}} | {{$storKali}}x</h6>
-                                </div>
-                                <div class=" col-6 col-md-2 col-sm-6 d-flex justify-content-center">
-                                    <div class="stats-icon red mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -230 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z"/></svg>
-                                    </div>
-                                </div>
-                                <div class=" col-6 col-md-4 col-sm-6">
-                                    <h6 class="text-muted font-semibold">Uang Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}} | {{$tarikKali}}x</h6>
-                                </div>
-                            </div>
-                        </div>
+    
+    <!-- Section Kartu Statistik -->
+    <div class="row g-3 mb-3">
+        <!-- Card Uang Masuk & Keluar (Digabung biar lebih proporsional) -->
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-green-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/></svg>
                     </div>
-                </div>
-                <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
-                                    <div class="stats-icon purple mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -250 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M0 112.5L0 422.3c0 18 10.1 35 27 41.3c87 32.5 174 10.3 261-11.9c79.8-20.3 159.6-40.7 239.3-18.9c23 6.3 48.7-9.5 48.7-33.4l0-309.9c0-18-10.1-35-27-41.3C462 15.9 375 38.1 288 60.3C208.2 80.6 128.4 100.9 48.7 79.1C25.6 72.8 0 88.6 0 112.5zM288 352c-44.2 0-80-43-80-96s35.8-96 80-96s80 43 80 96s-35.8 96-80 96zM64 352c35.3 0 64 28.7 64 64l-64 0 0-64zm64-208c0 35.3-28.7 64-64 64l0-64 64 0zM512 304l0 64-64 0c0-35.3 28.7-64 64-64zM448 96l64 0 0 64c-35.3 0-64-28.7-64-64z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-9 col-sm-6">
-                                    <h6 class="text-muted font-semibold">Jumlah Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-3 col-md-12 col-sm-12 ">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-6 col-md-3 col-sm-6 d-flex justify-content-center ">
-                                    <div class="stats-icon blue mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -250 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M64 32C28.7 32 0 60.7 0 96l0 32 576 0 0-32c0-35.3-28.7-64-64-64L64 32zM576 224L0 224 0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-192zM112 352l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm112 16c0-8.8 7.2-16 16-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-9 col-sm-6">
-                                    <h6 class="text-muted font-semibold">Jumlah Digital</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_digital)}}</h6>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Transaksi Masuk</h6>
+                        <h5 class="font-extrabold mb-1">Rp {{ number_format($transaksi_masuk) }}</h5>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-circle"></i> {{$storKali}}x Setoran</small>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <div class="row justify-content-center">
-        <div class="container">
-            <div class="card position-relative shadow">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">Input Transaksi</h5>
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-red-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Transaksi Keluar</h6>
+                        <h5 class="font-extrabold mb-1">Rp {{ number_format($transaksi_keluar) }}</h5>
+                        <small class="text-danger fw-bold"><i class="bi bi-arrow-down-circle"></i> {{$tarikKali}}x Penarikan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-12 col-xl-4">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-green-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Tunai | Digital</h6>
+                        <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_tunai) }} | Rp {{ number_format($jumlah_saldo_digital) }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Responsive flex container -->
+    {{-- Section Input Aksi --}}
+    {{-- Tambahkan position-relative dan z-index tinggi di bungkus paling luarnya --}}
+    <div class="row mb-3 position-relative" style="z-index: 999;">
+        <div class="col-12">
+            {{-- Tambahkan overflow: visible biar dropdown gak kepotong sama border radius card --}}
+            <div class="card stat-card mb-0 shadow-sm border-0" style="overflow: visible;">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3"><i class="bi bi-grid me-2"></i>Menu Transaksi Cepat</h5>
+                    
                     <div class="d-flex flex-column flex-md-row gap-3">
-
-                        <!-- Tombol Stor Per Orang -->
+                        
                         <div class="flex-fill">
-                            <a href="{{route('bendahara.tabungan.stor')}}" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512">
-                                    <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
-                                </svg>
+                            <a href="{{ route('bendahara.tabungan.stor') }}" class="btn btn-primary w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-person-plus-fill fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
                                 <span>Stor Per Orang</span>
                             </a>
                         </div>
 
                         <div class="flex-fill position-relative">
                             <div class="dropdown h-100">
-                                <button class="btn btn-primary dropdown-toggle w-100 h-100 d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown">
-                                    Stor Per Kelas
+                                <button class="btn btn-primary dropdown-toggle w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-people-fill fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
+                                    Stor Per Rombel
                                 </button>
-                                <ul class="dropdown-menu w-100" style="z-index: 1050;">
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/1">Kelas 1</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/2">Kelas 2</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/3">Kelas 3</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/4">Kelas 4</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/5">Kelas 5</a></li>
-                                    <li><a class="dropdown-item" href="/bendahara/tabungan/stor/kelas/6">Kelas 6</a></li>
+                                <ul class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto;">
+                                    @forelse($rombels as $r)
+                                        <li>
+                                            <a class="dropdown-item py-2" href="{{ url('/bendahara/tabungan/stor/rombel/' . $r->id) }}">
+                                                <i class="bi bi-box-arrow-in-right me-2 text-muted" style="margin-top: -18px; margin-left: -5px;"></i>{{ $r->name }}
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li><span class="dropdown-item text-muted" style="margin-top: -18px; margin-left: -5px;">Belum ada rombel</span></li>
+                                    @endforelse
                                 </ul>
                             </div>
                         </div>
 
-                        <!-- Tombol Tarik -->
                         <div class="flex-fill">
-                            <a href="{{route('bendahara.tabungan.tarik')}}" class="btn btn-danger w-100 h-100 d-flex align-items-center justify-content-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512">
-                                    <path fill="#ffffff" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/>
-                                </svg>
-                                <span>Tarik</span>
+                            <a href="{{ route('bendahara.tabungan.tarik') }}" class="btn btn-danger w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-cash-coin fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
+                                <span>Tarik Tunai</span>
                             </a>
                         </div>
 
-                        <!-- Uncomment jika diperlukan -->
-                        <!--
-                        <div class="flex-fill">
-                            <button class="btn btn-success w-100 h-100" data-bs-toggle="modal" data-bs-target="#importModal">
-                                Import
-                            </button>
-                        </div>
-                        -->
-
-                    </div>
-                </div>
-            </div>
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5 class="card-title">Transaksi Hari Ini</h5>
-                    </div>
-                    <p class="text-center">Pilih Kelas</p>
-                    <div class="row justify-content-center g-2">
-                        @foreach(range(1,7) as $i)
-                            <div class="col-6 col-sm-4 col-md-1">
-                                <button
-                                    class="btn btn-sm btn-light w-100"
-                                    onclick="showTable({{ $i }})">
-                                    Kelas {{ $i }}
-                                </button>
-                            </div>
-                        @endforeach
-                    </div>
-
-
-                    <!-- Dropdown Table Section -->
-                    <div class="dropdown-table mt-5 w-100">
-                        @foreach(range(1,7) as $i)
-                            @php $kelasData = $kelasList['kelas'.$i]; @endphp
-                            <div id="table{{ $i }}" class="table-responsive-lg" style="display: none;">
-                                <div class="mb-3">
-                                    <div class="d-flex flex-wrap gap-3">
-                                        <h6 class="mb-0">Kelas {{ $i }} :</h6>
-                                        <div class="badge bg-success">Stor: Rp. {{ number_format($kelasData['stor']) }}</div>
-                                        <div class="badge bg-danger">Tarik: Rp. {{ number_format($kelasData['tarik']) }}</div>
-                                    </div>
-                                </div>
-                                <table class="table table-hover" style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">No.</th>
-                                            <th class="text-center">ID</th>
-                                            <th>Nama</th>
-                                            {{-- <th class="text-center">Kelas</th> --}}
-                                            <th class="text-center">Saldo Awal</th>
-                                            <th class="text-center">Jumlah Transaksi</th>
-                                            <th class="text-center">Saldo Akhir</th>
-                                            <th class="text-center">Transaksi</th>
-                                            <th class="text-center">Pembuat</th>
-                                            <th class="text-center">Tanggal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($kelasData['data'] as $transaksis)
-                                            <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td class="text-center">{{ $transaksis->user->username }}</td>
-                                                <td>{{ Str::limit($transaksis->user->name, 20, '...') }}</td>
-                                                {{-- <td class="text-center">{{ $transaksis->user->kelas->name ?? '-' }}</td> --}}
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_awal ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->jumlah_transaksi ?? 0) }}</td>
-                                                <td class="text-center">Rp. {{ number_format($transaksis->saldo_akhir ?? 0) }}</td>
-                                                <td class="text-center">
-                                                    @if ($transaksis->tipe_transaksi == 'Stor')
-                                                        <span class="badge bg-success">Stor</span>
-                                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
-                                                    @elseif ($transaksis->tipe_transaksi == 'Tarik')
-                                                        <span class="badge bg-danger">Tarik</span>
-                                                        <span class="badge bg-light">{{ $transaksis->pembayaran ?? '-' }}</span>
-                                                    @else
-                                                        <span class="badge bg-secondary">-</span>
-                                                        <span class="badge bg-light">-</span>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">{{ Str::limit($transaksis->pembuat, 10, '...') }}</td>
-                                                <td class="text-center">{{ \Carbon\Carbon::parse($transaksis->created_at)->format('d M Y H:i') }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="10" class="text-center">Data Kosong</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-
-                                <div class="d-flex justify-content-between">
-                                    <form method="GET" action="{{ request()->url() }}">
-                                        <div class="d-flex justify-content-end mb-3">
-                                            <label for="perPage" style="margin-top: 3px">Show</label>
-                                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
-                                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
-                                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                                            </select>
-                                        </div>
-                                    </form>
-                                    <div class="justify-content-end">
-                                        {{ $kelasData['data']->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Section Tabel Transaksi Harian (Desain Baru) --}}
+    <div class="card stat-card shadow-sm border-0">
+        {{-- Hapus bg-white, biarkan class card-header bawaan template bekerja --}}
+        <div class="card-header pt-4 pb-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <h5 class="card-title mb-0"><i class="bi bi-journal-text me-2"></i>Rekap Transaksi Harian</h5>
+            
+            <div class="d-flex align-items-center gap-2">
+                <label for="selectRombel" class="text-muted small fw-medium text-nowrap">Pilih Rombel:</label>
+                {{-- Hapus shadow dan border khusus, gunakan form-select standar agar ikuti tema --}}
+                <select id="selectRombel" class="form-select" style="min-width: 200px;" onchange="showTable(this.value)">
+                    @foreach($rombels as $r)
+                        <option value="{{ $r->id }}">{{ $r->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        
+        <div class="card-body pt-4">
+            <div class="dropdown-table w-100">
+                @foreach($rombels as $r)
+                    @php $rombelData = $rombelList[$r->id]; @endphp
+                    <div id="table{{ $r->id }}" class="rombel-table-container table-responsive" style="display: none;">
+                        
+                        {{-- Mini Dashboard Rombel (Tanpa bg-light, lebih bersih) --}}
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2">
+                            <h6 class="mb-0 fw-bold">
+                                <i class="bi bi-bookmark-fill text-primary me-2"></i>Data {{ $rombelData['nama_rombel'] }}
+                            </h6>
+                            <div class="d-flex gap-2">
+                                {{-- Menggunakan badge standar agar warnanya solid dan aman di dark mode --}}
+                                <span class="badge bg-success px-3 py-2">
+                                    <i class="bi bi-arrow-down-left-circle me-1"></i> Stor: Rp {{ number_format($rombelData['stor']) }}
+                                </span>
+                                <span class="badge bg-danger px-3 py-2">
+                                    <i class="bi bi-arrow-up-right-circle me-1"></i> Tarik: Rp {{ number_format($rombelData['tarik']) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover align-middle mb-0" style="width: 100%">
+                            {{-- Hapus table-light agar header tabel menyatu dengan warna card di dark mode --}}
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="50">No</th>
+                                    <!-- <th class="text-center">Kode</th> -->
+                                    <th>Nama Siswa</th>
+                                    {{-- Pastikan header angka rata kanan (text-end) presisi dengan isinya --}}
+                                    <th class="text-end">Saldo Awal</th>
+                                    <th class="text-end">Jumlah</th>
+                                    <th class="text-end">Saldo Akhir</th>
+                                    <th class="text-center">Tipe</th>
+                                    <th class="text-center">Pembuat</th>
+                                    <th class="text-center">Waktu</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($rombelData['data'] as $transaksi)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <!-- <td class="text-center">
+                                            <span class="badge bg-secondary">{{ $transaksi->user->username }}</span>
+                                        </td> -->
+                                        <td class="fw-medium">{{ Str::limit($transaksi->user->name, 25, '...') }}</td>
+                                        <td class="text-end text-muted">Rp {{ number_format($transaksi->saldo_awal ?? 0) }}</td>
+                                        <td class="text-end fw-medium {{ $transaksi->tipe_transaksi == 'Stor' ? 'text-success' : 'text-danger' }}">
+                                            {{ $transaksi->tipe_transaksi == 'Stor' ? '+' : '-' }} Rp {{ number_format($transaksi->jumlah_transaksi ?? 0) }}
+                                        </td>
+                                        <td class="text-end fw-bold">Rp {{ number_format($transaksi->saldo_akhir ?? 0) }}</td>
+                                        <td class="text-center">
+                                            @if ($transaksi->tipe_transaksi == 'Stor')
+                                                <span class="badge bg-success">Stor | {{ $transaksi->pembayaran ?? '-' }}</span>
+                                            @elseif ($transaksi->tipe_transaksi == 'Tarik')
+                                                <span class="badge bg-danger">Tarik | {{ $transaksi->pembayaran ?? '-' }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center small">{{ Str::limit($transaksi->pembuat, 15, '...') }}</td>
+                                        <td class="text-center small text-muted">{{ \Carbon\Carbon::parse($transaksi->created_at)->format('H:i') }}</td>
+                                        <td class="text-center">
+                                            {{-- Tombol untuk trigger Modal --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" 
+                                                    onclick="batalTransaksi({{ $transaksi->id }}, '{{ addslashes($transaksi->user->name) }}', {{ $transaksi->jumlah_transaksi }}, '{{ $transaksi->tipe_transaksi }}')">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="bi bi-journal-x display-4 text-muted d-block mb-3"></i>
+                                            <h6 class="text-muted fw-normal">Belum ada transaksi di rombel ini hari ini.</h6>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
 </div>
 
-{{-- Modal Import --}}
-<div class="modal fade modal-borderless" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="importModalLabel">Import Data Transaksi</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+{{-- Modal Batal Transaksi --}}
+<div class="modal fade" id="batalModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger pt-4 pb-3">
+                <h5 class="modal-title text-white"><i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Batal Transaksi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('bendahara.tabungan.import') }}" method="POST" enctype="multipart/form-data">
+            <form id="formBatal" method="POST" action="">
                 @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="formFile" class="form-label">Pilih File ( Format : .xls .xlsx)</label>
-                        <input class="form-control" type="file" name="file" id="formFile">
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning py-2 small mb-4">
+                        <i class="bi bi-info-circle me-1"></i> Membatalkan transaksi akan otomatis mengurangi/menambah saldo akhir siswa. Data yang dibatalkan tidak bisa dikembalikan.
+                    </div>
+                    
+                    <p class="mb-4 text-center">
+                        Batalkan transaksi <strong id="batalTipe" class="text-uppercase"></strong> sebesar <br>
+                        <strong id="batalNominal" class="fs-4 text-danger"></strong><br>
+                        atas nama <strong id="batalNama"></strong>?
+                    </p>
+                    
+                    <div class="mb-2 bg-body-secondary p-3 rounded border">
+                        <label class="form-label fw-bold text-center w-100 mb-2">Ketik "BATAL" untuk konfirmasi:</label>
+                        <input type="text" name="konfirmasi" class="form-control text-center text-uppercase fw-bold" placeholder="BATAL" required autocomplete="off">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-danger px-4">Ya, Batalkan</button>
                 </div>
             </form>
         </div>
@@ -282,34 +332,44 @@
 @endsection
 
 @section('js')
-<script>
-    function showTable(tableId) {
-        for (let i = 1; i <= 7; i++) {
-            const tbl = document.getElementById('table' + i);
-            if (tbl) tbl.style.display = 'none';
-        }
-        const sel = document.getElementById('table' + tableId);
-        if (sel) sel.style.display = 'block';
-    }
-    document.addEventListener("DOMContentLoaded", () => showTable(1));
-</script>
-{{-- <script>
-    function showTable(tableId) {
-        for (let i = 1; i <= 9; i++) {
-            const table = document.getElementById('table' + i);
-            if (table) {
-                table.style.display = 'none';
-            }
-        }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        const selectedTable = document.getElementById('table' + tableId);
+<script>
+    // Logic untuk merubah tampilan tabel berdasarkan Select Option
+    function showTable(rombelId) {
+        const tables = document.querySelectorAll('.rombel-table-container');
+        tables.forEach(table => {
+            table.style.display = 'none';
+        });
+
+        const selectedTable = document.getElementById('table' + rombelId);
         if (selectedTable) {
             selectedTable.style.display = 'block';
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        showTable(1);
+    // Jalankan saat halaman pertama kali di-load
+    document.addEventListener("DOMContentLoaded", () => {
+        const selectElement = document.getElementById('selectRombel');
+        if (selectElement && selectElement.value) {
+            showTable(selectElement.value);
+        }
     });
-</script> --}}
+
+    // Fungsi Batal Transaksi (Butuh jQuery)
+    function batalTransaksi(id, nama, nominal, tipe) {
+        let formatNominal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(nominal);
+        
+        $('#batalNama').text(nama);
+        $('#batalNominal').text(formatNominal);
+        $('#batalTipe').text(tipe);
+        
+        let url = "{{ url('/bendahara/tabungan/batal') }}/" + id;
+        $('#formBatal').attr('action', url);
+        
+        $('input[name="konfirmasi"]').val('');
+        
+        $('#batalModal').modal('show');
+    }
+</script>
 @endsection

@@ -3,6 +3,19 @@
 @section('title') Kelola Rombel - SakuRame @endsection
 
 @section('content')
+<style>
+    /* Styling Custom Card & Hover Effect */
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+</style>
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
@@ -28,7 +41,7 @@
 </div>
 
 <div class="page-content">
-    <div class="card shadow">
+    <div class="card stat-card shadow-sm border-0">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -58,6 +71,7 @@
             @endif
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahRombelModal">
+                    <i class="bi bi-plus-circle"></i>    
                     Tambah Rombel
                 </button>
                 <form action="{{ route('bendahara.rombel.index') }}" method="GET">
@@ -70,6 +84,13 @@
             </div>
         </div>
         <div class="card-body pb-1 pt-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small">
+                    Menampilkan {{ $rombels->firstItem() ?? 0 }}–{{ $rombels->lastItem() ?? 0 }}
+                    dari {{ $rombels->total() }} rombel
+                </span>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-hover" style="width: 100%">
                     <thead>

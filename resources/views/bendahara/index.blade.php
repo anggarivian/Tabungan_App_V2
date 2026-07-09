@@ -4,151 +4,183 @@
 
 @section('content')
 <style>
+    /* Styling Animasi Teks Header */
     .page-heading h3 {
         font-size: 1.8rem;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2, #667eea);
-        background-size: 200% 200%;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        animation: darkWave 3s ease-in-out infinite, slideInUp 2s ease-out;
+        animation: gradientMove 3s ease-in-out infinite;
         font-weight: 800;
+        margin-bottom: 0.2rem;
     }
 
     .page-heading h4 {
-        font-size: 1.2rem;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2, #667eea);
-        background-size: 200% 200%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: darkWave 3s ease-in-out infinite, slideInUp 2s ease-out;
-        font-weight: 200;
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 400;
+        margin-bottom: 0;
     }
 
-    @keyframes darkWave {
-        0%, 100% { background-position: 0% 50% }
-        50% { background-position: 100% 50% }
+    @keyframes gradientMove {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Styling Custom Card & Hover Effect */
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+
+    .icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-box svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Custom Colors for Icons */
+    .bg-blue-light { background-color: #e0f2fe; color: #0284c7; }
+    .bg-green-light { background-color: #dcfce7; color: #16a34a; }
+    .bg-purple-light { background-color: #f3e8ff; color: #9333ea; }
+    .bg-red-light { background-color: #fee2e2; color: #dc2626; }
+    .bg-orange-light { background-color: #ffedd5; color: #ea580c; }
+    
+    /* Custom Tabs */
+    .custom-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .custom-tabs .nav-link.active {
+        color: #764ba2;
+        border-bottom-color: #764ba2;
+        background: transparent;
     }
 </style>
-<div class="page-heading">
-    <h4>Selamat Datang, </h4>
+
+<div class="page-heading mb-4">
+    <h4>Selamat Datang kembali,</h4>
     <h3>{{auth()->user()->name}}</h3>
 </div>
+
 <div class="page-content">
-    <section class="row">
-        <div class="col-12 col-lg-12">
-            <div class="row">
-                <div class="col-12 col-lg-4 col-md-12">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon blue mb-2">
-                                        <i class="iconly-boldProfile"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Jumlah Penabung</h6>
-                                    <h6 class="font-extrabold mb-0">{{$jumlah_penabung}} Orang</h6>
-                                </div>
-                            </div>
-                        </div>
+    <div class="row g-3 mb-3 mt-4">
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-blue-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg>
                     </div>
-                </div>
-                <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon purple mb-2">
-                                        <i class="iconly-boldWallet"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Saldo Tunai</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_tunai)}}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-4 col-md-6">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon green mb-2">
-                                        <i class="iconly-boldWallet"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Saldo Digital</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($jumlah_saldo_digital)}}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Row kedua -->
-                <div class="col-6 col-lg-6 col-md-6">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon green mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -230 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M352 96l64 0c17.7 0 32 14.3 32 32l0 256c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0c53 0 96-43 96-96l0-256c0-53-43-96-96-96l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32zm-9.4 182.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L242.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Transaksi Masuk</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_masuk)}} | {{$storKali}}x</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-6 col-md-6">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon red mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -230 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Transaksi Keluar</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($transaksi_keluar)}} | {{$tarikKali}}x</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-12 col-md-12">
-                    <div class="card shadow">
-                        <div class="card-body px-4 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
-                                    <div class="stats-icon purple mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-230 -250 1000 1000"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M0 112.5L0 422.3c0 18 10.1 35 27 41.3c87 32.5 174 10.3 261-11.9c79.8-20.3 159.6-40.7 239.3-18.9c23 6.3 48.7-9.5 48.7-33.4l0-309.9c0-18-10.1-35-27-41.3C462 15.9 375 38.1 288 60.3C208.2 80.6 128.4 100.9 48.7 79.1C25.6 72.8 0 88.6 0 112.5zM288 352c-44.2 0-80-43-80-96s35.8-96 80-96s80 43 80 96s-35.8 96-80 96zM64 352c35.3 0 64 28.7 64 64l-64 0 0-64zm64-208c0 35.3-28.7 64-64 64l0-64 64 0zM512 304l0 64-64 0c0-35.3 28.7-64 64-64zM448 96l64 0 0 64c-35.3 0-64-28.7-64-64z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Hasil Penarikan | Perkiraan Hasil</h6>
-                                    <h6 class="font-extrabold mb-0">Rp. {{ number_format($bendahara->saldo)}} | ~Rp. {{ number_format($premi)}}</h6>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Jumlah Penabung</h6>
+                        <h5 class="font-extrabold mb-0">{{$jumlah_penabung}} <span class="fs-6 text-muted fw-normal">Orang</span></h5>
                     </div>
                 </div>
             </div>
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Statistik Tabungan</h5>
+        </div>
 
-                    <!-- Tabs Navigation -->
-                    <ul class="nav nav-tabs" id="tabunganTabs" role="tablist">
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-green-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Saldo Tunai</h6>
+                        <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_tunai) }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-purple-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2Zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7Z"/><path d="M2 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Saldo Digital</h6>
+                        <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_digital) }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-green-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Transaksi Masuk</h6>
+                        <h5 class="font-extrabold mb-1">Rp {{ number_format($transaksi_masuk) }}</h5>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-circle"></i> {{$storKali}}x Setoran</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-red-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Transaksi Keluar</h6>
+                        <h5 class="font-extrabold mb-1">Rp {{ number_format($transaksi_keluar) }}</h5>
+                        <small class="text-danger fw-bold"><i class="bi bi-arrow-down-circle"></i> {{$tarikKali}}x Penarikan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 mt-3">
+            <div class="card stat-card shadow-sm h-100 mb-0">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="icon-box bg-orange-light me-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.265-1.608-.666-1.608-1.479 0-.895.83-1.41 2.04-1.49v3.136l-.432-.167zm1.59 2.455c1.19.264 1.777.683 1.777 1.55 0 1.054-.92 1.62-2.132 1.714v-3.475l.355.211z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1 font-semibold">Administrasi</h6>
+                        <h5 class="font-extrabold mb-1">Rp {{ number_format($bendahara->saldo) }}</h5>
+                        <small class="text-warning fw-bold">+ ~Rp {{ number_format($premi) }} (Perkiraan)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card stat-card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                    <h5 class="card-title fw-bold mb-3">Statistik Tabungan</h5>
+                    
+                    <ul class="nav custom-tabs" id="tabunganTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="frekuensi-tab" data-bs-toggle="tab" data-bs-target="#frekuensi-tab-pane" type="button" role="tab" aria-controls="frekuensi-tab-pane" aria-selected="true">
                                 Frekuensi Menabung ({{ count($chart_frekuensi) }}x)
@@ -160,20 +192,21 @@
                             </button>
                         </li>
                     </ul>
+                </div>
 
-                    <!-- Tabs Content -->
-                    <div class="tab-content pt-3" id="tabunganTabsContent">
+                <div class="card-body px-4 pb-4">
+                    <div class="tab-content mt-2" id="tabunganTabsContent">
                         <div class="tab-pane fade show active" id="frekuensi-tab-pane" role="tabpanel" aria-labelledby="frekuensi-tab" tabindex="0">
-                            <div id="frekuensi"></div>
+                            <div id="frekuensi" style="min-height: 350px;"></div>
                         </div>
                         <div class="tab-pane fade" id="total-tab-pane" role="tabpanel" aria-labelledby="total-tab" tabindex="0">
-                            <div id="total"></div>
+                            <div id="total" style="min-height: 350px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>
 @endsection
 
@@ -184,41 +217,25 @@
     const chartDataFrekuensi = @json($chart_frekuensi);
     const chartDataTotal = @json($chart_total);
 
-    // Grafik untuk frekuensi
-    var optionsFrekuensi = {
-        series: [{
-            name: 'Data Frekuensi',
-            data: chartDataFrekuensi
-        }],
+    // Konfigurasi umum agar style seragam
+    const commonChartOptions = {
         chart: {
             type: 'area',
             stacked: false,
             height: 350,
-            zoom: {
-                type: 'x',
-                enabled: true,
-                autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
-            }
+            fontFamily: 'inherit',
+            toolbar: { show: false }, // Disembunyikan biar lebih clean UI-nya
+            zoom: { enabled: true }
         },
-        dataLabels: {
-            enabled: false
-        },
-        markers: {
-            size: 0
-        },
-        title: {
-            text: 'Jumlah Menabung',
-            align: 'left'
-        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 }, // Mengubah garis jadi lebih melengkung modern
+        markers: { size: 0, hover: { size: 5 } },
         fill: {
             type: 'gradient',
             gradient: {
                 shadeIntensity: 1,
                 inverseColors: false,
-                opacityFrom: 0.5,
+                opacityFrom: 0.4,
                 opacityTo: 0,
                 stops: [0, 90, 100]
             }
@@ -226,96 +243,45 @@
         yaxis: {
             labels: {
                 formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
+                    return "Rp " + (val).toLocaleString('id-ID');
                 }
-            },
-            title: {
-                text: 'Rupiah (Rp.)'
             }
         },
         xaxis: {
             type: 'datetime',
-            labels: {
-                format: 'dd MMM yyyy'
-            }
+            labels: { format: 'dd MMM yyyy' },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        grid: {
+            borderColor: '#f1f1f1',
+            strokeDashArray: 4, // Garis grid putus-putus biar minimalis
         },
         tooltip: {
-            shared: false,
+            theme: 'light',
             y: {
                 formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
+                    return "Rp " + (val).toLocaleString('id-ID');
                 }
             }
         }
     };
 
+    // Render Grafik Frekuensi
+    var optionsFrekuensi = {
+        ...commonChartOptions,
+        series: [{ name: 'Jumlah Menabung', data: chartDataFrekuensi }],
+        colors: ['#0284c7'] // Warna biru modern
+    };
     var chartFrekuensi = new ApexCharts(document.querySelector("#frekuensi"), optionsFrekuensi);
     chartFrekuensi.render();
 
+    // Render Grafik Total
     var optionsTotal = {
-        series: [{
-            name: 'Data Total',
-            data: chartDataTotal
-        }],
-        chart: {
-            type: 'area',
-            stacked: false,
-            height: 350,
-            zoom: {
-                type: 'x',
-                enabled: true,
-                autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        markers: {
-            size: 0
-        },
-        title: {
-            text: 'Jumlah Saldo',
-            align: 'left'
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                inverseColors: false,
-                opacityFrom: 0.5,
-                opacityTo: 0,
-                stops: [0, 90, 100]
-            }
-        },
-        yaxis: {
-            labels: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
-            },
-            title: {
-                text: 'Rupiah (Rp.)'
-            }
-        },
-        xaxis: {
-            type: 'datetime',
-            labels: {
-                format: 'dd MMM yyyy'
-            }
-        },
-        tooltip: {
-            shared: false,
-            y: {
-                formatter: function (val) {
-                    return "Rp. " + (val).toLocaleString('id-ID');
-                }
-            }
-        }
+        ...commonChartOptions,
+        series: [{ name: 'Total Saldo', data: chartDataTotal }],
+        colors: ['#9333ea'] // Warna ungu modern
     };
-
     var chartTotal = new ApexCharts(document.querySelector("#total"), optionsTotal);
     chartTotal.render();
 </script>

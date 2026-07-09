@@ -112,12 +112,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bendahara/tabungan', [TabunganController::class, 'bendahara_index'])->name('bendahara.tabungan.index');
         Route::post('/bendahara/tabungan/import', [TabunganController::class, 'bendahara_importTransaksi'])->name('bendahara.tabungan.import');
         Route::get('/bendahara/tabungan/stor', [TabunganController::class, 'bendahara_stor'])->name('bendahara.tabungan.stor');
-        Route::get('/bendahara/tabungan/stor/kelas/{id}', [TabunganController::class, 'bendahara_storMasal'])->name('bendahara.tabungan.stor.masal');
-        Route::post('/bendahara/tabungan/stor/kelas/add', [TabunganController::class, 'bendahara_storMasalTabungan'])->name('bendahara.tabungan.storMasalTabungan');
+        Route::get('/bendahara/tabungan/stor/rombel/{id}', [TabunganController::class, 'bendahara_storMasal'])->name('bendahara.tabungan.stor.masal');
+        Route::post('/bendahara/tabungan/stor/rombel/add', [TabunganController::class, 'bendahara_storMasalTabungan'])->name('bendahara.tabungan.storMasalTabungan');
         Route::post('/bendahara/tabungan/stor/add', [TabunganController::class, 'bendahara_storTabungan'])->name('bendahara.tabungan.storTabungan');
         Route::get('/bendahara/tabungan/tarik', [TabunganController::class, 'bendahara_tarik'])->name('bendahara.tabungan.tarik');
         Route::post('/bendahara/tabungan/tarik/add', [TabunganController::class, 'bendahara_tarikTabungan'])->name('bendahara.tabungan.tarikTabungan');
         Route::get('/bendahara/tabungan/search', [TabunganController::class, 'bendahara_search'])->name('bendahara.search');
+        Route::post('/bendahara/tabungan/batal/{id}', [TabunganController::class, 'bendahara_batalTransaksi'])->name('bendahara.tabungan.batal');
 
         // Menangani pengelolaan Pengajuan.
         Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');

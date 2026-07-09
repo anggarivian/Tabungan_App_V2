@@ -3,6 +3,19 @@
 @section('title') Kelola Walikelas - SakuRame @endsection
 
 @section('content')
+<style>
+    /* Styling Custom Card & Hover Effect */
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+</style>
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
@@ -27,7 +40,7 @@
     </div>
 </div>
 <div class="page-content">
-    <div class="card shadow">
+    <div class="card stat-card shadow-sm border-0">
         <div class="card-body pb-1 pt-3">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -53,7 +66,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
                 <div>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahModal">
-                        <i class="bi bi-plus-circle"></i> Tambah Data
+                        <i class="bi bi-plus-circle"></i> Tambah Walikelas
                     </button>
                 </div>
                 

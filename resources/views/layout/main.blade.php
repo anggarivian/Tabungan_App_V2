@@ -45,6 +45,18 @@
                 display: none !important;
             }
         }
+
+        .fixed-dark-mode {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* Agar selalu di atas elemen lain */
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
         /* Animasi untuk modal */
         .modal.fade .modal-dialog {
             transition: transform 0.3s ease-out;
@@ -334,7 +346,7 @@
                 <nav class="main-navbar shadow-sm">
                     <div class="container">
                         <ul>
-                            {{-- Dasdhboard -------------------------------------------------------------------------------------------------------------------- --}}
+                            {{-- Dashboard --}}
                             @if( auth()->user()->roles_id == 1 )
                             <li class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
                                 <a href="{{ route ('kepsek.dashboard')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
@@ -360,28 +372,52 @@
                                 </a>
                             </li>
                             @endif
-                            {{-- Periode Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
+
+                            {{-- Master Data --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('bendahara.periode*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.periode.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi bi-calendar2-week" style="margin-top: -6px"></i><span>Periode</span>
+                            <li class="menu-item {{ request()->routeIs('bendahara.periode*', 'bendahara.rombel*', 'bendahara.walikelas*', 'bendahara.siswa*') ? 'active' : '' }} has-sub">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-folder2-open"></i><span> Master Data</span>
                                 </a>
+                                <div class="submenu">
+                                    <div class="submenu-group-wrapper">
+                                        <ul class="submenu-group">
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.periode*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.periode.index')}}" class="submenu-link">Periode</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.rombel*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.rombel.index')}}" class="submenu-link">Rombel</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.walikelas*') ? 'active' : '' }}">
+                                                <a href="{{ route('bendahara.walikelas.index') }}" class="submenu-link">Walikelas</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.siswa*') ? 'active' : '' }}">
+                                                <a href="{{ route('bendahara.siswa.index') }}" class="submenu-link">Siswa</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>
                             @endif
-                            {{-- Rombel Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
+
+                            {{-- Transaksi --}}
                             @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('bendahara.rombel*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.rombel.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi-people"></i><span>Rombel</span>
+                            <li class="menu-item {{ request()->routeIs('bendahara.tabungan*', 'tabungan.stor', 'tabungan.tarik', 'bendahara.pengajuan*') ? 'active' : '' }} has-sub">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-cash-stack"></i><span> Transaksi</span>
                                 </a>
-                            </li>
-                            @endif
-                            {{-- Transaksi Tabungan -------------------------------------------------------------------------------------------------------------------- --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('bendahara.tabungan*') || request()->routeIs('tabungan.stor') || request()->routeIs('tabungan.tarik') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.tabungan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi-cash-stack"></i><span> Tabungan </span>
-                                </a>
+                                <div class="submenu">
+                                    <div class="submenu-group-wrapper">
+                                        <ul class="submenu-group">
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.tabungan*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.tabungan.index')}}" class="submenu-link">Tabungan</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.pengajuan*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.pengajuan.index')}}" class="submenu-link">Pengajuan</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>
                             @elseif( auth()->user()->roles_id == 3)
                             <li class="menu-item {{ request()->routeIs('walikelas.tabungan*') ? 'active' : '' }}">
@@ -395,22 +431,14 @@
                                     <i class="bi-box-arrow-in-down"></i><span> Stor Tabungan</span>
                                 </a>
                             </li>
-                            @endif
-                            {{-- Pengajuan -------------------------------------------------------------------------------------------------------------------- --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('bendahara.pengajuan*') ? 'active' : '' }}">
-                                <a href="{{ route ('bendahara.pengajuan.index')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi-journal-arrow-up"></i><span> Pengajuan </span>
-                                </a>
-                            </li>
-                            @elseif( auth()->user()->roles_id == 4)
                             <li class="menu-item {{ request()->routeIs('siswa.tabungan.tarik*') ? 'active' : '' }}">
                                 <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-box-arrow-up"></i><span> Tarik Tabungan</span>
                                 </a>
                             </li>
                             @endif
-                            {{-- Laporan -------------------------------------------------------------------------------------------------------------------- --}}
+
+                            {{-- Laporan --}}
                             @if( auth()->user()->roles_id == 1)
                             <li class="menu-item {{ request()->is('kepsek/laporan*') ? 'active' : '' }} has-sub">
                                 <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
@@ -419,18 +447,10 @@
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.tabungan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.kepsek.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.transaksi') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.kepsek.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.pengajuan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.kepsek.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.export') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.kepsek.export') }}" class="submenu-link">Laporan Export</a>
-                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.tabungan') ? 'active' : '' }}"><a href="{{ route('laporan.kepsek.tabungan') }}" class="submenu-link">Laporan Tabungan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.transaksi') ? 'active' : '' }}"><a href="{{ route('laporan.kepsek.transaksi') }}" class="submenu-link">Laporan Transaksi</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.pengajuan') ? 'active' : '' }}"><a href="{{ route('laporan.kepsek.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.kepsek.export') ? 'active' : '' }}"><a href="{{ route('laporan.kepsek.export') }}" class="submenu-link">Laporan Export</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -443,21 +463,11 @@
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.tabungan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.bendahara.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.transaksi') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.bendahara.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.pengajuan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.bendahara.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.export') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.bendahara.export') }}" class="submenu-link">Laporan Export</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.online-users') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.bendahara.online-users') }}" class="submenu-link">Online Users</a>
-                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.tabungan') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.tabungan') }}" class="submenu-link">Laporan Tabungan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.transaksi') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.transaksi') }}" class="submenu-link">Laporan Transaksi</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.pengajuan') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.export') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.export') }}" class="submenu-link">Laporan Export</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.online-users') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.online-users') }}" class="submenu-link">Online Users</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -470,15 +480,9 @@
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.tabungan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.walikelas.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.transaksi') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.walikelas.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.export') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.walikelas.export') }}" class="submenu-link">Laporan Export</a>
-                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.tabungan') ? 'active' : '' }}"><a href="{{ route('laporan.walikelas.tabungan') }}" class="submenu-link">Laporan Tabungan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.transaksi') ? 'active' : '' }}"><a href="{{ route('laporan.walikelas.transaksi') }}" class="submenu-link">Laporan Transaksi</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.walikelas.export') ? 'active' : '' }}"><a href="{{ route('laporan.walikelas.export') }}" class="submenu-link">Laporan Export</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -491,45 +495,16 @@
                                 <div class="submenu">
                                     <div class="submenu-group-wrapper">
                                         <ul class="submenu-group">
-                                            {{-- <li class="submenu-item {{ request()->routeIs('laporan.siswa.tabungan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.siswa.tabungan') }}" class="submenu-link">Laporan Tabungan</a>
-                                            </li> --}}
-                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.transaksi') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.siswa.transaksi') }}" class="submenu-link">Laporan Transaksi</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.pengajuan') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.siswa.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.export') ? 'active' : '' }}">
-                                                <a href="{{ route('laporan.siswa.export') }}" class="submenu-link">Laporan Export</a>
-                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.transaksi') ? 'active' : '' }}"><a href="{{ route('laporan.siswa.transaksi') }}" class="submenu-link">Laporan Transaksi</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.pengajuan') ? 'active' : '' }}"><a href="{{ route('laporan.siswa.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a></li>
+                                            <li class="submenu-item {{ request()->routeIs('laporan.siswa.export') ? 'active' : '' }}"><a href="{{ route('laporan.siswa.export') }}" class="submenu-link">Laporan Export</a></li>
                                         </ul>
                                     </div>
                                 </div>
                             </li>
                             @endif
-                            {{-- Siswa Walikelas -------------------------------------------------------------------------------------------------------------------- --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->is('bendahara/kelola-*') ? 'active' : '' }} has-sub">
-                                    <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                        <i class="bi-person-lines-fill"></i><span> Data Pengguna</span>
-                                    </a>
-                                    <div class="submenu">
-                                        <div class="submenu-group-wrapper">
-                                            <ul class="submenu-group">
-                                                {{-- Walikelas --}}
-                                                <li class="submenu-item {{ request()->routeIs('bendahara.walikelas.index') ? 'active' : '' }}">
-                                                    <a href="{{ route('bendahara.walikelas.index') }}" class="submenu-link">Walikelas</a>
-                                                </li>
-                                                {{-- Siswa --}}
-                                                <li class="submenu-item {{ request()->routeIs('bendahara.siswa.index') ? 'active' : '' }}">
-                                                    <a href="{{ route('bendahara.siswa.index') }}" class="submenu-link">Siswa</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li>
-                            @endif
+
+                            {{-- Profil & Logout --}}
                             <li class="menu-item {{ request()->routeIs('profil*') ? 'active' : '' }}">
                                 <a href="{{ route ('profil.edit')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-person-circle"></i><span>Profil</span>
@@ -539,27 +514,7 @@
                                 <a href="{{ route('logout') }}" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bi-box-arrow-right"></i><span>Logout</span>
                                 </a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </li>
-                            <li class="menu-item ms-auto custom-margin-top-fix" style="margin-top: -13px;">
-                                <div class="d-flex align-items-center px-3 py-1 rounded-3 shadow-sm"
-                                    style="background-color: white; transition: background-color 0.3s ease; color: black;"
-                                    id="toggle-wrapper">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                        class="bi bi-sun" viewBox="0 0 16 16">
-                                        <path d="M8 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zM8 0a.5.5 0 0 1 .5.5V2A.5.5 0 0 1 8 2V.5A.5.5 0 0 1 8 0zM8 14a.5.5 0 0 1 .5.5V16a.5.5 0 0 1-1 0v-1.5A.5.5 0 0 1 8 14zM2.343 2.343a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 1 1-.707.708L2.343 3.05a.5.5 0 0 1 0-.707zm9.192 9.192a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 0 1-.707.708l-1.06-1.06a.5.5 0 0 1 0-.707zM0 8a.5.5 0 0 1 .5-.5H2a.5.5 0 0 1 0 1H.5A.5.5 0 0 1 0 8zm14 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H14.5a.5.5 0 0 1-.5-.5zM2.343 13.657a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708zm9.192-9.192a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708z"/>
-                                    </svg>
-                                    <div class="form-check form-switch mx-2 mb-0">
-                                        <input class="form-check-input" type="checkbox" id="toggle-dark" style="cursor: pointer;">
-                                    </div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                        class="bi bi-moon" viewBox="0 0 16 16">
-                                        <path d="M6 0a7 7 0 0 0 0 14a7.001 7.001 0 0 0 6.938-6H13a6 6 0 0 1-11.855-1.156C.322 6.57 0 5.814 0 5a6 6 0 0 1 6-5z"/>
-                                    </svg>
-                                </div>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </li>
                         </ul>
                     </div>
@@ -575,6 +530,22 @@
             <!-- Konten Sebenarnya -->
             <div class="main-content container" style="display: none; font-size: 14px;">
                 @yield('content')
+            </div>
+
+            <div class="fixed-dark-mode" id="toggle-wrapper">
+                <div class="d-flex align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-sun" viewBox="0 0 16 16">
+                        <path d="M8 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zM8 0a.5.5 0 0 1 .5.5V2A.5.5 0 0 1 8 2V.5A.5.5 0 0 1 8 0zM8 14a.5.5 0 0 1 .5.5V16a.5.5 0 0 1-1 0v-1.5A.5.5 0 0 1 8 14zM2.343 2.343a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 1 1-.707.708L2.343 3.05a.5.5 0 0 1 0-.707zm9.192 9.192a.5.5 0 0 1 .707 0l1.06 1.06a.5.5 0 0 1-.707.708l-1.06-1.06a.5.5 0 0 1 0-.707zM0 8a.5.5 0 0 1 .5-.5H2a.5.5 0 0 1 0 1H.5A.5.5 0 0 1 0 8zm14 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H14.5a.5.5 0 0 1-.5-.5zM2.343 13.657a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708zm9.192-9.192a.5.5 0 0 1 .707 0l1.06-1.06a.5.5 0 0 1-.707-.708l-1.06 1.06a.5.5 0 0 1 0 .708z"/>
+                    </svg>
+                    
+                    <div class="form-check form-switch mx-2 mb-0">
+                        <input class="form-check-input" type="checkbox" id="toggle-dark" style="cursor: pointer;">
+                    </div>
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-moon" viewBox="0 0 16 16">
+                        <path d="M6 0a7 7 0 0 0 0 14a7.001 7.001 0 0 0 6.938-6H13a6 6 0 0 1-11.855-1.156C.322 6.57 0 5.814 0 5a6 6 0 0 1 6-5z"/>
+                    </svg>
+                </div>
             </div>
 
             <footer>
