@@ -74,8 +74,8 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->where('status_siswa', 'aktif')->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
 
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
@@ -139,8 +139,8 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $premi = Tabungan::where('periode_id',PeriodeHelper::id())->sum('premi');
         $bendahara = Tabungan::where('user_id', 2)->first();
 

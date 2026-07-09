@@ -25,262 +25,168 @@ class ExportController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    private function hitungSaldoBersih(?int $kelasId, string $pembayaran, ?int $periodeId = null): int
+    // Private function hitung saldo bersih periode aktif
+    private function hitungSaldoBersih(string $pembayaran, int $periodeId): int
     {
-        $baseQuery = function ($tipe) use ($kelasId, $pembayaran, $periodeId) {
-            return Transaksi::where('pembayaran', $pembayaran)
+        $baseQuery = function ($tipe) use ($pembayaran, $periodeId) {
+            return \App\Models\Transaksi::where('pembayaran', $pembayaran)
                 ->where('tipe_transaksi', $tipe)
                 ->where('status', 'success')
-                ->when($periodeId, function ($q) use ($periodeId) {
-                    $q->where('periode_id', $periodeId);
+                ->where('periode_id', $periodeId)
+                ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                    $q->where('rombels.periode_id', $periodeId);
                 })
-                ->when($kelasId, function ($q) use ($kelasId, $periodeId) {
-                    $q->whereHas('user.rombels', function ($qq) use ($kelasId, $periodeId) {
-                        $qq->where('kelas_id', $kelasId);
-                        if ($periodeId) {
-                            $qq->where('periode_id', $periodeId);
-                        }
-                    });
+                ->whereHas('user.tabungan', function ($q) use ($periodeId) {
+                    $q->where('periode_id', $periodeId)->where('saldo', '>', 0);
                 })
                 ->sum('jumlah_transaksi');
         };
 
-        return $baseQuery('stor') - $baseQuery('tarik');
+        return $baseQuery('Stor') - $baseQuery('Tarik');
     }
 
+    // EXPORT TABUNGAN
     public function kepsek_exportTabungan(Request $request)
     {
         $validated = $request->validate([
-            'export_option' => 'required',
+            'export_option' => 'required|in:siswa,semua',
             'export_type'   => 'required|in:pdf,excel',
             'siswa_id'      => 'nullable|exists:users,id',
-            'kelas_id'      => 'nullable|exists:kelas,id',
+            'periode_id'    => 'required|exists:periodes,id',
         ]);
 
         $exportType   = $validated['export_type'];
         $exportOption = $validated['export_option'];
         $siswaId      = $validated['siswa_id'] ?? null;
-        $kelasId      = $validated['kelas_id'] ?? null;
-        $periodeId    = PeriodeHelper::id();
+        $periodeId    = $validated['periode_id'];
 
-        $query = Tabungan::query()->where('periode_id', $periodeId);
-
-        if ($siswaId) {
-            $query->where('user_id', $siswaId);
-        }
-        if ($kelasId) {
-            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
-                $q->where('kelas_id', $kelasId)
-                  ->where('periode_id', $periodeId);
+        // Kueri Tabungan dengan pengecualian: Harus masuk rombel & saldo > 0
+        $query = \App\Models\Tabungan::where('periode_id', $periodeId)
+            ->where('saldo', '>', 0)
+            ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
             });
+
+        if ($exportOption == 'siswa' && $siswaId) {
+            $query->where('user_id', $siswaId);
         }
 
         $siswas = $query->get();
-        $user   = $siswaId ? User::find($siswaId) : null;
+        $user   = $siswaId ? \App\Models\User::with(['rombel', 'tabungan' => function($q) use ($periodeId) { $q->where('periode_id', $periodeId); }])->find($siswaId) : null;
 
-        $jumlahPenabung = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
-                $q->where('periode_id', $periodeId);
-                if ($kelasId) {
-                    $q->where('kelas_id', $kelasId);
-                }
+        // Hitung total ringkasan data valid
+        $jumlahPenabungAll = \App\Models\User::where('roles_id', 4)
+            ->whereHas('rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
             })
-            ->count();
-            
-        $jumlahPenabungAll = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId) {
-                $q->where('periode_id', $periodeId);
-            })
-            ->count();
+            ->whereHas('tabungan', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId)->where('saldo', '>', 0);
+            })->count();
 
-        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
-        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
-        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
+        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih('Tunai', $periodeId);
+        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih('Digital', $periodeId);
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.tabungan', compact(
-                'siswas', 'exportOption', 'kelasId', 'user',
-                'jumlahPenabung', 'jumlahPenabungAll',
-                'jumlahSaldoTunai', 'jumlahSaldoDigital',
-                'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
+                'siswas', 'exportOption', 'user', 'periodeId',
+                'jumlahPenabungAll', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
             ));
-            return $pdf->download('laporan_tabungan.pdf');
+            return $pdf->download('laporan_tabungan_periode_' . $periodeId . '.pdf');
         } elseif ($exportType == 'excel') {
             return Excel::download(new TabunganExport($siswas, $exportType), 'laporan_tabungan.xlsx');
         }
-
-        return back()->with('error', 'Invalid export type');
     }
 
+    // EXPORT TRANSAKSI
     public function kepsek_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
-            'export_option' => 'required',
+            'export_option' => 'required|in:siswa,semua',
             'export_type'   => 'required|in:pdf,excel',
             'siswa_id'      => 'nullable|exists:users,id',
-            'kelas_id'      => 'nullable|exists:kelas,id',
-            'date_range'    => 'nullable|string',
+            'periode_id'    => 'required|exists:periodes,id',
         ]);
 
         $exportType   = $validated['export_type'];
         $exportOption = $validated['export_option'];
         $siswaId      = $validated['siswa_id'] ?? null;
-        $kelasId      = $validated['kelas_id'] ?? null;
-        $dateRange    = $validated['date_range'] ?? null;
-        $periodeId    = PeriodeHelper::id();
+        $periodeId    = $validated['periode_id'];
 
-        $startDate = null;
-        $endDate   = null;
-
-        if ($dateRange) {
-            $parts = preg_split('/\s+-\s+/', trim($dateRange), 2);
-            if (count($parts) === 2) {
-                $startDate = trim($parts[0]);
-                $endDate   = trim($parts[1]);
-            }
-        }
-        
-        $query = Transaksi::query()
-            ->where('periode_id', $periodeId)
-            ->where('status', 'success');
-
-        if ($siswaId) {
-            $query->where('user_id', $siswaId);
-        }
-        if ($kelasId) {
-            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
-                $q->where('kelas_id', $kelasId)
-                  ->where('periode_id', $periodeId);
+        // Kueri Transaksi dengan pengecualian siswa bersaldo 0 & tanpa rombel
+        $query = \App\Models\Transaksi::where('periode_id', $periodeId)->where('status', 'success')
+            ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
+            })
+            ->whereHas('user.tabungan', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId)->where('saldo', '>', 0);
             });
-        }
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
+
+        if ($exportOption == 'siswa' && $siswaId) {
+            $query->where('user_id', $siswaId);
         }
 
         $transaksis = $query->get();
-        $user = $siswaId ? User::find($siswaId) : null;
+        $user = $siswaId ? \App\Models\User::find($siswaId) : null;
 
-        $jumlahPenabung = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
-                $q->where('periode_id', $periodeId);
-                if ($kelasId) {
-                    $q->where('kelas_id', $kelasId);
-                }
-            })
-            ->count();
-            
-        $jumlahPenabungAll = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId) {
-                $q->where('periode_id', $periodeId);
-            })
-            ->count();
-
-        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
-        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
-        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
+        $jumlahPenabungAll     = \App\Models\User::where('roles_id', 4)->whereHas('rombel', function ($q) use ($periodeId) { $q->where('rombels.periode_id', $periodeId); })->whereHas('tabungan', function ($q) use ($periodeId) { $q->where('periode_id', $periodeId)->where('saldo', '>', 0); })->count();
+        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih('Tunai', $periodeId);
+        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih('Digital', $periodeId);
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.transaksi', compact(
-                'transaksis', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate',
-                'jumlahPenabung', 'jumlahPenabungAll',
-                'jumlahSaldoTunai', 'jumlahSaldoDigital',
-                'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
+                'transaksis', 'user', 'exportOption', 'periodeId',
+                'jumlahPenabungAll', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
             ));
-            return $pdf->download('laporan_transaksi.pdf');
+            return $pdf->download('laporan_transaksi_periode_' . $periodeId . '.pdf');
         } elseif ($exportType == 'excel') {
-            return Excel::download(new TransaksiExport($transaksis, $exportType, $user), 'laporan_transaksi.xlsx');
+            return Excel::download(new TransaksiExport($transaksis, $exportType), 'laporan_transaksi.xlsx');
         }
-
-        return back()->with('error', 'Invalid export type');
     }
 
+    // EXPORT PENGAJUAN
     public function kepsek_exportPengajuan(Request $request)
     {
         $validated = $request->validate([
-            'export_option' => 'required',
+            'export_option' => 'required|in:siswa,semua',
             'export_type'   => 'required|in:pdf,excel',
             'siswa_id'      => 'nullable|exists:users,id',
-            'kelas_id'      => 'nullable|exists:kelas,id',
-            'date_range'    => 'nullable|string',
+            'periode_id'    => 'required|exists:periodes,id',
         ]);
 
         $exportType   = $validated['export_type'];
         $exportOption = $validated['export_option'];
         $siswaId      = $validated['siswa_id'] ?? null;
-        $kelasId      = $validated['kelas_id'] ?? null;
-        $dateRange    = $validated['date_range'] ?? null;
-        $periodeId    = PeriodeHelper::id();
+        $periodeId    = $validated['periode_id'];
 
-        $startDate = null;
-        $endDate   = null;
-
-        if ($dateRange) {
-            $parts = preg_split('/\s+-\s+/', trim($dateRange), 2);
-            if (count($parts) === 2) {
-                $startDate = trim($parts[0]);
-                $endDate   = trim($parts[1]);
-            }
-        }
-
-        $query = Pengajuan::query()->where('periode_id', $periodeId);
-
-        if ($siswaId) {
-            $query->where('user_id', $siswaId);
-        }
-        if ($kelasId) {
-            $query->whereHas('user.rombels', function ($q) use ($kelasId, $periodeId) {
-                $q->where('kelas_id', $kelasId)
-                  ->where('periode_id', $periodeId);
+        // Kueri Pengajuan dengan pengecualian siswa bersaldo 0 & tanpa rombel
+        $query = \App\Models\Pengajuan::where('periode_id', $periodeId)
+            ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
+            })
+            ->whereHas('user.tabungan', function ($q) use ($periodeId) {
+                $q->where('periode_id', $periodeId)->where('saldo', '>', 0);
             });
-        }
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
+
+        if ($exportOption == 'siswa' && $siswaId) {
+            $query->where('user_id', $siswaId);
         }
 
         $pengajuans = $query->get();
-        $user = $siswaId ? User::find($siswaId) : null;
+        $user = $siswaId ? \App\Models\User::find($siswaId) : null;
 
-        $jumlahPenabung = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId, $kelasId) {
-                $q->where('periode_id', $periodeId);
-                if ($kelasId) {
-                    $q->where('kelas_id', $kelasId);
-                }
-            })
-            ->count();
-            
-        $jumlahPenabungAll = User::where('roles_id', 4)
-            ->whereHas('rombels', function ($q) use ($periodeId) {
-                $q->where('periode_id', $periodeId);
-            })
-            ->count();
-
-        $jumlahSaldoTunai      = $this->hitungSaldoBersih($kelasId, 'Tunai', $periodeId);
-        $jumlahSaldoDigital    = $this->hitungSaldoBersih($kelasId, 'Digital', $periodeId);
-        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih(null, 'Tunai', $periodeId);
-        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih(null, 'Digital', $periodeId);
+        $jumlahPenabungAll     = \App\Models\User::where('roles_id', 4)->whereHas('rombel', function ($q) use ($periodeId) { $q->where('rombels.periode_id', $periodeId); })->whereHas('tabungan', function ($q) use ($periodeId) { $q->where('periode_id', $periodeId)->where('saldo', '>', 0); })->count();
+        $jumlahSaldoTunaiAll   = $this->hitungSaldoBersih('Tunai', $periodeId);
+        $jumlahSaldoDigitalAll = $this->hitungSaldoBersih('Digital', $periodeId);
 
         if ($exportType == 'pdf') {
             $pdf = PDF::loadView('export.pengajuan', compact(
-                'pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate',
-                'jumlahPenabung', 'jumlahPenabungAll',
-                'jumlahSaldoTunai', 'jumlahSaldoDigital',
-                'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
+                'pengajuans', 'user', 'exportOption', 'periodeId',
+                'jumlahPenabungAll', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'
             ));
-            return $pdf->download('laporan_pengajuan.pdf');
+            return $pdf->download('laporan_pengajuan_periode_' . $periodeId . '.pdf');
         } elseif ($exportType == 'excel') {
-            return Excel::download(new PengajuanExport($pengajuans, $exportType, $user), 'laporan_pengajuan.xlsx');
+            return Excel::download(new PengajuanExport($pengajuans, $exportType), 'laporan_pengajuan.xlsx');
         }
-
-        return back()->with('error', 'Invalid export type');
     }
 
     // Export Bendahara -----------------------------------------------------------------------------------------------

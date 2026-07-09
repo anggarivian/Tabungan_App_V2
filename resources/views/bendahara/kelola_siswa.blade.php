@@ -40,61 +40,146 @@
     </div>
 </div>
 <div class="page-content">
+    @php
+        $filterAktif =
+            request()->anyFilled([
+                'search',
+                'status_siswa',
+                'jenis_kelamin',
+            ]) ||
+            (request()->has('sort_by') && request('sort_by') !== 'terbaru');
+    @endphp
+
     <div class="card stat-card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <form action="{{ route('bendahara.siswa.index') }}" method="GET">
-                <div class="row g-2 align-items-end">
-                    <div class="col-12 col-md-4">
-                        <label class="form-label small text-muted mb-1">Cari</label>
-                        <input type="text" class="form-control" name="search" value="{{ request('search') }}"
-                            placeholder="Nama, email, kontak, orang tua, alamat...">
-                    </div>
 
-                    <div class="col-6 col-md-2">
-                        <label class="form-label small text-muted mb-1">Status</label>
-                        <select name="status_siswa" class="form-select">
-                            <option value="">Semua Status</option>
-                            <option value="aktif" {{ request('status_siswa') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="nonaktif" {{ request('status_siswa') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                            <option value="lulus" {{ request('status_siswa') == 'lulus' ? 'selected' : '' }}>Lulus</option>
-                            <option value="pindah" {{ request('status_siswa') == 'pindah' ? 'selected' : '' }}>Pindah</option>
-                        </select>
-                    </div>
+        {{-- Header Filter --}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold">
+                <i class="bi bi-funnel me-2"></i>Filter Data
+            </h6>
 
-                    <div class="col-6 col-md-2">
-                        <label class="form-label small text-muted mb-1">Jenis Kelamin</label>
-                        <select name="jenis_kelamin" class="form-select">
-                            <option value="">Semua</option>
-                            <option value="L" {{ request('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="P" {{ request('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                        </select>
-                    </div>
+            <button class="btn btn-sm btn-outline-primary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#filterCollapse"
+                    aria-expanded="{{ $filterAktif ? 'true' : 'false' }}"
+                    aria-controls="filterCollapse">
 
-                    <div class="col-6 col-md-2">
-                        <label class="form-label small text-muted mb-1">Urutkan</label>
-                        <select name="sort_by" class="form-select">
-                            <option value="terbaru" {{ request('sort_by', 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
-                            <option value="terlama" {{ request('sort_by') == 'terlama' ? 'selected' : '' }}>Terlama</option>
-                            <option value="nama_az" {{ request('sort_by') == 'nama_az' ? 'selected' : '' }}>Nama A-Z</option>
-                            <option value="nama_za" {{ request('sort_by') == 'nama_za' ? 'selected' : '' }}>Nama Z-A</option>
-                        </select>
-                    </div>
+                <i class="bi {{ $filterAktif ? 'bi-chevron-up' : 'bi-chevron-down' }}"
+                id="filterIcon"></i>
 
-                    <div class="col-6 col-md-2 d-flex gap-1">
-                        <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-search"></i> Cari</button>
-                        @if(request()->anyFilled(['search', 'status_siswa', 'jenis_kelamin']))
-                            <a href="{{ route('bendahara.siswa.index') }}" class="btn btn-outline-secondary" title="Reset">
-                                <i class="bi bi-x-circle"></i>
-                            </a>
-                        @endif
-                    </div>
-                </div>
-                <input type="hidden" name="perPage" value="{{ request('perPage', 10) }}">
-            </form>
+                <span id="filterText">
+                    {{ $filterAktif ? 'Sembunyikan' : 'Tampilkan' }}
+                </span>
+            </button>
         </div>
-    </div>
 
-    <div class="card stat-card shadow-sm border-0">
+        {{-- Isi Filter --}}
+        <div class="collapse {{ $filterAktif ? 'show' : '' }}" id="filterCollapse">
+            <div class="card-body p-4 border-top">
+                <form action="{{ route('bendahara.siswa.index') }}" method="GET">
+                    <div class="row g-3 align-items-end">
+                        {{-- Status --}}
+                        <div class="col-12 col-md-4 col-lg-2">
+                            <label class="form-label small text-muted fw-medium mb-1">
+                                Status
+                            </label>
+                            <select name="status_siswa" class="form-select">
+                                <option value="">Semua Status</option>
+                                <option value="aktif" {{ request('status_siswa')=='aktif'?'selected':'' }}>Aktif</option>
+                                <option value="nonaktif" {{ request('status_siswa')=='nonaktif'?'selected':'' }}>Nonaktif</option>
+                                <option value="lulus" {{ request('status_siswa')=='lulus'?'selected':'' }}>Lulus</option>
+                                <option value="pindah" {{ request('status_siswa')=='pindah'?'selected':'' }}>Pindah</option>
+                            </select>
+                        </div>
+                        {{-- Jenis Kelamin --}}
+                        <div class="col-12 col-md-4 col-lg-2">
+                            <label class="form-label small text-muted fw-medium mb-1">
+                                Jenis Kelamin
+                            </label>
+                            <select name="jenis_kelamin" class="form-select">
+                                <option value="">Semua</option>
+                                <option value="L" {{ request('jenis_kelamin')=='L'?'selected':'' }}>Laki-laki</option>
+                                <option value="P" {{ request('jenis_kelamin')=='P'?'selected':'' }}>Perempuan</option>
+                            </select>
+                        </div>
+                        {{-- Urutkan --}}
+                        <div class="col-12 col-md-4 col-lg-2">
+                            <label class="form-label small text-muted fw-medium mb-1">
+                                Urutkan
+                            </label>
+                            <select name="sort_by" class="form-select">
+                                <option value="terbaru" {{ request('sort_by','terbaru')=='terbaru'?'selected':'' }}>Terbaru</option>
+                                <option value="terlama" {{ request('sort_by')=='terlama'?'selected':'' }}>Terlama</option>
+                                <option value="nama_az" {{ request('sort_by')=='nama_az'?'selected':'' }}>Nama A-Z</option>
+                                <option value="nama_za" {{ request('sort_by')=='nama_za'?'selected':'' }}>Nama Z-A</option>
+                            </select>
+                        </div>
+                        {{-- Cari --}}
+                        <div class="col-12 col-lg-6">
+                            <label class="form-label small text-muted fw-medium mb-1">
+                                Pencarian
+                            </label>
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="search"
+                                    value="{{ request('search') }}"
+                                    placeholder="Nama, email, kontak, orang tua, alamat...">
+
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <a href="{{ route('bendahara.siswa.index') }}"
+                                class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden"
+                        name="perPage"
+                        value="{{ request('perPage',10) }}">
+                </form>
+                {{-- Badge Filter --}}
+                @if($filterAktif)
+                    <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+                        <span class="small text-muted">
+                            Filter Aktif :
+                        </span>
+                        @if(request('search'))
+                            <span class="badge border text-muted">
+                                Cari : "{{ request('search') }}"
+                            </span>
+                        @endif
+                        @if(request('status_siswa'))
+                            <span class="badge bg-secondary">
+                                Status : {{ ucfirst(request('status_siswa')) }}
+                            </span>
+                        @endif
+                        @if(request('jenis_kelamin'))
+                            <span class="badge border text-muted">
+                                Jenis Kelamin :
+                                {{ request('jenis_kelamin') == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                            </span>
+                        @endif
+                        @if(request('sort_by') && request('sort_by') != 'terbaru')
+                            <span class="badge border text-muted">
+                                Urut :
+                                {{ strtoupper(str_replace('_',' ',request('sort_by'))) }}
+                            </span>
+                        @endif
+                        <a href="{{ route('bendahara.siswa.index') }}"
+                        class="badge bg-danger text-decoration-none">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <div class="card-body pb-1 pt-3">
             
             {{-- Alert Success --}}
@@ -496,4 +581,25 @@ document.getElementById('importForm').addEventListener('submit', function () {
         }
     });
 </script>
+@section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const collapse = document.getElementById('filterCollapse');
+    const icon = document.getElementById('filterIcon');
+    const text = document.getElementById('filterText');
+
+    collapse.addEventListener('shown.bs.collapse', function () {
+        icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+        text.innerHTML = 'Sembunyikan';
+    });
+
+    collapse.addEventListener('hidden.bs.collapse', function () {
+        icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
+        text.innerHTML = 'Tampilkan';
+    });
+
+});
+</script>
+@endsection
 @endsection

@@ -177,7 +177,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card stat-card shadow-sm border-0 rounded-4">
-                <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <div class="card-header border-0 pt-4 pb-0 px-4">
                     <h5 class="card-title fw-bold mb-3">Statistik Tabungan</h5>
                     
                     <ul class="nav custom-tabs" id="tabunganTabs" role="tablist">

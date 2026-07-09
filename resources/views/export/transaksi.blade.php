@@ -1,145 +1,98 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title> Laporan Data Transaksi </title>
+    <title>Laporan Data Transaksi</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-size: 12px;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .wrapper {
-            width: 100%;
-            max-width: 800px;
-        }
-        .header {
-            text-align: center;
-            padding: 15px;
-            background: #ffffff;
-            color: rgb(0, 0, 0);
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        .container {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
-        }
-        .table-container {
-            margin-top: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background: #007BFF;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .footer {
-            text-align: right;
-            margin-top: 15px;
-            font-style: italic;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-size: 11px; font-family: Arial, sans-serif; color: #333; padding: 30px; line-height: 1.4; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
+        .header h2 { font-size: 14px; margin-bottom: 2px; }
+        .header h1 { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
+        .title-report { font-size: 14px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .meta-table { width: 100%; margin-bottom: 15px; border: none; }
+        .meta-table td { border: none; padding: 3px 0; }
+        .main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .main-table th, .main-table td { border: 1px solid #333; padding: 7px 5px; text-align: left; }
+        .main-table th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
+        .text-center { text-align: center !important; }
+        .text-end { text-align: right !important; }
+        .footer-sign { width: 100%; margin-top: 30px; }
+        .footer-sign td { border: none; text-align: right; font-size: 12px; }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="header">
-            <h2>DINAS PENDIDIKAN PEMUDA DAN OLAHRAGA</h2>
-            <h3>KABUPATEN CIANJUR</h3>
-            <h1>SEKOLAH DASAR NEGERI SUKARAME</h1>
-            <h4>KECAMATAN SUKANAGARA</h4>
-        </div>
-        <div class="container">
-            <h3>Laporan Transaksi Tabungan</h3>
-            <p>Detail Transaksi dari {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}</p>
-
-            @if($exportOption == 'siswa')
-            <table>
-                <tr><td>ID Tabungan</td><td>{{ $user->username }}</td></tr>
-                <tr><td>Nama</td><td>{{ $user->name }}</td></tr>
-                <tr><td>Kelas</td><td>{{ $user->kelas->name }}</td></tr>
-                <tr><td>Kontak</td><td>{{ $user->kontak }}</td></tr>
-                <tr><td>Jumlah Tabungan Tunai</td><td>Rp. {{ number_format($user->tabungan->saldo, 0, ',', '.') }}</td></tr>
-                <tr><td>Jumlah Tabungan Digital</td><td>Rp. 0</td></tr>
-            </table>
-            @elseif($exportOption == 'kelas')
-                <table>
-                    <tr><td>Kelas</td><td>:</td><td>{{ $kelasId }}</td></tr>
-                    <tr><td>Jumlah Penabung</td><td>:</td><td>{{ $jumlahPenabung }}</td></tr>
-                    <tr><td>Total Tabungan Tunai</td><td>:</td><td>Rp. {{ number_format($jumlahSaldoTunai, 0, ',', '.') }}</td></tr>
-                    <tr><td>Total Tabungan Digital</td><td>:</td><td>Rp. {{ number_format($jumlahSaldoDigital, 0, ',', '.') }}</td></tr>
-                </table>
-            @elseif($exportOption == 'semua')
-                <table>
-                    <tr><td>Jumlah Penabung</td><td>:</td><td>{{ $jumlahPenabungAll }}</td></tr>
-                    <tr><td>Total Tabungan Tunai</td><td>:</td><td>Rp. {{ number_format($jumlahSaldoTunaiAll, 0, ',', '.') }}</td></tr>
-                    <tr><td>Total Tabungan Digital</td><td>:</td><td>Rp. {{ number_format($jumlahSaldoDigitalAll, 0, ',', '.') }}</td></tr>
-                </table>
-            @endif
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            @if($exportOption == 'kelas')<th>ID Tab.</th><th>Nama</th>@endif
-                            @if($exportOption == 'semua')<th>ID Tab.</th><th>Nama</th><th>Kelas</th>@endif
-                            <th>Saldo Awal</th>
-                            <th>Transaksi</th>
-                            <th>Saldo Akhir</th>
-                            <th>Keterangan</th>
-                            <th>Pembuat</th>
-                            <th>Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($transaksis as $item)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                @if($exportOption == 'kelas')<td>{{ $item->user->username }}</td><td>{{ $item->user->name }}</td>@endif
-                                @if($exportOption == 'semua')<td>{{ $item->user->username }}</td><td>{{ $item->user->name }}</td><td>{{ $item->user->kelas->name }}@endif
-                                <td>{{ number_format($item->saldo_awal) }}</td>
-                                <td>{{ number_format($item->jumlah_transaksi) }}</td>
-                                <td>{{ number_format($item->saldo_akhir) }}</td>
-                                <td>{{ $item->tipe_transaksi }}, {{ $item->pembayaran }}</td>
-                                <td>{{ $item->pembuat }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d m Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="footer">
-                <p>Cianjur, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
-                <p><strong>Kepala Sekolah</strong></p>
-                <br><br>
-                <p><strong>SUHENDI YUSUF, S.Pd, MM</strong></p>
-            </div>
-        </div>
+    <div class="header">
+        <h2>DINAS PENDIDIKAN PEMUDA DAN OLAHRAGA</h2>
+        <h3>KABUPATEN CIANJUR</h3>
+        <h1>SEKOLAH DASAR NEGERI SUKARAME</h1>
+        <h4>KECAMATAN SUKANAGARA</h4>
     </div>
+
+    <div class="title-report">Laporan Mutasi Transaksi Buku Tabungan</div>
+
+    @if($exportOption == 'siswa' && $user)
+        <table class="meta-table">
+            <tr><td width="150">Kode Siswa (ID)</td><td width="10">:</td><td>{{ optional($user->rombel->first())->pivot->kode ?? $user->username }}</td></tr>
+            <tr><td>Nama Siswa</td><td>:</td><td>{{ $user->name }}</td></tr>
+            <tr><td>Rombel</td><td>:</td><td>{{ optional($user->rombel->first())->name ?? '-' }}</td></tr>
+        </table>
+    @else
+        <table class="meta-table">
+            <tr><td width="150">Total Penabung Aktif</td><td width="10">:</td><td>{{ $jumlahPenabungAll }} Orang</td></tr>
+            <tr><td>Total Kumulatif Tunai</td><td>:</td><td>Rp {{ number_format($jumlahSaldoTunaiAll, 0, ',', '.') }}</td></tr>
+        </table>
+    @endif
+
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th width="30">No</th>
+                @if($exportOption == 'semua')
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Rombel</th>
+                @endif
+                <th>Saldo Awal</th>
+                <th>Mutasi Nominal</th>
+                <th>Saldo Akhir</th>
+                <th>Jenis</th>
+                <th>Petugas</th>
+                <th>Tanggal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($transaksis as $item)
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    @if($exportOption == 'semua')
+                        <td class="text-center">{{ optional($item->user->rombel->first())->pivot->kode ?? $item->user->username }}</td>
+                        <td>{{ $item->user->name }}</td>
+                        <td class="text-center">{{ optional($item->user->rombel->first())->name ?? '-' }}</td>
+                    @endif
+                    <td class="text-end">Rp {{ number_format($item->saldo_awal, 0, ',', '.') }}</td>
+                    <td class="text-end fw-bold">Rp {{ number_format($item->jumlah_transaksi, 0, ',', '.') }}</td>
+                    <td class="text-end">Rp {{ number_format($item->saldo_akhir, 0, ',', '.') }}</td>
+                    <td class="text-center">{{ $item->tipe_transaksi }} ({{ $item->pembayaran }})</td>
+                    <td>{{ $item->pembuat }}</td>
+                    <td class="text-center">{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y H:i') }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="{{ $exportOption == 'semua' ? '9' : '6' }}" class="text-center">Belum ada transaksi terekam pada periode ini.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <table class="footer-sign">
+        <tr>
+            <td>
+                <p>Cianjur, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
+                <p>Kepala Sekolah</p>
+                <br><br><br>
+                <p><strong>SUHENDI YUSUF, S.Pd, MM</strong></p>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

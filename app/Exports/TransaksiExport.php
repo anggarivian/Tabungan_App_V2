@@ -19,40 +19,28 @@ class TransaksiExport implements FromCollection, WithHeadings
     public function collection()
     {
         return $this->transaksi->map(function($transaksi, $index) {
-                $data = [
-                    'no' => $index + 1,
-                    'id' => $transaksi->user->username,
-                    'nama' => $transaksi->user->name,
-                    'kelas' => $transaksi->user->kelas->name,
-                    'saldo_awal' => $transaksi->saldo_awal,
-                    'jumlah_transaksi' => $transaksi->jumlah_transaksi,
-                    'saldo_akhir' => $transaksi->saldo_akhir,
-                    'tipe_transaksi' => $transaksi->tipe_transaksi,
-                    'pembayaran' => $transaksi->pembayaran,
-                    'pembuat' => $transaksi->pembuat,
-                    'status' => $transaksi->status,
-                    'created_at' => $transaksi->created_at->format('Y-m-d H:i:s'),
-                ];
-
-            return $data;
+            return [
+                'no'               => $index + 1,
+                'id'               => optional($transaksi->user->rombel->first())->pivot->kode ?? $transaksi->user->username,
+                'nama'             => $transaksi->user->name,
+                'rombel'           => optional($transaksi->user->rombel->first())->name ?? '-',
+                'saldo_awal'       => $transaksi->saldo_awal,
+                'jumlah_transaksi' => $transaksi->jumlah_transaksi,
+                'saldo_akhir'      => $transaksi->saldo_akhir,
+                'tipe_transaksi'   => $transaksi->tipe_transaksi,
+                'pembayaran'       => $transaksi->pembayaran,
+                'pembuat'          => $transaksi->pembuat,
+                'status'           => $transaksi->status,
+                'created_at'       => $transaksi->created_at->format('Y-m-d H:i:s'),
+            ];
         });
     }
 
     public function headings(): array
     {
         return [
-            'No',
-            'ID Tabungan',
-            'Nama',
-            'Kelas',
-            'Saldo Awal',
-            'Jumlah Transaksi',
-            'Saldo Akhir',
-            'Tipe Transaksi',
-            'Pembayaran',
-            'Pembuat',
-            'Status',
-            'Tanggal Dibuat',
+            'No', 'Kode Rombel', 'Nama', 'Rombel', 'Saldo Awal', 'Jumlah Transaksi', 
+            'Saldo Akhir', 'Tipe Transaksi', 'Pembayaran', 'Pembuat', 'Status', 'Tanggal Dibuat',
         ];
     }
 }

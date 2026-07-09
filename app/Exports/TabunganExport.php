@@ -18,37 +18,34 @@ class TabunganExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return $this->siswas->map(function($siswas, $index) {
-                $data = [
-                    'no' => $index + 1,
-                    'id' => $siswas->user->username,
-                    'nama' => $siswas->user->name,
-                    'kelas' => $siswas->user->kelas->name,
-                    'saldo_tunai' => \App\Models\Transaksi::where('user_id', $siswas->user_id)
-                                    ->where('pembayaran', 'Tunai')
-                                    ->sum('jumlah_transaksi'),
-                    'saldo_digital' => \App\Models\Transaksi::where('user_id', $siswas->user_id)
-                                    ->where('pembayaran', 'Digital')
-                                    ->sum('jumlah_transaksi'),
-                    'terakhir_transaksi' => optional($siswas->user->transaksi()->latest('updated_at')->first())->updated_at,
-                    'dapat_ditarik' => $siswas->sisa,
-                ];
+        return $this->siswas->map(function($tabungan, $index) {
+            
+            // Hitung bersih Tunai (Stor - Tarik di periode ini)
+            $storTunai = \App\Models\Transaksi::where('user_id', $tabungan->user_id)->where('periode_id', $tabungan->periode_id)->where('pembayaran', 'Tunai')->where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
+            $tarikTunai = \App\Models\Transaksi::where('user_id', $tabungan->user_id)->where('periode_id', $tabungan->periode_id)->where('pembayaran', 'Tunai')->where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
+            
+            // Hitung bersih Digital (Stor - Tarik di periode ini)
+            $storDigital = \App\Models\Transaksi::where('user_id', $tabungan->user_id)->where('periode_id', $tabungan->periode_id)->where('pembayaran', 'Digital')->where('tipe_transaksi', 'Stor')->where('status', 'success')->sum('jumlah_transaksi');
+            $tarikDigital = \App\Models\Transaksi::where('user_id', $tabungan->user_id)->where('periode_id', $tabungan->periode_id)->where('pembayaran', 'Digital')->where('tipe_transaksi', 'Tarik')->where('status', 'success')->sum('jumlah_transaksi');
 
-            return $data;
+            return [
+                'no'                 => $index + 1,
+                'id'                 => optional($tabungan->user->rombel->first())->pivot->kode ?? $tabungan->user->username,
+                'nama'               => $tabungan->user->name,
+                'rombel'             => optional($tabungan->user->rombel->first())->name ?? '-',
+                'saldo_tunai'        => $storTunai - $tarikTunai,
+                'saldo_digital'      => $storDigital - $tarikDigital,
+                'terakhir_transaksi' => optional($tabungan->user->transaksi()->latest('updated_at')->first())->updated_at,
+                'dapat_ditarik'      => $tabungan->sisa,
+            ];
         });
     }
 
     public function headings(): array
     {
         return [
-            'No',
-            'ID Tabungan',
-            'Nama',
-            'Kelas',
-            'Saldo Tunai',
-            'Saldo Digital',
-            'Terakhir Transaksi',
-            'Dapat Ditarik',
+            'No', 'Kode Rombel', 'Nama', 'Rombel', 'Saldo Tunai', 
+            'Saldo Digital', 'Terakhir Transaksi', 'Dapat Ditarik',
         ];
     }
 }
