@@ -43,60 +43,69 @@ class PengajuanController extends Controller
 
     public function kelola_pengajuan(Request $request)
     {
-        $perPage = request('perPage', 10);
+        $perPage = $request->input('perPage', 10);
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
-        $query = Pengajuan::query()->where('status', 'pending');
-        $query->select('id', 'jumlah_penarikan', 'status', 'pembayaran', 'alasan', 'user_id', 'tabungan_id', 'created_at');
+        // Ambil pengajuan berstatus pending khusus di periode aktif
+        $query = \App\Models\Pengajuan::where('status', 'pending')
+            ->where('periode_id', $periodeAktif)
+            ->with(['user.rombel' => function($q) use ($periodeAktif) {
+                $q->where('rombels.periode_id', $periodeAktif);
+            }, 'tabungan']);
+
         $searchTerm = $request->input('search');
-
         if (!empty($searchTerm)) {
-            $query->where(function ($query) use ($searchTerm) {
-                $query->where('jumlah_penarikan', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('status', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('pembayaran', 'LIKE', '%'.$searchTerm.'%')
-                    ->orWhere('alasan', 'LIKE', '%'.$searchTerm.'%');
-            });
-
-            $query->orWhereHas('user', function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', '%'.$searchTerm.'%');
-            });
-
-            $query->orWhereHas('user.kelas', function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', '%'.$searchTerm.'%');
+            $query->where(function ($q) use ($searchTerm, $periodeAktif) {
+                $q->where('jumlah_penarikan', 'LIKE', '%'.$searchTerm.'%')
+                  ->orWhere('pembayaran', 'LIKE', '%'.$searchTerm.'%')
+                  ->orWhere('alasan', 'LIKE', '%'.$searchTerm.'%')
+                  
+                  // Pencarian berdasarkan nama/username siswa
+                  ->orWhereHas('user', function ($qu) use ($searchTerm) {
+                      $qu->where('name', 'LIKE', '%'.$searchTerm.'%')
+                         ->orWhere('username', 'LIKE', '%'.$searchTerm.'%');
+                  })
+                  
+                  // Pencarian berdasarkan nama Rombel siswa di periode aktif
+                  ->orWhereHas('user.rombel', function ($qr) use ($searchTerm, $periodeAktif) {
+                      $qr->where('rombels.name', 'LIKE', '%'.$searchTerm.'%')
+                         ->where('rombels.periode_id', $periodeAktif);
+                  });
             });
         }
 
         $query->orderBy('created_at', 'desc');
-        $pengajuan = $query->paginate($perPage);
+        $pengajuan = $query->paginate($perPage)->withQueryString();
 
-        // dd($pengajuan);
         return view('bendahara.kelola_pengajuan', compact('pengajuan'));
     }
 
     /**
-    * Mengambil data pengajuan berdasarkan ID dan mengembalikannya dalam format JSON.
-    *
-    * @param int $id ID pengajuan yang akan diambil.
-    * @return \Illuminate\Http\JsonResponse Response JSON yang berisi data pengajuan.
-    */
-
+     * Mengambil data pengajuan berdasarkan ID untuk Modal AJAX
+     */
     public function getPengajuanData($id)
     {
-        $pengajuan = Pengajuan::findOrFail($id);
+        $pengajuan = \App\Models\Pengajuan::with(['tabungan', 'user'])->findOrFail($id);
+        
+        // Cari rombel siswa yang sesuai dengan periode pengajuan tersebut dibuat
+        $rombel = $pengajuan->user->rombel()
+            ->where('rombels.periode_id', $pengajuan->periode_id)
+            ->first();
 
         return response()->json([
-            'id' => $pengajuan->user->id ?? '-',
-            'jumlah_tarik' => $pengajuan->jumlah_penarikan ?? '-',
-            'username' => $pengajuan->user->username ?? '-',
-            'status' => $pengajuan->status ?? '-',
-            'pembayaran' => $pengajuan->pembayaran ?? '-',
-            'metode_digital' => $pengajuan->metode_digital ?? '-',
-            'type_tujuan' => $pengajuan->bank_code ?? $pengajuan->ewallet_type ?? '-',
-            'nomor_tujuan' => $pengajuan->nomor_rekening ?? $pengajuan->ewallet_number ?? '-',
-            'name' => $pengajuan->user->name ?? '-',
-            'kelas' => $pengajuan->user->kelas->name ?? '-',
-            'tabungan' => $pengajuan->user->tabungan->saldo ?? '-',
-            'alasan' => $pengajuan->alasan ?? '-',
+            'pengajuan_id'      => $pengajuan->id,
+            'user_id'           => $pengajuan->user->id ?? '-',
+            'username'          => $pengajuan->user->username ?? '-',
+            'name'              => $pengajuan->user->name ?? '-',
+            'kelas'             => $rombel->name ?? '-',
+            'tabungan'          => $pengajuan->tabungan->saldo ?? 0, 
+            'jumlah_penarikan'  => $pengajuan->jumlah_penarikan,
+            'status'            => $pengajuan->status,
+            'pembayaran'        => $pengajuan->pembayaran,
+            'metode_digital'    => $pengajuan->metode_digital ?? '-',
+            'type_tujuan'       => $pengajuan->bank_code ?? $pengajuan->ewallet_type ?? '-',
+            'nomor_tujuan'      => $pengajuan->nomor_rekening ?? $pengajuan->ewallet_number ?? '-',
+            'alasan'            => $pengajuan->alasan,
         ]);
     }
 
@@ -111,7 +120,18 @@ class PengajuanController extends Controller
     public function ajukan(Request $request)
     {
         $user = auth()->user();
-        $saldo = $user->tabungan->saldo;
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
+
+        // 1. Ambil data tabungan spesifik di periode aktif
+        $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->first();
+
+        if (!$tabungan) {
+            return back()->with('error', 'Data tabungan Anda pada periode ini tidak ditemukan.');
+        }
+
+        $saldo = $tabungan->saldo;
 
         $validatedData = $request->validate([
             'jumlah_tarik'      => 'required|numeric|min:1000|max:' . $saldo,
@@ -127,16 +147,17 @@ class PengajuanController extends Controller
             'nomor_rekening.required_if' => 'Nomor rekening harus diisi',
             'ewallet_type.required_if'   => 'Silakan pilih e-wallet',
             'ewallet_number.required_if' => 'Nomor e-wallet harus diisi',
+            'jumlah_tarik.max'           => 'Jumlah penarikan tidak boleh melebihi saldo saat ini.',
         ]);
 
-        $pengajuan = new Pengajuan();
+        $pengajuan = new \App\Models\Pengajuan();
         $pengajuan->user_id           = $user->id;
-        $pengajuan->tabungan_id       = $user->tabungan->id;
+        $pengajuan->tabungan_id       = $tabungan->id; // Gunakan id tabungan periode ini
         $pengajuan->jumlah_penarikan  = $validatedData['jumlah_tarik'];
         $pengajuan->alasan            = $validatedData['alasan'];
         $pengajuan->pembayaran        = $validatedData['jenis_pembayaran'];
         $pengajuan->status            = 'Pending';
-        $pengajuan->periode_id        = \App\Helpers\PeriodeHelper::id();
+        $pengajuan->periode_id        = $periodeAktif; // Kunci ke periode aktif
 
         if ($validatedData['jenis_pembayaran'] === 'Digital') {
             $pengajuan->metode_digital = $validatedData['metode_digital'];
@@ -153,107 +174,112 @@ class PengajuanController extends Controller
         $pengajuan->save();
 
         return redirect()->route('siswa.tabungan.tarik')
-            ->with('success', 'Pengajuan Penarikan Tabungan Berhasil di Ajukan.')
+            ->with('success', 'Pengajuan Penarikan Tabungan Berhasil Diajukan.')
             ->with('alert-type', 'success')
-            ->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil di Ajukan.')
-            ->with('alert-duration', 30000);
+            ->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil Diajukan.')
+            ->with('alert-duration', 5000); // Set ke 5 detik agar tidak mengganggu
     }
-
-
 
     public function batal($id)
     {
-        $pengajuan = Pengajuan::find($id);
+        $pengajuan = \App\Models\Pengajuan::find($id);
 
-        if (!$pengajuan) {
-            return redirect()->back()->with('error', 'Pengajuan tidak ditemukan.');
+        if (!$pengajuan || $pengajuan->status !== 'Pending') {
+            return redirect()->back()->with('error', 'Pengajuan tidak valid atau sudah diproses.');
         }
 
         $pengajuan->status = 'Batal';
         $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan Penarikan Telah di Batalkan.')
-        ->with('alert-type', 'success')
-        ->with('alert-message', 'Pengajuan Penarikan Telah di Batalkan.')
-        ->with('alert-duration', 30000);
+        return redirect()->back()
+            ->with('success', 'Pengajuan Penarikan Telah Dibatalkan.')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Pengajuan Penarikan Telah Dibatalkan.')
+            ->with('alert-duration', 5000);
     }
 
-    // Bendahara Terima Pengajuan ----------------------------------------------------------------------------------
     /**
-    * Menangani Keputusan Pengajuan Penarikan Tabungan Siswa oleh Bendahara.
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\RedirectResponse
-    */
-
-    public function terima(Request $request)
+     * Menangani Keputusan Pengajuan Penarikan Tabungan (Tunai & Digital)
+     */
+    public function terima(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'username'      => 'required',
-            'jumlah_tarik'  => 'required|numeric|min:10000',
-            'alasan'        => 'required|string',
-        ]);
-
-        DB::beginTransaction();
+        \Illuminate\Support\Facades\DB::beginTransaction();
 
         try {
-            $user      = User::where('username', $validatedData['username'])->firstOrFail();
-            $pengajuan = Pengajuan::where('user_id', $user->id)
-                                ->where('status', 'Pending')
-                                ->firstOrFail();
-            $tabungan  = Tabungan::where('user_id', $user->id)->firstOrFail();
+            // 1. Langsung cari berdasarkan ID pengajuan
+            $pengajuan = \App\Models\Pengajuan::where('id', $id)
+                            ->where('status', 'Pending')
+                            ->firstOrFail();
 
-            $jumlahTarikInput = $validatedData['jumlah_tarik'];
+            $user = $pengajuan->user;
+            
+            // 2. Cari tabungan berdasarkan periode pengajuan tersebut!
+            $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+                            ->where('periode_id', $pengajuan->periode_id)
+                            ->firstOrFail();
+
+            $jumlahTarikInput = $pengajuan->jumlah_penarikan;
             $biayaAdmin = ceil(($jumlahTarikInput * 0.05) / 1000) * 1000;
             $totalTarik = $jumlahTarikInput + $biayaAdmin;
 
             if ($totalTarik > $tabungan->saldo) {
-                return redirect()->back()
-                    ->withErrors(['jumlah_tarik' => 'Penarikan (termasuk biaya admin) melebihi saldo tabungan'])
-                    ->withInput();
+                return redirect()->back()->with('error', 'Penarikan (termasuk biaya admin) melebihi saldo tabungan saat ini.');
             }
-
-            $pengajuan->status       = 'Diterima';
-            $pengajuan->jumlah_tarik = $totalTarik;
-            $pengajuan->save();
 
             if ($pengajuan->pembayaran === 'Digital') {
+                // Jika digital, lempar ke Xendit dan status jadi PROCESSING
                 $this->processDigitalPayout($pengajuan, $user, $totalTarik);
+            } else {
+                // Jika Tunai, langsung potong saldo & catat transaksi
+                $tabungan->saldo -= $totalTarik;
+                $tabungan->save();
+
+                $pengajuan->status = 'Diterima'; // Atau SUCCEEDED
+                $pengajuan->save();
+
+                \App\Models\Transaksi::create([
+                    'jumlah_transaksi' => $totalTarik,
+                    'saldo_awal'       => $tabungan->saldo + $totalTarik,
+                    'saldo_akhir'      => $tabungan->saldo,
+                    'tipe_transaksi'   => 'Tarik',
+                    'pembayaran'       => 'Tunai',
+                    'status'           => 'success',
+                    'pembuat'          => auth()->user()->name,
+                    'user_id'          => $user->id,
+                    'tabungan_id'      => $tabungan->id,
+                    'periode_id'       => $pengajuan->periode_id // Wajib masuk!
+                ]);
             }
 
-            DB::commit();
+            \Illuminate\Support\Facades\DB::commit();
 
             return redirect()->route('bendahara.pengajuan.index')
-                ->with('success', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')
+                ->with('success', 'Pengajuan Penarikan Tabungan berhasil diproses.')
                 ->with('alert-type', 'success')
-                ->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil di Terima.')
-                ->with('alert-duration', 30000);
+                ->with('alert-message', 'Pengajuan Penarikan Tabungan berhasil diproses.')
+                ->with('alert-duration', 5000);
+
         } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])
-                ->withInput();
+            \Illuminate\Support\Facades\DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
     /**
-    * Memproses pencairan dana digital untuk pengajuan tabungan siswa.
-    *
-    * @param Pengajuan $pengajuan Data pengajuan tabungan yang akan diproses.
-    * @param User $user Pengguna yang mengajukan pencairan.
-    * @param float $amount Jumlah dana yang akan dicairkan.
-    * @return mixed Hasil dari permintaan pencairan dana melalui Xendit.
-    * @throws \Exception Jika metode pembayaran tidak valid atau data pembayaran tidak lengkap.
-    */
-
+     * Memproses pencairan dana digital ke Xendit V2
+     */
     protected function processDigitalPayout($pengajuan, $user, $amount)
     {
         if (!in_array($pengajuan->metode_digital, ['bank_transfer', 'ewallet'])) {
             throw new \Exception('Metode pembayaran digital tidak valid');
         }
 
+        // SET XENDIT KEY (Wajib ada!)
+        \Xendit\Configuration::setXenditKey(config('services.xendit.secret_key'));
+        $payoutApi = new \Xendit\Payout\PayoutApi();
+
         $channelProperties = [];
-        $referenceId = 'SISWA-' . $user->id . '-' . now()->format('YmdHis');
+        $referenceId = 'TARIK-' . $pengajuan->id . '-' . time();
 
         if ($pengajuan->metode_digital === 'bank_transfer') {
             if (empty($pengajuan->bank_code) || empty($pengajuan->nomor_rekening)) {
@@ -270,28 +296,26 @@ class PengajuanController extends Controller
             }
             $channelProperties = [
                 'account_holder_name' => $user->name,
-                'account_number' => $pengajuan->ewallet_number,
+                'account_number'      => $pengajuan->ewallet_number,
             ];
             $channelCode = $pengajuan->ewallet_type;
         }
 
-        $payoutRequest = new CreatePayoutRequest([
+        $payoutRequest = new \Xendit\Payout\CreatePayoutRequest([
             'reference_id'       => $referenceId,
             'currency'           => 'IDR',
             'channel_code'       => $channelCode,
             'channel_properties' => $channelProperties,
             'amount'             => $amount,
             'description'        => 'Penarikan Tabungan Siswa ' . $user->name,
-            'type'               => 'DIRECT_DISBURSEMENT'
+            'type'               => 'DIRECT_DISBURSEMENT' // Atau bebas sesuai kebutuhan API V2
         ]);
 
-        $result = $this->payoutApi->createPayout(
-            'DISB-' . Str::random(10),
-            null,
-            $payoutRequest
-        );
+        // Eksekusi Payout V2
+        $idempotencyKey = 'DISB-' . \Illuminate\Support\Str::random(10);
+        $result = $payoutApi->createPayout($idempotencyKey, null, $payoutRequest);
 
-        $pengajuan->xendit_payout_id = $result->getId();
+        $pengajuan->xendit_payout_id = $result['id'];
         $pengajuan->status = 'PROCESSING';
         $pengajuan->reference_id = $referenceId;
         $pengajuan->save();
@@ -300,87 +324,73 @@ class PengajuanController extends Controller
     }
 
     /**
-    * Memeriksa status pencairan dana (payout) berdasarkan ID payout yang diberikan.
-    *
-    * @param string $payoutId ID dari payout yang ingin diperiksa statusnya.
-    * @return mixed Status payout jika berhasil, atau null jika terjadi kesalahan.
-    */
-
-    public function checkPayoutStatus($payoutId)
-    {
-        try {
-            $payoutStatus = $this->payoutApi->getPayoutById($payoutId);
-            return $payoutStatus;
-        } catch (\Xendit\XenditSdkException $e) {
-            \Log::error('Payout Status Check Error: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-    * Menangani webhook dari Xendit untuk payout yang berhasil.
-    *
-    * @param Request $request Data yang dikirimkan oleh Xendit melalui webhook.
-    * @return \Illuminate\Http\JsonResponse Respon JSON dengan status sukses atau error.
-    */
-
+     * Menangani webhook dari Xendit Payouts V2
+     */
     public function handlePayoutWebhook(Request $request)
     {
-        Log::info('Webhook Payout Diterima', ['payload' => $request->all()]);
-
-        $data = $request->input('data');
-
-        if ($request->input('event') !== 'payout.succeeded') {
-            return response()->json(['message' => 'Event not processed'], 400);
+        // Proteksi CSRF/Callback Token (Sangat disarankan)
+        $xenditXCallbackToken = $request->header('x-callback-token');
+        if ($xenditXCallbackToken !== config('services.xendit.webhook_token')) {
+            return response()->json(['message' => 'Unauthorized Webhook Token'], 401);
         }
+
+        $event = $request->input('event');
+        $data = $request->input('data');
 
         if (!isset($data['reference_id'])) {
             return response()->json(['message' => 'Reference ID is missing'], 400);
         }
 
-        DB::beginTransaction();
+        \Illuminate\Support\Facades\DB::beginTransaction();
         try {
-            $pengajuan = Pengajuan::where('reference_id', $data['reference_id'])->first();
+            $pengajuan = \App\Models\Pengajuan::where('reference_id', $data['reference_id'])->first();
 
             if (!$pengajuan) {
-                throw new \Exception('Pengajuan tidak ditemukan untuk reference_id: ' . $data['reference_id']);
+                throw new \Exception('Pengajuan tidak ditemukan.');
             }
 
             if ($pengajuan->status !== 'PROCESSING') {
-                throw new \Exception('Status pengajuan bukan PROCESSING, tidak dapat diperbarui.');
+                return response()->json(['message' => 'Pengajuan sudah diproses sebelumnya.'], 200);
             }
 
-            $pengajuan->status = 'SUCCEEDED';
-            $pengajuan->xendit_payout_id = $data['id'];
-            $pengajuan->save();
+            // Jika status Payout BERHASIL
+            if ($event === 'payout.succeeded') {
+                $pengajuan->status = 'SUCCEEDED';
+                $pengajuan->save();
 
-            $tabungan = Tabungan::where('user_id', $pengajuan->user_id)->firstOrFail();
-            $saldo_sebelum = $tabungan->saldo;
-            $tabungan->saldo -= $pengajuan->jumlah_penarikan;
-            $tabungan->premi = $tabungan->saldo * 0.025;
-            $tabungan->sisa = $tabungan->saldo - $tabungan->premi;
-            $tabungan->save();
+                // Potong saldo tabungan (Total termasuk admin!)
+                $tabungan = \App\Models\Tabungan::where('id', $pengajuan->tabungan_id)->firstOrFail();
+                $saldo_sebelum = $tabungan->saldo;
+                
+                $jumlahTarikInput = $pengajuan->jumlah_penarikan;
+                $biayaAdmin = ceil(($jumlahTarikInput * 0.05) / 1000) * 1000;
+                $totalTarik = $jumlahTarikInput + $biayaAdmin;
 
-            Transaksi::create([
-                'jumlah_transaksi' => $pengajuan->jumlah_penarikan,
-                'saldo_awal' => $saldo_sebelum,
-                'saldo_akhir' => $tabungan->saldo,
-                'tipe_transaksi' => 'Tarik',
-                'pembayaran' => $pengajuan->pembayaran,
-                'status' => 'success',
-                'pembuat' => 'Xendit Webhook',
-                'token_stor' => $data['idempotency_key'] ?? null,
-                'user_id' => $pengajuan->user_id,
-                'tabungan_id' => $tabungan->id
-            ]);
+                $tabungan->saldo -= $totalTarik;
+                $tabungan->save();
 
-            DB::commit();
+                \App\Models\Transaksi::create([
+                    'jumlah_transaksi' => $totalTarik,
+                    'saldo_awal'       => $saldo_sebelum,
+                    'saldo_akhir'      => $tabungan->saldo,
+                    'tipe_transaksi'   => 'Tarik',
+                    'pembayaran'       => 'Digital',
+                    'status'           => 'success',
+                    'pembuat'          => 'Xendit',
+                    'token_stor'       => $data['id'] ?? null,
+                    'user_id'          => $pengajuan->user_id,
+                    'tabungan_id'      => $tabungan->id,
+                    'periode_id'       => $pengajuan->periode_id // Wajib masuk!
+                ]);
+            }
 
+            \Illuminate\Support\Facades\DB::commit();
             return response()->json(['message' => 'Payout processed successfully'], 200);
+
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Webhook Payout Error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error processing payout', 'error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Webhook Payout Error', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Error processing payout'], 500);
         }
     }
 
@@ -394,15 +404,22 @@ class PengajuanController extends Controller
 
     public function tolak($id)
     {
-        $pengajuan = Pengajuan::where('user_id', $id)->latest()->first();
+        $pengajuan = \App\Models\Pengajuan::findOrFail($id);
+        
+        if ($pengajuan->status !== 'Pending') {
+            return redirect()->back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
+        }
 
         $pengajuan->status = 'Tolak';
-
         $pengajuan->save();
 
-        return redirect()->route('bendahara.pengajuan.index')->with('success', 'Pengajuan Penarikan Tabungan Berhasil di Tolak.')->with('alert-type', 'danger')->with('alert-message', 'Pengajuan Penarikan Tabungan Berhasil di Tolak.')->with('alert-duration', 30000);
+        // Gunakan redirect back agar kembali ke halaman filter sebelumnya dengan aman
+        return redirect()->back()
+            ->with('success', 'Pengajuan Penarikan Tabungan berhasil ditolak.')
+            ->with('alert-type', 'danger')
+            ->with('alert-message', 'Pengajuan Penarikan Tabungan berhasil ditolak.')
+            ->with('alert-duration', 5000);
     }
-
     /**
     * Mengambil daftar channel pembayaran yang tersedia dari Xendit.
     *

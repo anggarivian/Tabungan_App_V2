@@ -186,7 +186,7 @@
                                         </td>
                                         
                                         {{-- Kolom Saldo Akhir --}}
-                                        <td class="text-center fw-bold text-dark">
+                                        <td class="text-center fw-bold">
                                             Rp {{ number_format($trx->saldo_akhir ?? 0, 0, ',', '.') }}
                                         </td>
                                     </tr>

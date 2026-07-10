@@ -1,6 +1,6 @@
 @extends('layout.main')
 
-@section('title') Kelola Pengajuan Penarikan - SakuRame @endsection
+@section('title', 'Kelola Pengajuan Penarikan - SakuRame')
 
 @section('content')
 <div class="page-heading mb-3">
@@ -11,127 +11,106 @@
         <div class="col-12 col-md-6 text-md-end">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
-                    @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
-                    @endif
+                    <li class="breadcrumb-item"><a href="{{ route('bendahara.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Pengajuan</li>
                 </ol>
             </nav>
         </div>
     </div>
 </div>
+
 <div class="page-content">
     <div class="card shadow">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
                 <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i>
-                    {{ session('alert-message') }}
+                    <i class="bi bi-check-circle me-1"></i> {{ session('alert-message') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <script>
-                @if(session('alert-duration'))
-                    setTimeout(function() {
-                        document.getElementById('alert').style.display = 'none';
-                    }, {{ session('alert-duration') }});
-                @endif
-            </script>
-            @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
-                    <strong>Terjadi Kesalahan!</strong>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-1"></i> {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <div class="d-flex justify-content-between">
-                <div class="input-group">
-                    <p class="card-title">Data Pengajuan Penarikan Tabungan</p>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+                <div>
+                    <h5 class="card-title mb-1">Data Pengajuan Penarikan Tabungan</h5>
+                    <small class="text-muted">Periode Aktif: Tarik data otomatis sesuai kalender akademik</small>
                 </div>
-                <form action="/bendahara/kelola-pengajuan" method="GET">
+                <form action="/bendahara/kelola-pengajuan" method="GET" class="w-100 w-md-auto">
                     <div class="input-group">
-                        <input type="text" class="form-control rounded" style="padding-right: 1px" name="search" id="search" value="{{ request('search') }}" placeholder="Cari..." aria-describedby="button-addon2">
-                        <button class="btn btn-primary" type="submit" id="button-addon2">Cari</button>
+                        <input type="text" class="form-control rounded" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama atau rombel...">
+                        <button class="btn btn-primary" type="submit">Cari</button>
                     </div>
                 </form>
             </div>
         </div>
-        <div class="card-body pb-1 pt-3">
+
+        <div class="card-body pb-1 pt-4">
             <div class="table-responsive">
-                <table class="table table-hover" style="width: 100%">
+                <table class="table table-hover align-middle" style="width: 100%">
                     <thead>
                         <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-center">ID</th>
-                            <th>Nama</th>
-                            <th class="text-center">Kelas</th>
-                            <th class="text-center">Alasan</th>
-                            <th class="text-center">Jumlah Penarikan</th>
+                            <th class="text-center" style="width: 50px">No.</th>
+                            <th class="text-center" style="width: 100px">ID</th>
+                            <th>Nama Siswa</th>
+                            <th class="text-center">Rombel</th>
+                            <th>Alasan</th>
+                            <th class="text-end">Jumlah Penarikan</th>
                             <th class="text-center">Tanggal</th>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Action</th>
+                            <th class="text-center" style="width: 100px">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($pengajuan as $index => $pengajuans)
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
-                                <td class="text-center">{{ $pengajuans->user->username }}</td>
-                                <td>{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
-                                <td class="text-center">{{ $pengajuans->user->kelas->name }}</td>
-                                <td class="text-center">{{ Str::limit($pengajuans->alasan, 20, '...')}}</td>
-                                <td class="text-center">Rp. {{ number_format($pengajuans->jumlah_penarikan ?? 0 ) }}</td>
-                                <td class="text-center">{{ \Carbon\Carbon::parse($pengajuans->created_at)->format('d M Y H:i') }}</td>
+                                <td class="text-center">{{ $penganuan->firstItem ?? $loop->iteration }}</td>
+                                <td class="text-center"><span class="badge bg-secondary">{{ $pengajuans->user->username }}</span></td>
+                                <td class="fw-medium">{{ Str::limit($pengajuans->user->name, 25, '...') }}</td>
                                 <td class="text-center">
-                                    @if ($pengajuans->status == 'Pending')
-                                        <span class="badge bg-warning">Pending</span>
-                                    @elseif ($pengajuans->status == 'Tolak')
-                                        <span class="badge bg-danger">Tolak</span>
-                                    @elseif ($pengajuans->status == 'Terima')
-                                        <span class="badge bg-success">Terima</span>
-                                    @else
-                                        <span class="badge bg-secondary">-</span>
-                                    @endif
+                                    <span class="badge border text-muted">
+                                        {{ $pengajuans->user->rombel->first()->name ?? '-' }}
+                                    </span>
+                                </td>
+                                <td><small class="text-muted" title="{{ $pengajuans->alasan }}">{{ Str::limit($pengajuans->alasan, 25, '...') }}</small></td>
+                                <td class="text-end fw-bold">Rp {{ number_format($pengajuans->jumlah_penarikan ?? 0, 0, ',', '.') }}</td>
+                                <td class="text-center small">{{ \Carbon\Carbon::parse($pengajuans->created_at)->format('d M Y H:i') }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark">Pending</span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-success" data-id="{{ $pengajuans->id }}" data-bs-toggle="modal" data-bs-target="#editModal">
-                                            Proses
-                                        </button>
-                                    </div>
+                                    <button type="button" class="btn btn-sm btn-success px-3 btn-proses" data-id="{{ $pengajuans->id }}">
+                                        Proses
+                                    </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">Data Kosong</td>
+                                <td colspan="9" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox display-6 d-block mb-2 text-secondary"></i>
+                                    Tidak ada antrean pengajuan penarikan tabungan saat ini.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-between">
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
                     <form method="GET" action="{{ request()->url() }}">
-                        <div class="d-flex justify-content-end mb-3">
-                            <label for="perPage" style="margin-top: 3px">Show</label>
-                            <select name="perPage" id="perPage" class="form-select form-control-sm form-select-sm mx-2" onchange="this.form.submit()">
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="perPage" class="small text-muted mb-0">Show</label>
+                            <select name="perPage" id="perPage" class="form-select form-select-sm" onchange="this.form.submit()">
                                 <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
                                 <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
                                 <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                <option value="75" {{ request('perPage') == 75 ? 'selected' : '' }}>75</option>
-                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
                             </select>
                         </div>
                     </form>
-                    <div class="justify-content-end">
+                    <div>
                         {{ $pengajuan->appends(['perPage' => request('perPage')])->links('layout.pagination.bootstrap-5') }}
                     </div>
                 </div>
@@ -140,136 +119,100 @@
     </div>
 </div>
 
-{{-- Modal --}}
 <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editModalLabel">Proses Pengajuan</h1>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="editModalLabel"><i class="bi bi-gear-fill text-primary me-2"></i>Proses Pengajuan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="editForm" method="POST" action="#">
-                <div class="modal-body">
+                @csrf
+                <div class="modal-body p-4">
                     <div class="row g-4">
-
-                        <!-- Kolom Kiri: Data User -->
-                        <div class="col-md-6">
-                            <h6 class="text-primary mb-3 border-bottom pb-2">Data Siswa</h6>
+                        <div class="col-md-6 border-end">
+                            <h6 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="bi bi-person-fill me-1"></i> Data Siswa</h6>
+                            <input type="hidden" id="edit-pengajuan-id">
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">ID Tabungan</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-id" class="form-control d-none" name="id" required readonly>
-                                    <input type="text" id="edit-username" class="form-control-plaintext" name="username" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">ID Tabungan</div>
+                                <div class="col-8"><input type="text" id="edit-username" class="form-control-plaintext fw-medium py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Nama</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-name" class="form-control-plaintext" name="name" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">Nama</div>
+                                <div class="col-8"><input type="text" id="edit-name" class="form-control-plaintext fw-medium py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Kelas</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-kelas" class="form-control-plaintext" name="kelas" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">Rombel</div>
+                                <div class="col-8"><input type="text" id="edit-kelas" class="form-control-plaintext fw-medium py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Jumlah Tabungan</label>
-                                </div>
+                                <div class="col-4 small text-muted">Saldo Tabungan</div>
                                 <div class="col-8">
-                                    <input type="text" id="edit-tabungan" class="form-control-plaintext bg-warning bg-opacity-25 border border-warning rounded px-2 py-1 fw-bold" name="tabungan" required readonly>
+                                    <input type="text" id="edit-tabungan" class="form-control bg-light border-0 fw-bold text-dark rounded px-2 py-1" readonly>
                                 </div>
                             </div>
 
                             <div class="row align-items-start mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Alasan</label>
-                                </div>
+                                <div class="col-4 small text-muted">Alasan</div>
                                 <div class="col-8">
-                                    <textarea id="edit-alasan" class="form-control-plaintext" name="alasan" rows="2" required readonly></textarea>
+                                    <textarea id="edit-alasan" class="form-control bg-light border-0 small text-dark" rows="2" readonly></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Kolom Kanan: Data Pembayaran -->
                         <div class="col-md-6">
-                            <h6 class="text-primary mb-3 border-bottom pb-2">Detail Pembayaran</h6>
+                            <h6 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="bi bi-credit-card-2-back-fill me-1"></i> Detail Pembayaran</h6>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Jenis Pembayaran</label>
-                                </div>
+                                <div class="col-4 small text-muted">Jenis Penarikan</div>
+                                <div class="col-8"><input type="text" id="edit-pembayaran" class="form-control-plaintext fw-bold py-0" readonly></div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-4 small text-muted">Jumlah Tarik</div>
                                 <div class="col-8">
-                                    <input type="text" id="edit-pembayaran" class="form-control-plaintext" name="pembayaran" required readonly>
+                                    <input type="text" id="edit-jumlah_penarikan" class="form-control bg-success bg-opacity-10 border-0 rounded px-2 py-1 text-success fw-bold" readonly>
                                 </div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Jumlah Penarikan</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-jumlah_tarik" class="form-control-plaintext bg-success bg-opacity-25 border border-success rounded px-2 py-1 text-success fw-bold" name="jumlah_tarik" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">Metode</div>
+                                <div class="col-8"><input type="text" id="edit-metode_digital" class="form-control-plaintext py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Metode Penarikan</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-metode_digital" class="form-control-plaintext" name="metode_digital" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">Tujuan/Layanan</div>
+                                <div class="col-8"><input type="text" id="edit-type_tujuan" class="form-control-plaintext py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Tujuan Penarikan</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-type_tujuan" class="form-control-plaintext" name="type_tujuan" required readonly>
-                                </div>
+                                <div class="col-4 small text-muted">No. Rek / HP</div>
+                                <div class="col-8"><input type="text" id="edit-nomor_tujuan" class="form-control-plaintext fw-bold py-0" readonly></div>
                             </div>
 
                             <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">No. Rekening/E-Wallet</label>
-                                </div>
+                                <div class="col-4 small text-muted">Biaya Admin (5%)</div>
                                 <div class="col-8">
-                                    <input type="text" id="edit-nomor_tujuan" class="form-control-plaintext" name="nomor_tujuan" required readonly>
-                                </div>
-                            </div>
-
-                            <div class="row align-items-center mb-3">
-                                <div class="col-4">
-                                    <label class="form-label mb-0 fw-medium">Biaya Admin (5%)</label>
-                                </div>
-                                <div class="col-8">
-                                    <input type="text" id="edit-premi" class="form-control-plaintext bg-warning bg-opacity-25 border border-warning rounded px-2 py-1 text-warning fw-bold" name="premi" readonly>
-                                    <small class="text-muted d-block mt-1">Biaya admin dihitung otomatis</small>
+                                    <input type="text" id="edit-premi" class="form-control bg-warning bg-opacity-10 border-0 rounded px-2 py-1 text-warning fw-bold" readonly>
+                                    <small class="text-muted d-block mt-1">*Pembulatan ke ribuan terdekat</small>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" id="tolakButton" class="btn btn-outline-danger">Tolak</button>
-                    <button type="submit" class="btn btn-primary">Setujui</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" id="tolakButton" class="btn btn-outline-danger px-4 fw-bold">
+                        <i class="bi bi-x-circle me-1"></i> Tolak Pengajuan
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">
+                        <i class="bi bi-check-circle me-1"></i> Setujui & Transfer
+                    </button>
                 </div>
             </form>
         </div>
@@ -280,70 +223,80 @@
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('.btn-success').on('click', function() {
-            var id = $(this).data('id');
-            $.ajax({
-                url: "{{ route('bendahara.pengajuan.getData', '') }}/" + id,
-                type: 'GET',
-                success: function(response) {
-                    if(response) {
-                        $('#edit-id').val(response.id);
-                        $('#edit-username').val(response.username);
-                        $('#edit-name').val(response.name);
-                        $('#edit-kelas').val(response.kelas);
-                        $('#edit-jumlah_tarik').val(response.jumlah_tarik);
-                        $('#edit-tabungan').val(response.tabungan);
-                        $('#edit-pembayaran').val(response.pembayaran);
-                        $('#edit-status').val(response.status);
-                        $('#edit-alasan').val(response.alasan);
-                        $('#edit-created_at').val(response.created_at);
-                        // Tambahan untuk metode digital, bank atau e-wallet
-                        $('#edit-metode_digital').val(response.metode_digital);
+$(document).ready(function() {
+    let currentPengajuanId = null;
+
+    // Ketika tombol "Proses" diklik
+    $('.btn-proses').on('click', function() {
+        currentPengajuanId = $(this).data('id');
+
+        $.ajax({
+            url: "/bendahara/pengajuan/get-data/" + currentPengajuanId,
+            type: 'GET',
+            success: function(response) {
+                if (response) {
+                    $('#edit-pengajuan-id').val(response.pengajuan_id);
+                    $('#edit-username').val(response.username);
+                    $('#edit-name').val(response.name);
+                    $('#edit-kelas').val(response.kelas);
+                    $('#edit-pembayaran').val(response.pembayaran);
+                    $('#edit-alasan').val(response.alasan);
+                    $('#edit-metode_digital').val(response.metode_digital);
+                    
+                    // Format mata uang untuk modal
+                    let formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+                    
+                    $('#edit-tabungan').val(formatter.format(response.tabungan));
+                    $('#edit-jumlah_penarikan').val(formatter.format(response.jumlah_penarikan));
+                    
+                    if(response.pembayaran === 'Digital') {
                         $('#edit-type_tujuan').val(response.type_tujuan);
                         $('#edit-nomor_tujuan').val(response.nomor_tujuan);
-
-                        $('#tolakButton').attr('href', '/bendahara/pengajuan/tolak/' + response.id);
-
                     } else {
-                        alert('Gagal mengambil data');
+                        $('#edit-type_tujuan').val('-');
+                        $('#edit-nomor_tujuan').val('-');
                     }
-                },
-                error: function() {
-                    alert('Terjadi kesalahan saat mengambil data');
+
+                    // Hitung biaya admin 5% dan pembulatan ke ribuan terdekat
+                    let jumlah = parseInt(response.jumlah_penarikan) || 0;
+                    let admin = Math.ceil(jumlah * 0.05);
+                    let dibulatkan = Math.ceil(admin / 1000) * 1000;
+                    $('#edit-premi').val(formatter.format(dibulatkan));
+                    
+                    // Update action form agar dinamis mengarah ke persetujuan penarikan
+                    $('#editForm').attr('action', '/bendahara/pengajuan/setuju/' + response.pengajuan_id);
+                } else {
+                    alert('Gagal mengambil data');
                 }
-            });
+            },
+            error: function() {
+                alert('Terjadi kesalahan saat mengambil data');
+            }
         });
+
+        $('#editModal').modal('show');
     });
-    $('#tolakButton').on('click', function () {
-        var id = $('#edit-id').val();
-        if (id) {
-            window.location.href = '/bendahara/pengajuan/tolak/' + id;
+
+    // Aksi Tombol Tolak
+    $('#tolakButton').on('click', function() {
+        var pengajuanId = $('#edit-pengajuan-id').val();
+        if (pengajuanId) {
+            if(confirm('Apakah Anda yakin ingin menolak pengajuan penarikan ini?')) {
+                window.location.href = '/bendahara/pengajuan/tolak/' + pengajuanId;
+            }
+        } else {
+            alert('ID pengajuan tidak ditemukan.');
         }
     });
-    function confirmDelete(id) {
-        $('#deleteForm').attr('action', '/bendahara/kelola-siswa/hapus/' + id);
-        $('#deleteModal').modal('show');
-    }
+
+    // Auto-hide alert banner
+    setTimeout(function() {
+        let alertEl = document.getElementById('alert');
+        if (alertEl) {
+            let bsAlert = new bootstrap.Alert(alertEl);
+            bsAlert.close();
+        }
+    }, 5000);
+});
 </script>
-<script>
-    function genapkanKeRibuan(angka) {
-        return Math.ceil(angka / 1000) * 1000;
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const jumlahTarikInput = document.getElementById('edit-jumlah_tarik');
-        const premiInput = document.getElementById('edit-premi');
-
-        const modal = document.getElementById('editModal');
-        modal.addEventListener('shown.bs.modal', function () {
-            const jumlahTarik = parseInt(jumlahTarikInput.value.replace(/[^0-9]/g, '')) || 0;
-            const biayaAdmin = Math.ceil(jumlahTarik * 0.05);
-            const dibulatkan = genapkanKeRibuan(biayaAdmin);
-
-            premiInput.value = dibulatkan.toLocaleString('id-ID');
-        });
-    });
-</script>
-
 @endsection

@@ -123,7 +123,7 @@ Route::middleware(['auth'])->group(function () {
         // Menangani pengelolaan Pengajuan.
         Route::get('/bendahara/pengajuan', [PengajuanController::class, 'kelola_pengajuan'])->name('bendahara.pengajuan.index');
         Route::get('/bendahara/pengajuan/get-data/{id}', [PengajuanController::class, 'getPengajuanData'])->name('bendahara.pengajuan.getData');
-        Route::put('/bendahara/pengajuan/terima', [PengajuanController::class, 'terima'])->name('bendahara.pengajuan.terima');
+        Route::post('/bendahara/pengajuan/setuju/{id}', [PengajuanController::class, 'terima'])->name('bendahara.pengajuan.terima');
         Route::get('/bendahara/pengajuan/tolak/{id}', [PengajuanController::class, 'tolak'])->name('bendahara.pengajuan.tolak');
 
         // Menangani pengelolaan Laporan.

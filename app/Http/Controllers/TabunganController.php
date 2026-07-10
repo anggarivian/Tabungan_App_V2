@@ -9,6 +9,7 @@ use App\Models\User;
 use Xendit\Invoices;
 use App\Models\Kelas;
 use App\Models\Rombel;
+use App\Models\Periode;
 use App\Models\Tabungan;
 use App\Models\Pengajuan;
 use App\Models\Transaksi;
@@ -53,40 +54,58 @@ class TabunganController extends Controller
     public function bendahara_index()
     {
         $periodeId = PeriodeHelper::id();
-        
-        // Ambil info periode untuk ditampilkan di UI (Asumsi lu punya relasi/helper untuk ini)
-        // Jika tidak ada nama periode di helper, lu bisa sesuaikan.
-        $periodeAktif = \App\Models\Periode::find($periodeId); 
+        $periodeAktif = Periode::find($periodeId);
 
-        // 1. Hitung Total Global (Hanya untuk transaksi HARI INI dan SUCCESS)
-        $baseGlobalQuery = Transaksi::whereDate('created_at', Carbon::today())
-                                    ->where('status', 'success');
+        // fix: guard kalau belum ada periode aktif sama sekali
+        if (!$periodeId) {
+            return view('bendahara.tabungan.index', [
+                'periodeAktif'          => null,
+                'transaksi_masuk'       => 0,
+                'transaksi_keluar'      => 0,
+                'jumlah_saldo_tunai'    => 0,
+                'jumlah_saldo_digital'  => 0,
+                'rombelList'            => [],
+                'rombels'               => collect(),
+                'storKali'              => 0,
+                'tarikKali'             => 0,
+            ]);
+        }
 
-        $transaksi_masuk  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
-        $transaksi_keluar = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
-        
-        $storKali  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->count();
-        $tarikKali = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->count();
-
-        $jumlah_saldo_tunai = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') 
-                            - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
-
-        $jumlah_saldo_digital = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') 
-                              - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
-
-        // 2. Ambil Semua Rombel Aktif di Periode Ini
-        $rombels = Rombel::where('periode_id', $periodeId)->orderBy('name')->get();
-        $rombelList = [];
-
-        // 3. Tarik Data Transaksi Hari Ini Per Rombel
-        foreach ($rombels as $rombel) {
-            $baseRombelQuery = Transaksi::whereHas('user.rombel', function($q) use ($rombel) {
-                $q->where('rombels.id', $rombel->id);
-            })
+        // fix: tambahkan periode_id eksplisit, jangan cuma andalkan whereDate(created_at, today())
+        $baseGlobalQuery = Transaksi::where('periode_id', $periodeId)
             ->whereDate('created_at', Carbon::today())
             ->where('status', 'success');
 
-            $transaksi_hari_ini = (clone $baseRombelQuery)->orderBy('created_at', 'desc')->get();
+        $transaksi_masuk  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
+        $transaksi_keluar = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
+
+        $storKali  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->count();
+        $tarikKali = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->count();
+
+        $jumlah_saldo_tunai = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi')
+                            - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+
+        $jumlah_saldo_digital = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Digital')->sum('jumlah_transaksi')
+                            - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+
+        $rombels = Rombel::where('periode_id', $periodeId)->orderBy('name')->get();
+        $rombelList = [];
+
+        foreach ($rombels as $rombel) {
+            // fix: filter periode_id di query Transaksi itu sendiri, sekaligus dobel-cek di whereHas
+            $baseRombelQuery = Transaksi::where('periode_id', $periodeId)
+                ->whereHas('user.rombel', function ($q) use ($rombel, $periodeId) {
+                    $q->where('rombels.id', $rombel->id)
+                    ->where('rombels.periode_id', $periodeId);
+                })
+                ->whereDate('created_at', Carbon::today())
+                ->where('status', 'success');
+
+            $transaksi_hari_ini = (clone $baseRombelQuery)
+                ->with('user') // fix: eager load, cegah N+1 di blade
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             $stor_rombel  = (clone $baseRombelQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
             $tarik_rombel = (clone $baseRombelQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
 
@@ -100,13 +119,13 @@ class TabunganController extends Controller
 
         return view('bendahara.tabungan.index', compact(
             'periodeAktif',
-            'transaksi_masuk', 
-            'transaksi_keluar', 
-            'jumlah_saldo_tunai', 
-            'jumlah_saldo_digital', 
-            'rombelList', 
+            'transaksi_masuk',
+            'transaksi_keluar',
+            'jumlah_saldo_tunai',
+            'jumlah_saldo_digital',
+            'rombelList',
             'rombels',
-            'storKali', 
+            'storKali',
             'tarikKali'
         ));
     }
@@ -1022,6 +1041,37 @@ class TabunganController extends Controller
     }
 
     // Siswa ------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    /**
+    * Menampilkan Dashboard Tarik Tabungan oleh Siswa.
+    *
+    * @return \Illuminate\Http\RedirectResponse
+    */
+
+    public function siswa_tarik()
+    {
+        $user = auth()->user();
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
+
+        // Cari pengajuan pending di periode aktif
+        $pengajuans = \App\Models\Pengajuan::where('status', 'pending')
+            ->where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->first();
+
+        // Cari tabungan spesifik di periode aktif
+        $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->first();
+
+        // Ambil nominal, jika belum ada tabungan set jadi 0
+        $nominal = $tabungan ? $tabungan->saldo : 0;
+        $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
+        
+        return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
+    }
+    
+    
     /**
     * Menampilkan Dashboard Stor Tabungan oleh Siswa.
     *
@@ -1031,104 +1081,152 @@ class TabunganController extends Controller
     public function siswa_stor()
     {
         $user = auth()->user();
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
-        $nominal = $user->tabungan ? $user->tabungan->saldo : 0;
-        $terbilang = RupiahHelper::terbilangRupiah($nominal);
+        // 1. Ambil data Tabungan siswa pada periode aktif
+        $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->first();
+
+        $nominal = $tabungan ? $tabungan->saldo : 0;
+        $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
+
+        // 2. Ambil data Rombel aktif siswa
+        $rombel = $user->rombel()->where('rombels.periode_id', $periodeAktif)->first();
 
         $invoice = null;
 
-        $pendingTransaksi = Transaksi::where('user_id', $user->id)
+        // 3. Ambil transaksi pending terbaru milik siswa di periode aktif
+        $pendingTransaksi = \App\Models\Transaksi::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
             ->where('status', 'pending')
             ->latest()
             ->first();
 
         if ($pendingTransaksi && $pendingTransaksi->external_id) {
-            $response = Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+            // Tarik data live dari server Xendit untuk sinkronisasi real-time
+            $response = \Illuminate\Support\Facades\Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
                 ->get('https://api.xendit.co/v2/invoices', [
                     'external_id' => $pendingTransaksi->external_id,
                 ]);
 
-            $invoices = $response->json();
+            if ($response->successful()) {
+                $invoices = $response->json();
+                if (is_array($invoices) && count($invoices) > 0) {
+                    $xenditInvoice = $invoices[0];
+                    $xenditStatus = $xenditInvoice['status'] ?? 'PENDING';
 
-            if ($response->successful() && is_array($invoices) && count($invoices) > 0) {
-                $invoice = $invoices[0];
-                $invoice['expiry_date_carbon'] = Carbon::parse($invoice['expiry_date']);
+                    if ($xenditStatus === 'EXPIRED') {
+                        // Skenario A: Invoice sudah kedaluwarsa saat siswa meninggalkan aplikasi
+                        $pendingTransaksi->status = 'Expired';
+                        $pendingTransaksi->save();
+                    } elseif ($xenditStatus === 'PAID' || $xenditStatus === 'SETTLED') {
+                        // Skenario B: Ternyata sudah dibayar tapi webhook terlewat, langsung sukseskan di sini
+                        if ($pendingTransaksi->status !== 'success') {
+                            \Illuminate\Support\Facades\DB::transaction(function() use ($pendingTransaksi, $tabungan) {
+                                $pendingTransaksi->status = 'success';
+                                $pendingTransaksi->save();
+
+                                if ($tabungan) {
+                                    $tabungan->saldo += $pendingTransaksi->jumlah_transaksi;
+                                    $tabungan->save();
+                                }
+                                \App\Jobs\SendWhatsAppMessage::dispatch($pendingTransaksi);
+                            });
+                            // Refresh data saldo untuk view form awal
+                            $nominal = $tabungan ? $tabungan->refresh()->saldo : 0;
+                            $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
+                        }
+                    } else {
+                        // Skenario C: Invoice benar-benar masih pending aktif, kunci tampilan ke "Lanjutkan Pembayaran"
+                        $invoice = $xenditInvoice;
+                        $invoice['expiry_date_carbon'] = \Carbon\Carbon::parse($invoice['expiry_date']);
+                    }
+                }
             }
         }
 
-        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice'));
+        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice', 'rombel'));
     }
 
     /**
-    * Menampilkan Batal Stor Tabungan oleh Siswa.
-    *
-    * @return \Illuminate\Http\RedirectResponse
-    */
-
+     * Menangani Pembatalan Transaksi/Invoice Aktif oleh Siswa
+     */
     public function batal($id)
     {
-        $transaksi = Transaksi::where('user_id', $id)->latest()->first();
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
+        // Ambil data transaksi pending siswa yang akan dibatalkan
+        $transaksi = \App\Models\Transaksi::where('user_id', $id)
+            ->where('periode_id', $periodeAktif)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
 
         if (!$transaksi) {
-            return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+            return redirect()->back()->with('error', 'Transaksi aktif tidak ditemukan.');
         }
 
+        // Hit API Xendit untuk mematikan paksa (expire) invoice agar tautan lamanya mati demi keamanan
+        if ($transaksi->external_id) {
+            $responseFetch = \Illuminate\Support\Facades\Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+                ->get('https://api.xendit.co/v2/invoices', [
+                    'external_id' => $transaksi->external_id,
+                ]);
+
+            if ($responseFetch->successful()) {
+                $invoices = $responseFetch->json();
+                if (is_array($invoices) && count($invoices) > 0) {
+                    $invoiceIdXendit = $invoices[0]['id'];
+                    
+                    // Trigger expire token ke server Xendit
+                    \Illuminate\Support\Facades\Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+                        ->post("https://api.xendit.co/v2/invoices/{$invoiceIdXendit}/expire!");
+                }
+            }
+        }
+
+        // Ubah status lokal di database aplikasi menjadi Batal
         $transaksi->status = 'Batal';
         $transaksi->save();
 
-        return redirect()->back()->with('success', 'Transaksi Telah di Batalkan.')
-        ->with('alert-type', 'success')
-        ->with('alert-message', 'Transaksi Telah di Batalkan.')
-        ->with('alert-duration', 30000);
+        return redirect()->back()->with('success', 'Transaksi berhasil dibatalkan.')
+            ->with('alert-type', 'success')
+            ->with('alert-message', 'Transaksi sebelumnya berhasil dibatalkan. Silakan isi form kembali.')
+            ->with('alert-duration', 5000);
     }
-
-    /**
-    * Menampilkan Dashboard Tarik Tabungan oleh Siswa.
-    *
-    * @return \Illuminate\Http\RedirectResponse
-    */
-
-    public function siswa_tarik()
-    {
-        $pengajuans = Pengajuan::where('status', 'pending')->where('user_id', Auth::id())->first();
-
-        $nominal = auth()->user()->tabungan->saldo ;
-        $terbilang = RupiahHelper::terbilangRupiah($nominal);
-        return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
-    }
-
-    /**
-    * Menangani Stor Tabungan Siswa oleh Siswa.
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\RedirectResponse
-    */
 
     public function createInvoice(Request $request)
     {
         $request->validate([
             'jumlah_stor' => ['required', 'numeric', 'min:10000'],
-        ], [
-            'jumlah_stor.min' => 'Jumlah stor minimal Rp10.000.',
-            'jumlah_stor.required' => 'Jumlah stor harus diisi.',
-            'jumlah_stor.numeric' => 'Jumlah stor harus berupa angka.',
         ]);
 
-        $user = Auth::user();
+        $user = auth()->user();
+        $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
-        if (!$user->tabungan) {
-            return back()->with('error', 'Tabungan tidak ditemukan.');
+        $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->first();
+
+        if (!$tabungan) {
+            return back()->with('error', 'Data tabungan Anda tidak ditemukan.');
         }
 
         $jumlahStor = $request->jumlah_stor;
 
-        $apiInstance = new InvoiceApi();
+        // =================================================================
+        // WAJIB SET API KEY GLOBAL SEBELUM INSTANSIASI SDK XENDIT BARU
+        // =================================================================
+        \Xendit\Configuration::setXenditKey(config('services.xendit.secret_key'));
+        
+        $apiInstance = new \Xendit\Invoice\InvoiceApi();
+        // =================================================================
 
         $externalId = 'stor-' . $user->id . '-' . time();
         $successRedirectUrl = route('siswa.dashboard');
 
-        $invoiceRequest = new CreateInvoiceRequest([
+        $invoiceRequest = new \Xendit\Invoice\CreateInvoiceRequest([
             'external_id' => $externalId,
             'payer_email' => $user->email,
             'description' => 'Stor Tabungan untuk ' . $user->name,
@@ -1140,19 +1238,21 @@ class TabunganController extends Controller
         try {
             $invoice = $apiInstance->createInvoice($invoiceRequest);
 
-            $transaksi = new Transaksi();
+            $transaksi = new \App\Models\Transaksi();
             $transaksi->jumlah_transaksi = $jumlahStor;
-            $transaksi->saldo_awal = $user->tabungan->saldo;
-            $transaksi->saldo_akhir = $user->tabungan->saldo + $jumlahStor;
+            $transaksi->saldo_awal = $tabungan->saldo;
+            $transaksi->saldo_akhir = $tabungan->saldo + $jumlahStor;
             $transaksi->tipe_transaksi = 'Stor';
             $transaksi->pembayaran = 'Digital';
             $transaksi->status = 'pending';
             $transaksi->pembuat = $user->name;
             $transaksi->checkout_link = $invoice['invoice_url'];
             $transaksi->external_id = $externalId;
-            $transaksi->token_stor = Str::random(10);
+            $transaksi->token_stor = \Illuminate\Support\Str::random(10);
             $transaksi->user_id = $user->id;
-            $transaksi->tabungan_id = $user->tabungan->id;
+            $transaksi->tabungan_id = $tabungan->id;
+            // FIX FATAL: Wajib masukkin periode_id biar kecatat di laporan
+            $transaksi->periode_id = $periodeAktif; 
             $transaksi->save();
 
             return redirect($invoice['invoice_url']);
@@ -1162,21 +1262,25 @@ class TabunganController extends Controller
     }
 
     /**
-    * Menangani webhook dari Xendit untuk payment yang berhasil.
-    *
-    * @param Request $request Data yang dikirimkan oleh Xendit melalui webhook.
-    * @return \Illuminate\Http\JsonResponse Respon JSON dengan status sukses atau error.
-    */
-
+     * Menangani webhook dari Xendit untuk payment yang berhasil.
+     */
     public function handleWebhook(Request $request)
     {
+        // Proteksi: Ambil token verification dari header yang dikirim Xendit
+        $xenditXCallbackToken = $request->header('x-callback-token');
+
+        // Cocokan dengan token yang kita simpan di config/services.php
+        if ($xenditXCallbackToken !== config('services.xendit.webhook_token')) {
+            return response()->json(['message' => 'Unauthorized Webhook Token'], 401);
+        }
+
         $data = $request->all();
 
         if (!isset($data['external_id']) || !isset($data['status'])) {
             return response()->json(['message' => 'Invalid request'], 400);
         }
 
-        $transaksi = Transaksi::where('external_id', $data['external_id'])->first();
+        $transaksi = \App\Models\Transaksi::where('external_id', $data['external_id'])->first();
 
         if (!$transaksi) {
             return response()->json(['message' => 'Transaction not found'], 404);
@@ -1187,24 +1291,28 @@ class TabunganController extends Controller
         }
 
         if ($data['status'] === 'PAID') {
-            \DB::beginTransaction();
+            \Illuminate\Support\Facades\DB::beginTransaction();
             try {
                 $transaksi->status = 'success';
                 $transaksi->save();
 
+                // Update saldo Tabungan (Aman karena tabungan_id sudah diset saat pembuatan invoice)
                 $tabungan = $transaksi->tabungan;
-                $tabungan->saldo += $transaksi->jumlah_transaksi;
-                $tabungan->save();
+                if ($tabungan) {
+                    $tabungan->saldo += $transaksi->jumlah_transaksi;
+                    $tabungan->save();
+                }
 
-                $user = User::find($transaksi->user_id);
+                $user = \App\Models\User::find($transaksi->user_id);
+                
+                // Trigger job WA
+                \App\Jobs\SendWhatsAppMessage::dispatch($transaksi);
 
-                SendWhatsAppMessage::dispatch($transaksi);
-
-                \DB::commit();
-                return response()->json(['message' => 'Payment success, email/whatsapp attempted']);
+                \Illuminate\Support\Facades\DB::commit();
+                return response()->json(['message' => 'Payment success, whatsapp attempted']);
             } catch (\Exception $e) {
-                \DB::rollBack();
-                \Log::error('Handle Webhook Error: ' . $e->getMessage());
+                \Illuminate\Support\Facades\DB::rollBack();
+                \Illuminate\Support\Facades\Log::error('Handle Webhook Error: ' . $e->getMessage());
                 return response()->json(['message' => 'Server Error'], 500);
             }
         }

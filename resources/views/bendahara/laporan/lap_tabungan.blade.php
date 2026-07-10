@@ -347,7 +347,7 @@
                                     </span>
                                 </td>
                                 <td class="text-end fw-bold pe-4">
-                                    Rp {{ number_format($users->tabungan->saldo ?? 0, 0, ',', '.') }}
+                                    Rp {{ number_format($users->total_saldo ?? 0, 0, ',', '.') }}
                                 </td>
                             </tr>
                         @empty
