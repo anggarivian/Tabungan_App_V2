@@ -1,346 +1,457 @@
 @extends('layout.main')
 
-@section('title') Export Data - SakuRame @endsection
+@section('title', 'Export Data - SakuRame')
 
 @section('content')
+
+<style>
+    .page-heading h3 {
+        font-size: 1.6rem;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientMove 3s ease-in-out infinite;
+        font-weight: 800;
+    }
+
+    @keyframes gradientMove {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .nav-tabs-custom .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        border: none;
+        border-bottom: 3px solid transparent;
+        background: transparent;
+    }
+
+    .nav-tabs-custom .nav-link.active {
+        color: #764ba2;
+        border-bottom-color: #764ba2;
+        background: transparent;
+    }
+
+    /* Custom searchable dropdown */
+    .searchable-dropdown {
+        position: relative;
+    }
+
+    .searchable-dropdown .dropdown-input {
+        cursor: pointer;
+        background-color: #fff;
+    }
+
+    .searchable-dropdown .dropdown-input.open-border {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        box-shadow: none;
+    }
+
+    .searchable-dropdown .dropdown-list-wrapper {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        z-index: 1050;
+        background: #fff;
+        border: 1px solid #dce7f1;
+        border-top: 0;
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .searchable-dropdown.open .dropdown-list-wrapper {
+        display: block;
+    }
+
+    .searchable-dropdown .search-input {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid #e9ecef;
+        padding: 10px 12px;
+        outline: none;
+        font-size: 0.95rem;
+    }
+
+    .searchable-dropdown .dropdown-items {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .searchable-dropdown .dropdown-item-option {
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: background-color .15s ease;
+        border-bottom: 1px solid #f1f3f5;
+        font-size: 0.95rem;
+    }
+
+    .searchable-dropdown .dropdown-item-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .searchable-dropdown .dropdown-item-option.selected {
+        background-color: #eef4ff;
+        color: #3b5bdb;
+        font-weight: 600;
+    }
+
+    .searchable-dropdown .dropdown-item-option:last-child {
+        border-bottom: 0;
+    }
+
+    .searchable-dropdown .no-results {
+        display: none;
+        padding: 10px 12px;
+        color: #6c757d;
+        font-size: 0.92rem;
+        background: #fff;
+    }
+    .searchable-dropdown{
+        position:relative;
+    }
+
+    .searchable-dropdown .dropdown-input{
+        cursor:pointer;
+    }
+
+    .searchable-dropdown .dropdown-list-wrapper{
+        display:none;
+        position:absolute;
+        top:100%;
+        left:0;
+        width:100%;
+        z-index:1050;
+        border-radius:0 0 .5rem .5rem;
+        overflow:hidden;
+
+        background:var(--bs-body-bg,#fff);
+        border:1px solid var(--bs-border-color,#dee2e6);
+        box-shadow:0 10px 25px rgba(0,0,0,.08);
+    }
+
+    .searchable-dropdown.open .dropdown-list-wrapper{
+        display:block;
+    }
+
+    .searchable-dropdown .search-input{
+        width:100%;
+        border:0;
+        outline:none;
+        padding:.75rem;
+
+        background:var(--bs-body-bg,#fff);
+        color:var(--bs-body-color,#212529);
+        border-bottom:1px solid var(--bs-border-color,#dee2e6);
+    }
+
+    .searchable-dropdown .search-input::placeholder{
+        color:var(--bs-secondary-color,#6c757d);
+    }
+
+    .searchable-dropdown .dropdown-items{
+        max-height:250px;
+        overflow-y:auto;
+
+        background:var(--bs-body-bg,#fff);
+    }
+
+    .searchable-dropdown .dropdown-item-option{
+        padding:.7rem .85rem;
+        cursor:pointer;
+        transition:.15s;
+
+        color:var(--bs-body-color,#212529);
+        border-bottom:1px solid var(--bs-border-color-translucent,rgba(0,0,0,.08));
+    }
+
+    .searchable-dropdown .dropdown-item-option:hover{
+        background:var(--bs-secondary-bg,#f8f9fa);
+    }
+
+    .searchable-dropdown .dropdown-item-option.selected{
+        background:rgba(var(--bs-primary-rgb),.15);
+        color:var(--bs-primary);
+        font-weight:600;
+    }
+
+    .searchable-dropdown .no-results{
+        padding:.75rem;
+        color:var(--bs-secondary-color,#6c757d);
+        background:var(--bs-body-bg,#fff);
+    }
+</style>
+
 <div class="page-heading mb-3">
     <div class="row align-items-center">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h3 class="mt-3">Export Data</h3>
-        </div>
-        <div class="col-12 col-md-6 text-md-end">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
-                    @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Dashboard</a></li>
-                    @endif
-                    <li class="breadcrumb-item active" aria-current="page">Export Data</li>
-                </ol>
-            </nav>
+        <div class="col-12 col-md-6">
+            <h3>Export Data Keuangan</h3>
         </div>
     </div>
 </div>
+
 <div class="page-content">
-    <div class="card shadow">
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            <div class="page-content">
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="tabungan-tab" data-bs-toggle="tab" data-bs-target="#tabungan" type="button" role="tab" aria-controls="tabungan" aria-selected="true">Tabungan</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="transaksi-tab" data-bs-toggle="tab" data-bs-target="#transaksi" type="button" role="tab" aria-controls="transaksi" aria-selected="false">Transaksi</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pengajuan-tab" data-bs-toggle="tab" data-bs-target="#pengajuan" type="button" role="tab" aria-controls="pengajuan" aria-selected="false">Pengajuan</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="tabungan" role="tabpanel" aria-labelledby="tabungan-tab">
-                        <div class="mt-3">
-                            <form id="exportTabunganForm" action="{{ route('bendahara.export.tabungan') }}" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Pilih Jenis Export</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSiswa" value="siswa" checked>
-                                            <label class="form-check-label" for="tabunganSiswa">Per Siswa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganKelas" value="kelas">
-                                            <label class="form-check-label" for="tabunganKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="tabunganSemua" value="semua">
-                                            <label class="form-check-label" for="tabunganSemua">Semua Kelas</label>
-                                        </div>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <ul class="nav nav-tabs nav-tabs-custom px-4 pt-2 border-bottom" id="exportTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="tab-tbg" data-bs-toggle="tab" data-bs-target="#pane-tbg" type="button">
+                        <i class="bi bi-wallet2 me-2"></i>Tabungan
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-trx" data-bs-toggle="tab" data-bs-target="#pane-trx" type="button">
+                        <i class="bi bi-arrow-left-right me-2"></i>Transaksi
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-pgj" data-bs-toggle="tab" data-bs-target="#pane-pgj" type="button">
+                        <i class="bi bi-file-earmark-text me-2"></i>Pengajuan
+                    </button>
+                </li>
+            </ul>
+        <div class="tab-content p-4">
+            @php
+                $forms = [
+                    'tbg' => 'bendahara.export.tabungan',
+                    'trx' => 'bendahara.export.transaksi',
+                    'pgj' => 'bendahara.export.pengajuan'
+                ];
+            @endphp
+
+            @foreach($forms as $key => $route)
+            <div class="tab-pane fade @if($loop->first) show active @endif" id="pane-{{ $key }}" role="tabpanel">
+                <form action="{{ route($route) }}" method="POST">
+                    @csrf
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Opsi Cakupan Data</label>
+                            <div class="mt-2">
+                                <div class="form-check form-check-inline me-3">
+                                    <input class="form-check-input radio-option" type="radio"
+                                           name="export_option"
+                                           id="opt-siswa-{{ $key }}"
+                                           value="siswa"
+                                           checked
+                                           data-key="{{ $key }}">
+                                    <label class="form-check-label" for="opt-siswa-{{ $key }}">Per Siswa</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input radio-option" type="radio"
+                                           name="export_option"
+                                           id="opt-semua-{{ $key }}"
+                                           value="semua"
+                                           data-key="{{ $key }}">
+                                    <label class="form-check-label" for="opt-semua-{{ $key }}">Semua Data</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4" id="section-siswa-{{ $key }}">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Pilih Siswa</label>
+
+                            <input type="hidden" name="siswa_id" id="pengajuanSiswaId-{{ $key }}">
+
+                            <div class="searchable-dropdown" id="pengajuanSiswaDropdown-{{ $key }}">
+                                <input type="text"
+                                       class="form-control dropdown-input"
+                                       id="pengajuanSiswaDisplay-{{ $key }}"
+                                       placeholder="Cari atau pilih siswa..."
+                                       readonly>
+
+                                <div class="dropdown-list-wrapper">
+                                    <input type="text"
+                                           class="search-input"
+                                           placeholder="Ketik untuk mencari...">
+
+                                    <div class="dropdown-items">
+                                        <div class="dropdown-item-option" data-value="">-- Pilih Siswa --</div>
+                                        @foreach($siswas as $siswa)
+                                            <div class="dropdown-item-option" data-value="{{ $siswa->id }}">
+                                                {{ $siswa->name }}
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="row mt-3" id="siswaSection">
-                                    <div class="col-md-12">
-                                        <label for="siswaTabungan" class="form-label">Pilih Siswa</label>
-                                        <select class="form-select" id="siswaTabungan" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
-                                            @foreach($siswas as $siswa)
-                                                <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mt-3" id="kelasSection" style="display: none;">
-                                    <div class="col-md-12">
-                                        <label for="kelasTabungan" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasTabungan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $k)
-                                                <option value="{{ $k->id }}">{{ $k->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="startDate" name="start_date">
-                                <input type="hidden" id="endDate" name="end_date">
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
-                                    </div>
-                                </div>
-                            </form>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Pilih Periode</label>
+                            <select class="form-select" name="periode_id">
+                                @foreach($periodes as $p)
+                                    <option value="{{ $p->id }}" {{ \App\Helpers\PeriodeHelper::id() == $p->id ? 'selected' : '' }}>
+                                        {{ $p->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="transaksi" role="tabpanel" aria-labelledby="transaksi-tab">
-                        <div class="mt-3">
-                            <form id="exportTransaksiForm" action="{{ route('bendahara.export.transaksi') }}" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Pilih Opsi Export</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiSiswa" value="siswa" checked>
-                                            <label class="form-check-label" for="transaksiSiswa">Per Siswa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiKelas" value="kelas">
-                                            <label class="form-check-label" for="transaksiKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="transaksiSemua" value="semua">
-                                            <label class="form-check-label" for="transaksiSemua">Semua Kelas</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="transaksiSiswaSelect">
-                                        <label for="siswaTransaksi" class="form-label">Pilih Siswa</label>
-                                        <select class="form-select" id="siswaTransaksi" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
-                                            @foreach($siswas as $siswa)
-                                                <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6" id="transaksiKelasSelect">
-                                        <label for="kelasTransaksi" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasTransaksi" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $kelasItem)
-                                                <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="dateRangeTransaksi" class="form-label">Pilih Rentang Tanggal</label>
-                                        <input type="text" class="form-control" id="dateRangeTransaksi" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+
+                    <div class="border-top mt-4 pt-3 d-flex gap-2 justify-content-end">
+                        <button type="submit" class="btn btn-sm btn-danger px-3" name="export_type" value="pdf">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-success px-3" name="export_type" value="excel">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                        </button>
                     </div>
-                    <div class="tab-pane fade" id="pengajuan" role="tabpanel" aria-labelledby="pengajuan-tab">
-                        <div class="mt-3">
-                            <form id="exportPengajuanForm" action="{{ route('bendahara.export.pengajuan') }}" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Pilih Opsi Export</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanSiswa" value="siswa" checked>
-                                            <label class="form-check-label" for="pengajuanSiswa">Per Siswa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanKelas" value="kelas">
-                                            <label class="form-check-label" for="pengajuanKelas">Per Kelas</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="export_option" id="pengajuanSemua" value="semua">
-                                            <label class="form-check-label" for="pengajuanSemua">Semua Kelas</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="pengajuanSiswaSelect">
-                                        <label for="siswaPengajuan" class="form-label">Pilih Siswa</label>
-                                        <select class="form-select" id="siswaPengajuan" name="siswa_id">
-                                            <option value="">Pilih Siswa</option>
-                                            @foreach($siswas as $siswa)
-                                                <option value="{{ $siswa->id }}">{{ $siswa->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6" id="pengajuanKelasSelect">
-                                        <label for="kelasPengajuan" class="form-label">Pilih Kelas</label>
-                                        <select class="form-select" id="kelasPengajuan" name="kelas_id">
-                                            <option value="">Pilih Kelas</option>
-                                            @foreach($kelas as $kelasItem)
-                                                <option value="{{ $kelasItem->id }}">{{ $kelasItem->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="dateRangePengajuan" class="form-label">Pilih Rentang Tanggal</label>
-                                        <input type="text" class="form-control" id="dateRangePengajuan" name="date_range" placeholder="Pilih Tanggal" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary" name="export_type" value="pdf">Export PDF</button>
-                                        <button type="submit" class="btn btn-success" name="export_type" value="excel">Export Excel</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
+            @endforeach
         </div>
     </div>
+</div>
+
 </div>
 @endsection
 
 @section('js')
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const tabunganSiswa = document.getElementById("tabunganSiswa");
-        const tabunganKelas = document.getElementById("tabunganKelas");
-        const tabunganSemua = document.getElementById("tabunganSemua");
-        const siswaSection = document.getElementById("siswaSection");
-        const kelasSection = document.getElementById("kelasSection");
 
-        function updateForm() {
-            if (tabunganSiswa.checked) {
-                siswaSection.style.display = "block";
-                kelasSection.style.display = "none";
-            } else if (tabunganKelas.checked) {
-                siswaSection.style.display = "none";
-                kelasSection.style.display = "block";
-            } else {
-                siswaSection.style.display = "none";
-                kelasSection.style.display = "none";
+<script>
+function initSearchableDropdown(wrapperId, hiddenId, displayId) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+
+    const hiddenInput = document.getElementById(hiddenId);
+    const displayInput = document.getElementById(displayId);
+    const listWrapper = wrapper.querySelector('.dropdown-list-wrapper');
+    const searchInput = wrapper.querySelector('.search-input');
+    const itemsContainer = wrapper.querySelector('.dropdown-items');
+
+    function openDropdown() {
+        closeAllDropdowns();
+        wrapper.classList.add('open');
+        displayInput.classList.add('open-border');
+        searchInput.value = '';
+        filterItems('');
+        setTimeout(() => searchInput.focus(), 0);
+    }
+
+    function selectItem(item) {
+        const value = item.dataset.value;
+        const text = item.textContent.trim();
+
+        hiddenInput.value = value;
+        displayInput.value = value ? text : '';
+
+        itemsContainer.querySelectorAll('.dropdown-item-option').forEach(el => el.classList.remove('selected'));
+        item.classList.add('selected');
+
+        closeAllDropdowns();
+    }
+
+    function filterItems(query) {
+        const items = itemsContainer.querySelectorAll('.dropdown-item-option');
+        let hasResult = false;
+
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+
+            if (!item.dataset.value) {
+                item.style.display = 'block';
+                return;
             }
-        }
 
-        tabunganSiswa.addEventListener("change", updateForm);
-        tabunganKelas.addEventListener("change", updateForm);
-        tabunganSemua.addEventListener("change", updateForm);
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const siswaOption = document.getElementById("transaksiSiswa");
-        const kelasOption = document.getElementById("transaksiKelas");
-        const semuaOption = document.getElementById("transaksiSemua");
-
-        const siswaContainer = document.getElementById("transaksiSiswaSelect");
-        const kelasContainer = document.getElementById("transaksiKelasSelect");
-
-        function toggleFields() {
-            if (siswaOption.checked) {
-                siswaContainer.style.display = "block";
-                kelasContainer.style.display = "none";
-            } else if (kelasOption.checked) {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "block";
+            if (text.includes(query)) {
+                item.style.display = 'block';
+                hasResult = true;
             } else {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "none";
+                item.style.display = 'none';
             }
+        });
+
+        let noResult = itemsContainer.querySelector('.no-results');
+
+        if (!hasResult && query) {
+            if (!noResult) {
+                noResult = document.createElement('div');
+                noResult.className = 'no-results';
+                noResult.textContent = 'Siswa tidak ditemukan';
+                itemsContainer.appendChild(noResult);
+            }
+            noResult.style.display = 'block';
+        } else if (noResult) {
+            noResult.style.display = 'none';
         }
+    }
 
-        siswaOption.addEventListener("change", toggleFields);
-        kelasOption.addEventListener("change", toggleFields);
-        semuaOption.addEventListener("change", toggleFields);
-
-        toggleFields();
+    displayInput.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = wrapper.classList.contains('open');
+        if (!isOpen) {
+            openDropdown();
+        } else {
+            closeAllDropdowns();
+        }
     });
-</script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const siswaOption = document.getElementById("pengajuanSiswa");
-        const kelasOption = document.getElementById("pengajuanKelas");
-        const semuaOption = document.getElementById("pengajuanSemua");
+    searchInput.addEventListener('input', function() {
+        filterItems(this.value.toLowerCase());
+    });
 
-        const siswaContainer = document.getElementById("pengajuanSiswaSelect");
-        const kelasContainer = document.getElementById("pengajuanKelasSelect");
+    itemsContainer.addEventListener('click', function(e) {
+        const item = e.target.closest('.dropdown-item-option');
+        if (!item) return;
+        selectItem(item);
+    });
 
-        function toggleFields() {
-            if (siswaOption.checked) {
-                siswaContainer.style.display = "block";
-                kelasContainer.style.display = "none";
-            } else if (kelasOption.checked) {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "block";
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) {
+            wrapper.classList.remove('open');
+            displayInput.classList.remove('open-border');
+        }
+    });
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.searchable-dropdown.open').forEach(d => {
+        d.classList.remove('open');
+        const display = d.querySelector('.dropdown-input');
+        if (display) display.classList.remove('open-border');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    @foreach($forms as $key => $route)
+        initSearchableDropdown(
+            'pengajuanSiswaDropdown-{{ $key }}',
+            'pengajuanSiswaId-{{ $key }}',
+            'pengajuanSiswaDisplay-{{ $key }}'
+        );
+    @endforeach
+
+    document.querySelectorAll('.radio-option').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const key = this.dataset.key;
+            const section = document.getElementById(`section-siswa-${key}`);
+            const hidden = document.getElementById(`pengajuanSiswaId-${key}`);
+            const display = document.getElementById(`pengajuanSiswaDisplay-${key}`);
+            const wrapper = document.getElementById(`pengajuanSiswaDropdown-${key}`);
+
+            if (this.value === 'siswa') {
+                section.style.display = '';
             } else {
-                siswaContainer.style.display = "none";
-                kelasContainer.style.display = "none";
+                section.style.display = 'none';
+
+                if (hidden) hidden.value = '';
+                if (display) display.value = '';
+                if (wrapper) {
+                    wrapper.querySelectorAll('.dropdown-item-option').forEach(el => el.classList.remove('selected'));
+                }
+                closeAllDropdowns();
             }
-        }
-
-        siswaOption.addEventListener("change", toggleFields);
-        kelasOption.addEventListener("change", toggleFields);
-        semuaOption.addEventListener("change", toggleFields);
-
-        toggleFields();
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let isProcessing = false;
-
-        document.querySelectorAll('button[name="export_type"]').forEach(button => {
-            button.addEventListener("click", function() {
-                isProcessing = true;
-
-                setTimeout(() => {
-                    isProcessing = false;
-                }, 5000);
-
-                const checkAndReload = setInterval(() => {
-                    if (!isProcessing) {
-                        clearInterval(checkAndReload);
-                        location.reload();
-                    }
-                }, 500);
-            });
         });
     });
-</script>
-
-<script>
-    new Litepicker({
-        element: document.getElementById('dateRangeTransaksi'),
-        format: 'YYYY-MM-DD',
-        singleMode: false,
-        autoApply: true,
-        allowRepick: true,
-    });
-</script>
-
-<script>
-    new Litepicker({
-        element: document.getElementById('dateRangePengajuan'),
-        format: 'YYYY-MM-DD',
-        singleMode: false,
-        autoApply: true,
-        allowRepick: true,
-    });
+});
 </script>
 
 @endsection

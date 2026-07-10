@@ -205,28 +205,44 @@ class TabunganController extends Controller
     * @param  \Illuminate\Http\Request  $request
     * @return \Illuminate\Http\JsonResponse
     */
-
+    
     public function bendahara_search(Request $request)
     {
         $kode = strtoupper(trim($request->get('kode')));
         $periodeId = PeriodeHelper::id();
 
-        // Cari user menggunakan fungsi findByKode yang ada di Model User
         $user = User::findByKode($kode, $periodeId);
 
         if ($user) {
-            // Load relasi tabungan dan rombel khusus periode ini
-            $user->load(['tabungan', 'rombel' => function($q) use ($periodeId) {
+            $user->load(['tabungan', 'rombel' => function ($q) use ($periodeId) {
                 $q->where('rombels.periode_id', $periodeId);
             }]);
 
             $namaRombel = $user->rombel->first()->name ?? 'Tidak Ada';
             $saldo = $user->tabungan ? $user->tabungan->saldo : 0;
 
+            // riwayat transaksi, urut LAMA -> BARU biar transaksi terbaru ada di paling bawah tabel
+            $riwayat = Transaksi::where('user_id', $user->id)
+                ->where('periode_id', $periodeId)
+                ->where('status', 'success')
+                ->orderBy('created_at', 'asc')
+                ->limit(20)
+                ->get()
+                ->map(function ($t) {
+                    return [
+                        'tanggal'     => $t->created_at->format('d M, H:i'),
+                        'tipe'        => strtolower($t->tipe_transaksi),
+                        'jumlah'      => number_format($t->jumlah_transaksi, 0, ',', '.'),
+                        'saldo_akhir' => number_format($t->saldo_akhir, 0, ',', '.'),
+                        'pembayaran'  => $t->pembayaran,
+                    ];
+                });
+
             return response()->json([
                 'name'     => $user->name,
                 'rombel'   => $namaRombel,
                 'tabungan' => number_format($saldo, 0, ',', '.'),
+                'riwayat'  => $riwayat,
             ]);
         }
 
@@ -234,6 +250,7 @@ class TabunganController extends Controller
             'name'     => 'Tidak Ada',
             'rombel'   => 'Tidak Ada',
             'tabungan' => 'Tidak Ada',
+            'riwayat'  => [],
         ]);
     }
 
@@ -599,76 +616,48 @@ class TabunganController extends Controller
 
     public function walikelas_index()
     {
-        $kelas_id = Auth::user()->kelas_id;
+        $walikelas = auth()->user();
+        $periodeId = \App\Helpers\PeriodeHelper::id();
         $perPage = request('perPage', 10);
 
-        $transaksi_masuk = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Stor')
-        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi');
+        // 1. Cari Rombel yang dipegang wali kelas ini pada periode aktif
+        $rombel = \App\Models\Rombel::where('walikelas_id', $walikelas->id)
+            ->where('periode_id', $periodeId)
+            ->first();
 
-        $transaksi_keluar = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Tarik')
-        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi');
+        // Jika belum ada rombel, set 0 agar tidak error
+        $rombelId = $rombel ? $rombel->id : 0;
 
-        $jumlah_saldo_tunai = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Stor')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi')
-        - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Tarik')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi');
+        // 2. Buat Base Query (Pencarian Utama HARI INI untuk Rombel tersebut)
+        // Pakai Clone biar gak perlu ngetik query yang sama berulang-ulang
+        $baseQuery = \App\Models\Transaksi::where('periode_id', $periodeId)
+            ->whereDate('created_at', \Carbon\Carbon::today())
+            ->where('status', 'success')
+            ->whereHas('user.rombel', function ($query) use ($rombelId) {
+                $query->where('rombels.id', $rombelId);
+            });
 
-        $jumlah_saldo_digital = Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Stor')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi')
-        - Transaksi::whereHas('user', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->where('tipe_transaksi', 'Tarik')
-        ->where('status', 'success')
-        ->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())
-        ->whereDate('created_at', Carbon::today())
-        ->sum('jumlah_transaksi');
+        // 3. Eksekusi perhitungan menggunakan clone dari base query
+        $transaksi_masuk = (clone $baseQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
+        $transaksi_keluar = (clone $baseQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
 
-        $kelas = Transaksi::whereHas('user.kelas', function ($query) use ($kelas_id) {
-            $query->where('kelas_id', $kelas_id);
-        })->whereDate('created_at', Carbon::today())
-        ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
-        ->paginate($perPage);
+        $jumlah_saldo_tunai = (clone $baseQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi') 
+                            - (clone $baseQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
 
-        $storKali = Transaksi::where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
-            ->where('created_at', '>=', Carbon::today()->startOfDay())
-            ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id);
-            })
-            ->count();
+        $jumlah_saldo_digital = (clone $baseQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Digital')->sum('jumlah_transaksi') 
+                              - (clone $baseQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
 
-        $tarikKali = Transaksi::where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')->where('periode_id',PeriodeHelper::id())
-            ->where('created_at', '>=', Carbon::today()->startOfDay())
-            ->whereHas('user', function ($query) use ($kelas_id) {
-                $query->where('kelas_id', $kelas_id);
-            })
-            ->count();
+        $storKali = (clone $baseQuery)->where('tipe_transaksi', 'Stor')->count();
+        $tarikKali = (clone $baseQuery)->where('tipe_transaksi', 'Tarik')->count();
 
-        return view('walikelas.tabungan.index', compact('transaksi_masuk', 'transaksi_keluar', 'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'kelas', 'storKali', 'tarikKali'));
+        // 4. Ambil data paginasi transaksi hari ini
+        $transaksis = (clone $baseQuery)->latest()->paginate($perPage);
+
+        return view('walikelas.tabungan.index', compact(
+            'rombel', 'transaksi_masuk', 'transaksi_keluar', 
+            'jumlah_saldo_tunai', 'jumlah_saldo_digital', 
+            'transaksis', 'storKali', 'tarikKali'
+        ));
     }
 
     /**
@@ -688,28 +677,54 @@ class TabunganController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function walikelas_storMasal()
+    public function walikelas_storMasal(Request $request, $id = null)
     {
-        $kelas = auth()->user()->kelas;
-        dd($kelas);
-        $siswa = Tabungan::where('periode_id', PeriodeHelper::id())
-            ->whereHas('user', function ($query) use ($kelas) {
-                $query->where('kelas_id', $kelas->id)
-                    ->where('roles_id', 4);
-            })
-            ->with('user')
-            ->get();
-        $walikelas = User::where('kelas_id', $kelas->id)->where('roles_id', 3)->first();
-        $kemarin = Carbon::yesterday()->toDateString();
+        $periodeId = PeriodeHelper::id();
 
+        // ambil rombel milik walikelas ini di periode aktif
+        $rombelQuery = Rombel::with('walikelas')
+            ->where('walikelas_id', auth()->id())
+            ->where('periode_id', $periodeId);
+
+        if ($id) {
+            $rombelQuery->where('id', $id); // kalau ada id spesifik, tetap wajib miliknya sendiri
+        }
+
+        $rombel = $rombelQuery->first();
+
+        if (!$rombel) {
+            abort(403, 'Anda tidak memiliki rombel yang bisa diakses pada periode aktif ini.');
+        }
+
+        $siswa = User::where('roles_id', 4)
+            ->whereHas('rombel', function ($q) use ($rombel) {
+                $q->where('rombels.id', $rombel->id);
+            })
+            ->with([
+                'rombel' => function ($q) use ($rombel) {
+                    $q->where('rombels.id', $rombel->id);
+                },
+                'tabungan' => function ($q) use ($periodeId) {
+                    $q->where('periode_id', $periodeId);
+                }
+            ])
+            ->get()
+            ->sortBy(function ($user) {
+                return $user->rombel->first()->pivot->kode ?? $user->name;
+            });
+
+        $kemarin = Carbon::yesterday()->toDateString();
         $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
-            ->whereHas('user', function ($query) use ($kelas) {
-                $query->where('kelas_id', $kelas->id);
+            ->where('tipe_transaksi', 'Stor')
+            ->whereHas('user.rombel', function ($q) use ($rombel) {
+                $q->where('rombels.id', $rombel->id);
             })
             ->where('status', 'success')
             ->sum('jumlah_transaksi');
 
-        return view('walikelas.tabungan.stor_masal', compact('kelas', 'siswa', 'walikelas', 'jumlahTransaksiKemarin'));
+        return view('walikelas.tabungan.stor_masal', compact(
+            'rombel', 'siswa', 'jumlahTransaksiKemarin'
+        ));
     }
 
     /**
@@ -721,34 +736,74 @@ class TabunganController extends Controller
 
     public function walikelas_search(Request $request)
     {
-        $username = $request->get('username');
-        $kelasIdWali = auth()->user()->kelas_id; // ambil kelas_id dari walikelas yang login
+        $kode = strtoupper(trim($request->get('kode')));
+        $periodeId = PeriodeHelper::id();
 
-        $user = DB::table('users')
-            ->join('tabungans', 'tabungans.user_id', '=', 'users.id')
-            ->join('kelas', 'kelas.id', '=', 'users.kelas_id')
-            ->where('users.username', $username)
-            ->where('users.kelas_id', $kelasIdWali) // batasi hanya siswa di kelas walikelas
-            ->select(
-                'users.name as user_name',
-                'kelas.name as kelas_name',
-                'tabungans.saldo as tabungan_saldo'
-            )
-            ->first();
+        // ambil rombel yang dipegang walikelas ini di periode aktif
+        // (biasanya 1, tapi whereIn jaga-jaga kalau suatu saat 1 walikelas pegang >1 rombel)
+        $rombelIds = Rombel::where('walikelas_id', auth()->id())
+            ->where('periode_id', $periodeId)
+            ->pluck('id');
 
-        if ($user) {
+        if ($rombelIds->isEmpty()) {
             return response()->json([
-                'name' => $user->user_name,
-                'kelas' => $user->kelas_name,
-                'tabungan' => number_format($user->tabungan_saldo, 0, ',', '.'),
-            ]);
-        } else {
-            return response()->json([
-                'name' => 'Tidak Ada',
-                'kelas' => 'Tidak Ada',
+                'name'     => 'Tidak Ada',
+                'rombel'   => 'Tidak Ada',
                 'tabungan' => 'Tidak Ada',
+                'riwayat'  => [],
             ]);
         }
+
+        // fix inti: cari siswa HANYA di antara rombel milik walikelas ini
+        $user = User::whereHas('rombel', function ($q) use ($kode, $rombelIds, $periodeId) {
+            $q->whereIn('rombels.id', $rombelIds)
+            ->where('rombels.periode_id', $periodeId)
+            ->where('rombel_user.kode', $kode);
+        })->first();
+
+        if (!$user) {
+            return response()->json([
+                'name'     => 'Tidak Ada',
+                'rombel'   => 'Tidak Ada',
+                'tabungan' => 'Tidak Ada',
+                'riwayat'  => [],
+            ]);
+        }
+
+        $rombelSekarang = $user->rombel()
+            ->whereIn('rombels.id', $rombelIds)
+            ->where('rombels.periode_id', $periodeId)
+            ->first();
+
+        // fix: query eksplisit, jangan andalkan relasi tunggal yang ambigu di lintas periode
+        $tabungan = Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeId)
+            ->first();
+
+        $saldo = $tabungan->saldo ?? 0;
+
+        $riwayat = Transaksi::where('user_id', $user->id)
+            ->where('periode_id', $periodeId)
+            ->where('status', 'success')
+            ->orderBy('created_at', 'asc')
+            ->limit(20)
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'tanggal'     => $t->created_at->format('d M, H:i'),
+                    'tipe'        => strtolower($t->tipe_transaksi),
+                    'jumlah'      => number_format($t->jumlah_transaksi, 0, ',', '.'),
+                    'saldo_akhir' => number_format($t->saldo_akhir, 0, ',', '.'),
+                    'pembayaran'  => $t->pembayaran,
+                ];
+            });
+
+        return response()->json([
+            'name'     => $user->name,
+            'rombel'   => $rombelSekarang->name ?? 'Tidak Ada',
+            'tabungan' => number_format($saldo, 0, ',', '.'),
+            'riwayat'  => $riwayat,
+        ]);
     }
 
 
@@ -766,32 +821,51 @@ class TabunganController extends Controller
         ]);
 
         $validated = $request->validate([
-            'username'     => 'required|exists:users,username',
-            'name'         => 'required',
-            'kelas'        => 'required',
+            'kode'         => 'required',
+            'name'         => 'required|not_in:Tidak Ada',
+            'rombel'       => 'required',
             'jumlah_stor'  => 'required|numeric|min:1000',
         ], [
-            'username.required'    => 'Id Tabungan harus diisi.',
-            'username.exists'      => 'Id Tabungan tidak ditemukan.',
+            'kode.required'        => 'Kode Siswa harus diisi.',
             'name.required'        => 'Nama harus diisi.',
-            'kelas.required'       => 'Kelas harus diisi.',
+            'name.not_in'          => 'Kode Siswa tidak ditemukan.',
+            'rombel.required'      => 'Rombel harus diisi.',
             'jumlah_stor.required' => 'Jumlah stor harus diisi.',
             'jumlah_stor.numeric'  => 'Jumlah stor harus berupa angka.',
-            'jumlah_stor.min'      => 'Minimal stor adalah 1.000.',
+            'jumlah_stor.min'      => 'Minimal stor adalah Rp 1.000.',
         ]);
 
-        $user     = User::where('username', $validated['username'])->firstOrFail();
-        $tabungan = $user->tabungan;
+        $periodeId = PeriodeHelper::id();
+        $kode = strtoupper(trim($validated['kode']));
+
+        // fix: re-validasi di server, JANGAN percaya field hidden dari form begitu saja --
+        // pastikan kode ini beneran ada di salah satu rombel milik walikelas yang login
+        $rombelIds = Rombel::where('walikelas_id', auth()->id())
+            ->where('periode_id', $periodeId)
+            ->pluck('id');
+
+        $user = User::whereHas('rombel', function ($q) use ($kode, $rombelIds, $periodeId) {
+            $q->whereIn('rombels.id', $rombelIds)
+            ->where('rombels.periode_id', $periodeId)
+            ->where('rombel_user.kode', $kode);
+        })->first();
+
+        if (!$user) {
+            return back()->withErrors(['kode' => 'Kode siswa tidak ditemukan di rombel yang Anda pegang.']);
+        }
+
+        $tabungan = Tabungan::firstOrCreate(
+            ['user_id' => $user->id, 'periode_id' => $periodeId],
+            ['saldo' => 0, 'premi' => 0, 'sisa' => 0]
+        );
 
         $awal  = $tabungan->saldo;
         $stor  = $validated['jumlah_stor'];
         $akhir = $awal + $stor;
 
-        // Hitung premi & sisa
         $premi = $akhir * 0.025;
         $sisa  = $akhir - $premi;
 
-        // Simpan transaksi
         $transaksi = new Transaksi([
             'jumlah_transaksi' => $stor,
             'saldo_awal'       => $awal,
@@ -801,27 +875,27 @@ class TabunganController extends Controller
             'status'           => 'success',
             'pembuat'          => auth()->user()->name,
             'token_stor'       => Str::random(10),
+            'periode_id'       => $periodeId, // fix: sebelumnya belum diisi
         ]);
-
         $transaksi->user()->associate($user);
         $transaksi->tabungan()->associate($tabungan);
         $transaksi->save();
-        $transaksi->load('user'); // Penting untuk WA job
+        $transaksi->load('user');
 
-        // Update saldo tabungan
         $tabungan->update([
             'saldo' => $akhir,
             'premi' => $premi,
             'sisa'  => $sisa,
         ]);
 
-        // Kirim WA
-        SendWhatsAppMessage::dispatch($transaksi);
+        if (class_exists('\App\Jobs\SendWhatsAppMessage')) {
+            SendWhatsAppMessage::dispatch($transaksi);
+        }
 
         return redirect()->back()
             ->with('success', 'Data stor tabungan berhasil disimpan.')
             ->with('alert-type', 'success')
-            ->with('alert-message', 'Data stor tabungan berhasil disimpan.')
+            ->with('alert-message', 'Data stor tabungan atas nama ' . $user->name . ' berhasil disimpan.')
             ->with('alert-duration', 3000);
     }
 
@@ -834,66 +908,117 @@ class TabunganController extends Controller
 
     public function walikelas_storMasalTabungan(Request $request)
     {
-        $sanitized = collect($request->input('input', []))
-            ->map(fn($row) => [
-                'username' => $row['username'] ?? null,
-                'stor'     => preg_replace('/\D+/', '', $row['stor'] ?? ''),
-            ])
-            ->filter(fn($row) => $row['username'] && is_numeric($row['stor']) && (int)$row['stor'] >= 1000)
-            ->values()
+        $periodeId = PeriodeHelper::id();
+        $rombelId  = $request->input('rombel_id');
+
+        // fix inti: pastikan rombel yang dikirim form ini beneran milik walikelas yang login
+        $rombel = Rombel::where('id', $rombelId)
+            ->where('walikelas_id', auth()->id())
+            ->where('periode_id', $periodeId)
+            ->first();
+
+        if (!$rombel) {
+            return redirect()->back()->withErrors(['Rombel tidak valid atau bukan milik Anda.']);
+        }
+
+        $inputs = $request->input('input', []);
+
+        $sanitized = [];
+        foreach ($inputs as $row) {
+            $stor = preg_replace('/\D+/', '', $row['stor'] ?? '');
+
+            if (!empty($row['kode']) && is_numeric($stor) && $stor >= 1000) {
+                $sanitized[] = [
+                    'kode' => strtoupper(trim($row['kode'])),
+                    'stor' => (int) $stor,
+                ];
+            }
+        }
+
+        if (empty($sanitized)) {
+            return redirect()->back()->withErrors(['Data kosong atau tidak valid. Pastikan minimal stor adalah Rp 1.000.']);
+        }
+
+        // fix inti: whitelist kode-kode yang memang anggota SAH rombel ini,
+        // biar gak bisa nyelundup kode siswa dari rombel/kelas lain
+        $kodeValidDiRombelIni = DB::table('rombel_user')
+            ->where('rombel_id', $rombel->id)
+            ->pluck('kode')
+            ->map(fn ($k) => strtoupper($k))
             ->toArray();
 
-        $request->merge(['input' => $sanitized]);
+        $sanitized = array_filter($sanitized, function ($row) use ($kodeValidDiRombelIni) {
+            return in_array($row['kode'], $kodeValidDiRombelIni);
+        });
 
-        $request->validate([
-            'input.*.username' => 'required|string|exists:users,username',
-            'input.*.stor'     => 'required|numeric|min:1000',
-        ], [
-            'input.*.stor.min' => 'Minimal stor Rp 1.000',
-        ]);
-
-        foreach ($request->input('input') as $row) {
-            $user = User::where('username', $row['username'])->first();
-            if (!$user || !$user->tabungan) continue;
-
-            $tabungan = $user->tabungan;
-            $awal     = $tabungan->saldo;
-            $stor     = (int)$row['stor'];
-            $akhir    = $awal + $stor;
-
-            $premi = $akhir * 0.025;
-            $sisa  = $akhir - $premi;
-
-            $tabungan->update([
-                'saldo' => $akhir,
-                'premi' => $premi,
-                'sisa'  => $sisa,
-            ]);
-
-            $transaksi = Transaksi::create([
-                'user_id'          => $user->id,
-                'tabungan_id'      => $tabungan->id,
-                'jumlah_transaksi' => $stor,
-                'saldo_awal'       => $awal,
-                'saldo_akhir'      => $akhir,
-                'tipe_transaksi'   => 'Stor',
-                'pembayaran'       => 'Tunai',
-                'status'           => 'success',
-                'pembuat'          => auth()->user()->name,
-                'token_stor'       => Str::random(10),
-            ]);
-
-            $transaksi->user()->associate($user);
-            $transaksi->tabungan()->associate($tabungan);
-            $transaksi->save();
-            $transaksi->load('user');
-            SendWhatsAppMessage::dispatch($transaksi);
+        if (empty($sanitized)) {
+            return redirect()->back()->withErrors(['Tidak ada data valid milik rombel Anda yang bisa diproses.']);
         }
+
+        $transaksis = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($sanitized as $data) {
+                $user = User::findByKode($data['kode'], $periodeId);
+                if (!$user) continue;
+
+                $tabungan = Tabungan::firstOrCreate(
+                    ['user_id' => $user->id, 'periode_id' => $periodeId],
+                    ['saldo' => 0, 'premi' => 0, 'sisa' => 0]
+                );
+
+                $tabungan = Tabungan::where('id', $tabungan->id)->lockForUpdate()->first();
+
+                $stor  = $data['stor'];
+                $awal  = $tabungan->saldo;
+                $akhir = $awal + $stor;
+
+                $premiSiswa = $akhir * 0.025;
+                $sisa       = $akhir - $premiSiswa;
+
+                $tabungan->update([
+                    'saldo' => $akhir,
+                    'premi' => $premiSiswa,
+                    'sisa'  => $sisa,
+                ]);
+
+                $trx = new Transaksi([
+                    'jumlah_transaksi' => $stor,
+                    'saldo_awal'       => $awal,
+                    'saldo_akhir'      => $akhir,
+                    'tipe_transaksi'   => 'Stor',
+                    'pembayaran'       => 'Tunai',
+                    'status'           => 'success',
+                    'pembuat'          => auth()->user()->name,
+                    'token_stor'       => Str::random(10),
+                    'periode_id'       => $periodeId,
+                ]);
+                $trx->user()->associate($user);
+                $trx->tabungan()->associate($tabungan);
+                $trx->save();
+
+                $transaksis[] = $trx;
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['Gagal memproses data! Kesalahan sistem: ' . $e->getMessage()]);
+        }
+
+        if (class_exists('\App\Jobs\SendWhatsAppMessage')) {
+            foreach ($transaksis as $trx) {
+                $trx->load('user');
+                \App\Jobs\SendWhatsAppMessage::dispatch($trx);
+            }
+        }
+
         return redirect()->back()
-            ->with('success', 'Data stor tabungan berhasil disimpan.')
+            ->with('success', true)
             ->with('alert-type', 'success')
-            ->with('alert-message', 'Data stor tabungan berhasil disimpan.')
-            ->with('alert-duration', 3000);
+            ->with('alert-message', count($transaksis) . ' data stor tabungan massal berhasil disimpan!')
+            ->with('alert-duration', 4000);
     }
 
     // Siswa ------------------------------------------------------------------------------------------------------------------------------------------------

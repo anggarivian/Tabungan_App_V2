@@ -259,16 +259,25 @@
                                 <td class="text-center">{{ $users->kontak }}</td>
                                 <td>{{ Str::limit($users->alamat, 20, '...') }}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-warning btn-edit btn-sm" data-id="{{ $users->id }}">Edit</button>
-                                    <form method="POST" action="{{ route('bendahara.siswa.toggleStatus', $users->id) }}" class="d-inline">
-                                        @csrf @method('PUT')
-                                        <button type="submit" class="btn {{ $users->status_siswa == 'aktif' ? 'btn-secondary' : 'btn-success' }} btn-sm">
-                                            {{ $users->status_siswa == 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-warning btn-edit" data-id="{{ $users->id }}">Edit</button>
+
+                                        @if($users->status_siswa == 'aktif')
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="confirmNonaktif({{ $users->id }}, '{{ addslashes($users->name) }}')">
+                                                Nonaktifkan
+                                            </button>
+                                        @else
+                                            <form method="POST" action="{{ route('bendahara.siswa.toggleStatus', $users->id) }}" class="d-inline">
+                                                @csrf @method('PUT')
+                                                <button type="submit" class="btn btn-success">Aktifkan</button>
+                                            </form>
+                                        @endif
+
+                                        <button type="button" class="btn btn-danger" onclick="confirmDelete({{ $users->id }}, '{{ addslashes($users->name) }}')">
+                                            Hapus
                                         </button>
-                                    </form>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $users->id }}, '{{ addslashes($users->name) }}')">
-                                        Hapus
-                                    </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -499,35 +508,118 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Konfirmasi Nonaktifkan --}}
+<div class="modal fade" id="nonaktifModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Konfirmasi Nonaktifkan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    Menonaktifkan <strong id="nonaktifNamaSiswa"></strong> akan otomatis
+                    <strong>mengeluarkannya dari rombel periode berjalan</strong> (jika terdaftar).
+                    Gunakan ini saat siswa lulus atau keluar dari sekolah.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form id="nonaktifForm" method="POST" action="">
+                    @csrf @method('PUT')
+                    <button type="submit" class="btn btn-warning">Ya, Nonaktifkan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-document.getElementById('importForm').addEventListener('submit', function () {
+    function confirmNonaktif(id, nama) {
+        $('#nonaktifNamaSiswa').text(nama);
+        $('#nonaktifForm').attr('action', "{{ url('bendahara/kelola-siswa/toggle-status') }}/" + id);
+        $('#nonaktifModal').modal('show');
+    }
 
-    const btnImport = document.getElementById('btnImport');
-    const btnBatal = document.getElementById('btnBatal');
-
-    // Disable tombol
-    btnImport.disabled = true;
-    btnBatal.disabled = true;
-
-    // Ganti teks menjadi loading
-    btnImport.querySelector('.btn-text').classList.add('d-none');
-    btnImport.querySelector('.btn-loading').classList.remove('d-none');
-});
+    function confirmDelete(id, nama) {
+        $('#hapusNamaSiswa').text(nama);
+        $('#deleteForm').attr('action', "{{ url('bendahara/kelola-siswa/hapus') }}/" + id);
+        $('#deleteModal').modal('show');
+    }
 </script>
+
 <script>
-    $(document).ready(function() {
-        $('.btn-edit').on('click', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        // ==== Import form loading state ====
+        const importForm = document.getElementById('importForm');
+        if (importForm) {
+            importForm.addEventListener('submit', function () {
+                const btnImport = document.getElementById('btnImport');
+                const btnBatal = document.getElementById('btnBatal');
+
+                btnImport.disabled = true;
+                btnBatal.disabled = true;
+
+                btnImport.querySelector('.btn-text').classList.add('d-none');
+                btnImport.querySelector('.btn-loading').classList.remove('d-none');
+            });
+        }
+
+        // ==== Delete modal animation ====
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function () {
+                const icon = this.querySelector('.bi-exclamation-triangle-fill');
+                if (icon) {
+                    icon.style.transform = 'scale(0)';
+                    setTimeout(() => {
+                        icon.style.transform = 'scale(1.2)';
+                        setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+                    }, 300);
+                }
+            });
+        }
+
+        const deleteForm = document.getElementById('deleteForm');
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function () {
+                const btn = this.querySelector('button[type="submit"]');
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menghapus...';
+                btn.disabled = true;
+            });
+        }
+
+        // ==== Filter collapse toggle text/icon ====
+        const collapse = document.getElementById('filterCollapse');
+        const icon = document.getElementById('filterIcon');
+        const text = document.getElementById('filterText');
+
+        if (collapse && icon && text) {
+            collapse.addEventListener('shown.bs.collapse', function () {
+                icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+                text.innerHTML = 'Sembunyikan';
+            });
+
+            collapse.addEventListener('hidden.bs.collapse', function () {
+                icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
+                text.innerHTML = 'Tampilkan';
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        $('.btn-edit').on('click', function () {
             var id = $(this).data('id');
             var timestamp = new Date().getTime();
 
             $.ajax({
                 url: "{{ url('bendahara/kelola-siswa/data') }}/" + id + "?t=" + timestamp,
                 type: 'GET',
-                success: function(response) {
+                success: function (response) {
                     if (response) {
                         $('#edit-name').val(response.name);
                         $('#edit-email').val(response.email);
@@ -543,63 +635,11 @@ document.getElementById('importForm').addEventListener('submit', function () {
                         alert('Gagal mengambil data');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Terjadi kesalahan saat mengambil data dari server');
                 }
             });
         });
     });
-
-    function confirmDelete(id, nama) {
-        $('#hapusNamaSiswa').text(nama);
-        $('#deleteForm').attr('action', "{{ url('bendahara/kelola-siswa/hapus') }}/" + id);
-        $('#deleteModal').modal('show');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const deleteModal = document.getElementById('deleteModal');
-        if (deleteModal) {
-            deleteModal.addEventListener('show.bs.modal', function() {
-                const icon = this.querySelector('.bi-exclamation-triangle-fill'); // fix: icon yang benar-benar ada di HTML
-                if (icon) {
-                    icon.style.transform = 'scale(0)';
-                    setTimeout(() => {
-                        icon.style.transform = 'scale(1.2)';
-                        setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
-                    }, 300);
-                }
-            });
-        }
-
-        const deleteForm = document.getElementById('deleteForm');
-        if (deleteForm) {
-            deleteForm.addEventListener('submit', function() {
-                const btn = this.querySelector('button[type="submit"]');
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menghapus...';
-                btn.disabled = true;
-            });
-        }
-    });
 </script>
-@section('js')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    const collapse = document.getElementById('filterCollapse');
-    const icon = document.getElementById('filterIcon');
-    const text = document.getElementById('filterText');
-
-    collapse.addEventListener('shown.bs.collapse', function () {
-        icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
-        text.innerHTML = 'Sembunyikan';
-    });
-
-    collapse.addEventListener('hidden.bs.collapse', function () {
-        icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
-        text.innerHTML = 'Tampilkan';
-    });
-
-});
-</script>
-@endsection
 @endsection

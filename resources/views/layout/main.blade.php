@@ -353,7 +353,55 @@
                                 <span class="fw-semibold text-primary">{{ App\Helpers\PeriodeHelper::nama() }}</span>
                             </small>
                         </div>
-                        <div class="header-top-right"> <div class="d-none d-md-flex"> <div class="text text-end"> <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6> @php $roles = [ 1 => 'Kepala Sekolah', 2 => 'Bendahara', 3 => 'Walikelas', 4 => 'Siswa' ]; @endphp <p class="user-dropdown-status text-sm text-muted"> {{ $roles[auth()->user()->roles_id] }} @if(auth()->user()->roles_id == 3) {{ auth()->user()->kelas->name }} @elseif(auth()->user()->roles_id == 4) Kelas {{ auth()->user()->kelas->name }} @endif </p> </div> <div class="avatar avatar-md2" style="margin-left: 20px"> <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar"> </div> </div> <div class="d-md-none"> <div class="avatar avatar-md2"> <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar"> </div> </div> <!-- Burger button responsive --> <a href="#" class="burger-btn d-block d-xl-none"> <i class="bi bi-justify fs-3"></i> </a> </div>
+                        <div class="header-top-right">
+                            <div class="d-none d-md-flex">
+                                <div class="text text-end">
+                                    <h6 class="user-dropdown-name">{{ auth()->user()->name }}</h6>
+
+                                    @php
+                                        $roles = [1 => 'Kepala Sekolah', 2 => 'Bendahara', 3 => 'Walikelas', 4 => 'Siswa'];
+                                        $rombelSekarang = null;
+
+                                        if (in_array(auth()->user()->roles_id, [3, 4])) {
+                                            $periodeAktif = \App\Helpers\PeriodeHelper::id();
+
+                                            if (auth()->user()->roles_id == 4) {
+                                                // siswa: ambil rombel lewat relasi many-to-many rombel_user
+                                                $rombelSekarang = auth()->user()->rombel()
+                                                    ->where('rombels.periode_id', $periodeAktif)
+                                                    ->first();
+                                            } elseif (auth()->user()->roles_id == 3) {
+                                                // walikelas: ambil rombel yang dia pegang lewat walikelas_id
+                                                $rombelSekarang = \App\Models\Rombel::where('walikelas_id', auth()->user()->id)
+                                                    ->where('periode_id', $periodeAktif)
+                                                    ->first();
+                                            }
+                                        }
+                                    @endphp
+
+                                    <p class="user-dropdown-status text-sm text-muted">
+                                        {{ $roles[auth()->user()->roles_id] }}
+
+                                        @if(auth()->user()->roles_id == 3)
+                                            {{ $rombelSekarang->name ?? '- (Belum ada rombel)' }}
+                                        @elseif(auth()->user()->roles_id == 4)
+                                            Kelas {{ $rombelSekarang->kelas->name ?? '- (Belum ada rombel)' }}
+                                        @endif
+                                    </p>
+                                </div>
+                                <div class="avatar avatar-md2" style="margin-left: 20px">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
+                                </div>
+                            </div>
+                            <div class="d-md-none">
+                                <div class="avatar avatar-md2">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
+                                </div>
+                            </div>
+                            <a href="#" class="burger-btn d-block d-xl-none">
+                                <i class="bi bi-justify fs-3"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <nav class="main-navbar shadow-sm">
@@ -480,7 +528,6 @@
                                             <li class="submenu-item {{ request()->routeIs('laporan.bendahara.transaksi') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.transaksi') }}" class="submenu-link">Laporan Transaksi</a></li>
                                             <li class="submenu-item {{ request()->routeIs('laporan.bendahara.pengajuan') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.pengajuan') }}" class="submenu-link">Laporan Pengajuan</a></li>
                                             <li class="submenu-item {{ request()->routeIs('laporan.bendahara.export') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.export') }}" class="submenu-link">Laporan Export</a></li>
-                                            <li class="submenu-item {{ request()->routeIs('laporan.bendahara.online-users') ? 'active' : '' }}"><a href="{{ route('laporan.bendahara.online-users') }}" class="submenu-link">Online Users</a></li>
                                         </ul>
                                     </div>
                                 </div>

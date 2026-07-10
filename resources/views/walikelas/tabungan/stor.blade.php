@@ -1,55 +1,117 @@
 @extends('layout.main')
 
-@section('title') Stor Tabungan - SakuRame @endsection
+@section('title', 'Stor Tabungan - SakuRame')
 
 @section('content')
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: var(--bs-card-bg, var(--bs-body-bg));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+
+    .riwayat-panel {
+        background: var(--bs-tertiary-bg);
+        border-radius: 0.75rem;
+        height: 100%;
+        min-height: 480px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .riwayat-header {
+        padding: 1rem 1.25rem 0.75rem;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .riwayat-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem 1rem;
+        scroll-behavior: smooth;
+    }
+
+    .riwayat-scroll::-webkit-scrollbar { width: 6px; }
+    .riwayat-scroll::-webkit-scrollbar-thumb {
+        background: var(--bs-border-color);
+        border-radius: 10px;
+    }
+
+    .riwayat-item {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border-radius: 0.6rem;
+        padding: 0.55rem 0.8rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--bs-border-color);
+        font-size: 0.85rem;
+    }
+
+    .riwayat-item .jumlah {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .riwayat-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--bs-secondary-color);
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+</style>
+
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h3 class="mt-3">Stor Tabungan</h3>
+            <h3 class="mt-3">Stor Tabungan (Per Orang)</h3>
         </div>
         <div class="col-12 col-md-6 text-md-end">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
-                    @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
-                    @endif
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.tabungan.index')}}">Tabungan</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('walikelas.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('walikelas.tabungan.index') }}">Tabungan</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Stor</li>
                 </ol>
             </nav>
         </div>
     </div>
 </div>
+
 <div class="page-content">
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+    <div class="card stat-card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-12 col-lg-7">
+
                     @if(session('success'))
                         <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle"></i>
+                            <i class="bi bi-check-circle me-2"></i>
                             {{ session('alert-message') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                        <script>
+                            @if(session('alert-duration'))
+                                setTimeout(function() {
+                                    document.getElementById('alert').style.display = 'none';
+                                }, {{ session('alert-duration') }});
+                            @endif
+                        </script>
                     @endif
-                    <script>
-                        @if(session('alert-duration'))
-                            setTimeout(function() {
-                                document.getElementById('alert').style.display = 'none';
-                            }, {{ session('alert-duration') }});
-                        @endif
-                    </script>
+
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
-                            <strong>Terjadi Kesalahan!</strong>
-                            <ul>
+                            <strong><i class="bi bi-exclamation-triangle me-2"></i>Terjadi Kesalahan!</strong>
+                            <ul class="mt-2">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -57,91 +119,85 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <form id="searchForm">
+
+                    {{-- Form Pencarian --}}
+                    <form id="searchForm" class="mb-4 p-3 rounded border">
                         <div class="form-group mb-0">
-                            <div class="row">
-                                <div class="col-md-4 mb-1">
-                                    <div class="input-group mb-3">
-                                        <label for="username" class="form-label">Cari ID Tabungan</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 mb-1">
-                                    <div class="input-group mb-3">
-                                        <input type="text" id="username" class="form-control" placeholder="Masukkan ID Tabungan"autocomplete="off">
-                                        <button class="btn btn-primary" type="submit">Cari</button>
-                                    </div>
-                                </div>
-                                <div id="tidak-ada"></div>
+                            <label for="kode" class="form-label fw-bold">Cari Kode Siswa <small class="text-muted fw-normal">(Contoh: 1A01)</small></label>
+                            <div class="input-group">
+                                <input type="text" id="kode" class="form-control" placeholder="Ketik lalu Enter..." autocomplete="off" autofocus>
+                                <button class="btn btn-primary px-4" type="submit"><i class="bi bi-search me-2"></i>Cari</button>
                             </div>
+                            <div id="tidak-ada" class="mt-2"></div>
+                            <small class="text-muted d-block mt-2">Pencarian hanya berlaku untuk siswa di rombel yang Anda pegang.</small>
                         </div>
                     </form>
-                    <form action="{{ route ('walikelas.tabungan.storTabungan')}}" method="POST">
+
+                    {{-- Form Input Transaksi --}}
+                    <form action="{{ route('walikelas.tabungan.storTabungan') }}" method="POST">
                         @csrf
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="nama">Nama</label>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" hidden class="form-control" id="username2" name="username" readonly>
-                                    <input type="text" class="form-control" id="name" name="name" readonly>
+                        <input type="hidden" id="kode2" name="kode">
+
+                        <div class="row mb-3">
+                            <label for="name" class="col-sm-4 col-form-label text-muted">Nama Siswa</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="name" name="name" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="rombel" class="col-sm-4 col-form-label text-muted">Rombel</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="rombel" name="rombel" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="jumlah_tabungan" class="col-sm-4 col-form-label text-muted">Saldo Saat Ini</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-text border-end-0">Rp</span>
+                                    <input type="text" class="form-control border-start-0" id="jumlah_tabungan" readonly>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="kelas">Kelas</label>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <input type="text" class="form-control" id="kelas" name="kelas" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="jumlah_tabungan">Tabungan Saat Ini</label>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="text" class="form-control" id="jumlah_tabungan" name="jumlah_tabungan" readonly >
-                                    </div>
+
+                        <hr class="my-4">
+
+                        <div class="row mb-4">
+                            <label for="jumlah_stor" class="col-sm-4 col-form-label fw-bold">Nominal Stor</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-text text-success fw-bold">Rp</span>
+                                    <input type="text" class="form-control form-control-lg text-success fw-bold" id="jumlah_stor" name="jumlah_stor" placeholder="0" autocomplete="off" required>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                    <label for="jumlah_stor">Jumlah Stor</label>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">Rp.</span>
-                                        <input type="text" class="form-control" id="jumlah_stor" name="jumlah_stor" placeholder="Masukkan Jumlah Stor" autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                                    <div class="d-flex justify-content-between">
-                                        <a href="{{ route ('walikelas.tabungan.index')}}" type="button" class="btn btn-secondary" style="width: 48%">Kembali</a>
-                                        <button type="submit" class="btn btn-primary" style="width: 48%">Stor</button>
-                                    </div>
-                                </div>
-                            </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('walikelas.tabungan.index') }}" class="btn btn-light border px-4">Batal</a>
+                            <button type="submit" class="btn btn-primary px-5"><i class="bi bi-save me-2"></i>Simpan Stor</button>
                         </div>
                     </form>
                 </div>
-                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                    <div class="container ">
-                        <div class="d-flex justify-content-center mt-3">
-                            <img src="{{ asset('dist/assets/compiled/jpg/2.jpg') }}" height="250px" width="250px" alt="Profile" style="border-radius: 15px;">
+
+                {{-- Panel Riwayat Transaksi --}}
+                <div class="col-12 col-lg-5">
+                    <div class="riwayat-panel">
+                        <div class="riwayat-header">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0"><i class="bi bi-clock-history me-1"></i> Riwayat Transaksi</h6>
+                                <span id="riwayat-nama" class="badge bg-body-secondary text-body border small"></span>
+                            </div>
+                        </div>
+
+                        <div class="riwayat-scroll" id="riwayat-scroll">
+                            <div class="riwayat-empty" id="riwayat-empty">
+                                <i class="bi bi-search fs-2 mb-2"></i>
+                                <br>
+                                <p class="mb-0 small">Cari kode siswa untuk melihat<br>riwayat transaksinya di sini</p>
+                            </div>
+                            <div id="riwayat-list"></div>
                         </div>
                     </div>
                 </div>
@@ -155,80 +211,99 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function(){
+
+        function renderRiwayat(riwayat, nama) {
+            var $list = $('#riwayat-list');
+            var $empty = $('#riwayat-empty');
+            var $scroll = $('#riwayat-scroll');
+
+            $('#riwayat-nama').text(nama || '');
+
+            if (!riwayat || riwayat.length === 0) {
+                $list.empty();
+                $empty.html('<i class="bi bi-inbox fs-2 mb-2"></i><br><p class="mb-0 small">Belum ada riwayat transaksi<br>untuk siswa ini di periode berjalan</p>').show();
+                return;
+            }
+
+            $empty.hide();
+
+            var html = '';
+            riwayat.forEach(function(item) {
+                var isStor = item.tipe === 'stor';
+                var badgeClass = isStor ? 'bg-success' : 'bg-danger';
+                var badgeLabel = isStor ? 'Stor' : 'Tarik';
+                var sign = isStor ? '+' : '-';
+                var amountClass = isStor ? 'text-success' : 'text-danger';
+
+                html += '<div class="riwayat-item">'
+                    + '<div class="d-flex justify-content-between align-items-start">'
+                    + '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>'
+                    + '<span class="text-muted" style="font-size:0.75rem">' + item.tanggal + '</span>'
+                    + '</div>'
+                    + '<div class="d-flex justify-content-between align-items-center mt-1">'
+                    + '<span class="jumlah ' + amountClass + '">' + sign + ' Rp ' + item.jumlah + '</span>'
+                    + '<span class="text-muted" style="font-size:0.75rem">Saldo: Rp ' + item.saldo_akhir + '</span>'
+                    + '</div>'
+                    + '</div>';
+            });
+
+            $list.html(html);
+            $scroll.animate({ scrollTop: $scroll[0].scrollHeight }, 300);
+        }
+
         $('#searchForm').on('submit', function(e) {
             e.preventDefault();
-
-            var username = $('#username').val();
+            var kode = $('#kode').val();
 
             $.ajax({
                 url: "{{ route('walikelas.search') }}",
                 method: "GET",
                 data: {
-                    username: username,
+                    kode: kode,
                     timestamp: new Date().getTime()
                 },
                 success: function(data) {
                     if (data) {
-                        console.log(data);
-                        if(data.name !== 'Tidak Ada' && data.kelas !== 'Tidak Ada' && data.tabungan !== 'Tidak Ada') {
+                        if (data.name !== 'Tidak Ada') {
                             $('#name').val(data.name);
-                            $('#kelas').val(data.kelas);
+                            $('#rombel').val(data.rombel);
                             $('#jumlah_tabungan').val(data.tabungan);
+                            $('#kode2').val(kode);
+
+                            $('#tidak-ada').empty();
+                            $('#jumlah_stor').focus();
+
+                            renderRiwayat(data.riwayat, data.name);
                         } else {
-                            $('#tidak-ada').html('<div class="alert alert-danger">Data tidak ditemukan</div>');
+                            $('#tidak-ada').html('<div class="alert alert-danger py-2 small mb-0"><i class="bi bi-x-circle me-1"></i> Data tidak ditemukan di rombel Anda.</div>');
                             setTimeout(function() {
                                 $('#tidak-ada').empty();
-                            }, 2000);
+                            }, 3000);
+
                             $('#name').val('');
-                            $('#kelas').val('');
+                            $('#rombel').val('');
                             $('#jumlah_tabungan').val('');
+                            $('#kode2').val('');
+
+                            renderRiwayat([], '');
                         }
-                        $('#jumlah_stor').focus();
-                    } else {
-                        alert('User tidak ditemukan');
                     }
                 },
                 error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan: ' + error);
+                    alert('Terjadi kesalahan jaringan: ' + error);
                 }
             });
         });
 
-        $('#username').on('keypress', function(e) {
-            if(e.which === 13) {
-                $('#jumlah_stor').focus();
-            }
+        $('#jumlah_stor').on('input', function () {
+            var value = $(this).val().replace(/\D/g, '');
+            var formatted = new Intl.NumberFormat('id-ID').format(value);
+            $(this).val(formatted);
         });
-    });
 
-    function formatNumber(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'decimal',
-            maximumFractionDigits: 0
-        }).format(number);
-    }
-
-    $('#username').on('change', function() {
-        $('#username2').val($(this).val());
-    });
-
-    $('#jumlah_tabungan').on('input', function () {
-        let angka = $(this).val().replace(/\D/g, '');
-        let format = new Intl.NumberFormat('id-ID').format(angka);
-        $(this).val(format);
-    });
-
-    $('#jumlah_stor').on('input', function () {
-        let angka = $(this).val().replace(/\D/g, '');
-        let format = new Intl.NumberFormat('id-ID').format(angka);
-        $(this).val(format);
-    });
-
-
-    $(document).ready(function(){
-        setTimeout(function(){
-            $('#username').focus();
-        }, 500);
+        $('#kode').on('change', function() {
+            $('#kode2').val($(this).val());
+        });
     });
 </script>
 @endsection

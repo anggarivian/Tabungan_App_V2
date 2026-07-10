@@ -8,6 +8,7 @@ use App\Helpers\PeriodeHelper;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
+use Illuminate\Support\Facades\DB;
 
 class SiswaController extends Controller
 {
@@ -209,13 +210,45 @@ class SiswaController extends Controller
     public function toggleStatus($id)
     {
         $siswa = User::where('roles_id', 4)->findOrFail($id);
-        $siswa->status_siswa = $siswa->status_siswa === 'aktif' ? 'nonaktif' : 'aktif';
+        $periodeAktifId = PeriodeHelper::id();
+
+        if ($siswa->status_siswa === 'aktif') {
+            // AKAN DINONAKTIFKAN: keluarkan dari rombel periode aktif (jika ada) + ubah status, sekaligus
+            $rombelSaatIni = $siswa->rombel()
+                ->where('rombels.periode_id', $periodeAktifId)
+                ->first();
+
+            DB::transaction(function () use ($siswa, $rombelSaatIni, $periodeAktifId) {
+                if ($rombelSaatIni) {
+                    // hanya lepas keanggotaan di periode AKTIF, riwayat rombel periode lalu tidak disentuh
+                    DB::table('rombel_user')
+                        ->where('user_id', $siswa->id)
+                        ->where('periode_id', $periodeAktifId)
+                        ->delete();
+                }
+
+                $siswa->status_siswa = 'nonaktif';
+                $siswa->save();
+            });
+
+            $pesan = $rombelSaatIni
+                ? "{$siswa->name} sekarang Nonaktif dan telah dikeluarkan dari rombel {$rombelSaatIni->name}."
+                : "{$siswa->name} sekarang berstatus Nonaktif.";
+
+            return redirect()->route('bendahara.siswa.index')
+                ->with('success', true)
+                ->with('alert-type', 'warning')
+                ->with('alert-message', $pesan);
+        }
+
+        // AKAN DIAKTIFKAN KEMBALI: cukup balikin status, assign rombel dilakukan manual di menu Rombel
+        $siswa->status_siswa = 'aktif';
         $siswa->save();
 
         return redirect()->route('bendahara.siswa.index')
-            ->with('success', 'Status siswa berhasil diperbarui')
-            ->with('alert-type', 'warning')
-            ->with('alert-message', "{$siswa->name} sekarang berstatus " . ucfirst($siswa->status_siswa));
+            ->with('success', true)
+            ->with('alert-type', 'success')
+            ->with('alert-message', "{$siswa->name} sekarang berstatus Aktif. Silakan assign ke rombel di menu Kelola Rombel.");
     }
 
     /**

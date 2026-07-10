@@ -4,19 +4,75 @@
 
 @section('content')
 <style>
-    /* Styling Custom Card & Hover Effect */
     .stat-card {
         border: none;
         border-radius: 1rem;
         transition: all 0.3s ease;
-        background: #ffffff;
+        background: var(--bs-card-bg, var(--bs-body-bg));
     }
-    
+
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
     }
+
+    /* Panel Riwayat Transaksi */
+    .riwayat-panel {
+        background: var(--bs-tertiary-bg);
+        border-radius: 0.75rem;
+        height: 100%;
+        min-height: 480px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .riwayat-header {
+        padding: 1rem 1.25rem 0.75rem;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .riwayat-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem 1rem;
+        scroll-behavior: smooth;
+    }
+
+    .riwayat-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    .riwayat-scroll::-webkit-scrollbar-thumb {
+        background: var(--bs-border-color);
+        border-radius: 10px;
+    }
+
+    .riwayat-item {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border-radius: 0.6rem;
+        padding: 0.55rem 0.8rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--bs-border-color);
+        font-size: 0.85rem;
+    }
+
+    .riwayat-item .jumlah {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .riwayat-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--bs-secondary-color);
+        text-align: center;
+        padding: 2rem 1rem;
+    }
 </style>
+
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
@@ -41,11 +97,11 @@
 </div>
 
 <div class="page-content">
-    <div class="card border-0 shadow-sm">
+    <div class="card stat-card shadow-sm border-0">
         <div class="card-body p-4">
-            <div class="row">
-                <div class="col-12 col-md-7 col-lg-7 pe-md-4">
-                    
+            <div class="row g-4">
+                <div class="col-12 col-lg-7">
+
                     {{-- Alert Messages --}}
                     @if(session('success'))
                         <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
@@ -90,8 +146,7 @@
                     <form action="{{ route('bendahara.tabungan.tarikTabungan') }}" method="POST">
                         @csrf
                         <input type="hidden" id="kode2" name="kode">
-                        
-                        {{-- Pakai form-control biasa + readonly biar aman di semua mode --}}
+
                         <div class="row mb-3 align-items-center">
                             <label class="col-sm-4 col-form-label text-muted">Nama Siswa</label>
                             <div class="col-sm-8">
@@ -127,7 +182,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mb-4 align-items-center">
                             <label for="premi" class="col-sm-4 col-form-label text-muted">Biaya Admin (5%)</label>
                             <div class="col-sm-8">
@@ -145,11 +200,26 @@
                         </div>
                     </form>
                 </div>
-                
-                {{-- Ilustrasi --}}
-                <div class="col-12 col-md-5 col-lg-5 d-none d-md-flex align-items-center justify-content-center border-start">
-                    {{-- Tambahin object-fit: cover dan aspect-ratio biar ga gepeng --}}
-                    <img src="{{ asset('dist/assets/compiled/jpg/2.jpg') }}" class="img-fluid rounded-4 shadow-sm" style="width: 100%; max-width: 300px; aspect-ratio: 1/1; object-fit: cover;" alt="Ilustrasi Tabungan">
+
+                {{-- Panel Riwayat Transaksi --}}
+                <div class="col-12 col-lg-5">
+                    <div class="riwayat-panel">
+                        <div class="riwayat-header">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0"><i class="bi bi-clock-history me-1"></i> Riwayat Transaksi</h6>
+                                <span id="riwayat-nama" class="badge bg-body-secondary text-body border small"></span>
+                            </div>
+                        </div>
+
+                        <div class="riwayat-scroll" id="riwayat-scroll">
+                            <div class="riwayat-empty" id="riwayat-empty">
+                                <i class="bi bi-search fs-2 mb-2"></i>
+                                <br>
+                                <p class="mb-0 small">Cari kode siswa untuk melihat<br>riwayat transaksinya di sini</p>
+                            </div>
+                            <div id="riwayat-list"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -180,14 +250,54 @@
         });
     });
 
-    // Logic Pencarian AJAX & Formatting
     $(document).ready(function(){
+
+        function renderRiwayat(riwayat, nama) {
+            var $list = $('#riwayat-list');
+            var $empty = $('#riwayat-empty');
+            var $scroll = $('#riwayat-scroll');
+
+            $('#riwayat-nama').text(nama || '');
+
+            if (!riwayat || riwayat.length === 0) {
+                $list.empty();
+                $empty.html('<i class="bi bi-inbox fs-2 mb-2"></i><br><p class="mb-0 small">Belum ada riwayat transaksi<br>untuk siswa ini di periode berjalan</p>').show();
+                return;
+            }
+
+            $empty.hide();
+
+            var html = '';
+            riwayat.forEach(function(item) {
+                var isStor = item.tipe === 'stor';
+                var badgeClass = isStor ? 'bg-success' : 'bg-danger';
+                var badgeLabel = isStor ? 'Stor' : 'Tarik';
+                var sign = isStor ? '+' : '-';
+                var amountClass = isStor ? 'text-success' : 'text-danger';
+
+                html += '<div class="riwayat-item">'
+                    + '<div class="d-flex justify-content-between align-items-start">'
+                    + '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>'
+                    + '<span class="text-muted" style="font-size:0.75rem">' + item.tanggal + '</span>'
+                    + '</div>'
+                    + '<div class="d-flex justify-content-between align-items-center mt-1">'
+                    + '<span class="jumlah ' + amountClass + '">' + sign + ' Rp ' + item.jumlah + '</span>'
+                    + '<span class="text-muted" style="font-size:0.75rem">Saldo: Rp ' + item.saldo_akhir + '</span>'
+                    + '</div>'
+                    + '</div>';
+            });
+
+            $list.html(html);
+
+            $scroll.animate({ scrollTop: $scroll[0].scrollHeight }, 300);
+        }
+
         $('#searchForm').on('submit', function(e) {
             e.preventDefault();
             var kode = $('#kode').val();
 
             $.ajax({
-                url: "{{ route('bendahara.search') }}", // Memakai route search yang sama dengan fitur stor
+                url: "{{ route('bendahara.search') }}",
                 method: "GET",
                 data: {
                     kode: kode,
@@ -195,24 +305,28 @@
                 },
                 success: function(data) {
                     if (data) {
-                        if(data.name !== 'Tidak Ada') {
+                        if (data.name !== 'Tidak Ada') {
                             $('#name').val(data.name);
                             $('#rombel').val(data.rombel);
                             $('#jumlah_tabungan').val(data.tabungan);
-                            $('#kode2').val(kode); 
+                            $('#kode2').val(kode);
 
                             $('#tidak-ada').empty();
                             $('#jumlah_tarik').focus();
+
+                            renderRiwayat(data.riwayat, data.name);
                         } else {
                             $('#tidak-ada').html('<div class="alert alert-danger py-2 small mb-0"><i class="bi bi-x-circle me-1"></i> Data tidak ditemukan di rombel aktif.</div>');
                             setTimeout(function() {
                                 $('#tidak-ada').empty();
                             }, 3000);
-                            
+
                             $('#name').val('');
                             $('#rombel').val('');
                             $('#jumlah_tabungan').val('');
                             $('#kode2').val('');
+
+                            renderRiwayat([], '');
                         }
                     }
                 },
@@ -223,7 +337,7 @@
         });
 
         $('#jumlah_tarik').on('input', function () {
-            var value = $(this).val().replace(/\D/g, ''); 
+            var value = $(this).val().replace(/\D/g, '');
             var formatted = new Intl.NumberFormat('id-ID').format(value);
             $(this).val(formatted);
         });
@@ -231,7 +345,7 @@
         $('#kode').on('change', function() {
             $('#kode2').val($(this).val());
         });
-        
+
         setTimeout(function(){
             $('#kode').focus();
         }, 500);

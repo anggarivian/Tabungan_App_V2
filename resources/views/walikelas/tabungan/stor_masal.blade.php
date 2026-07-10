@@ -1,138 +1,157 @@
 @extends('layout.main')
 
-@section('title') Stor Tabungan - SakuRame @endsection
+@section('title', 'Stor Tabungan Massal - SakuRame')
 
 @section('content')
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background: var(--bs-card-bg, var(--bs-body-bg));
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+</style>
 <div class="page-heading mb-3">
     <div class="row align-items-center">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h3 class="mt-3">Stor Tabungan</h3>
+            <h3 class="mt-3">Stor Tabungan Massal</h3>
         </div>
         <div class="col-12 col-md-6 text-md-end">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-start justify-content-md-end mb-0">
-                    @if(auth()->user()->roles_id == 1)
-                        <li class="breadcrumb-item"><a href="{{ route ('kepsek.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 2)
-                        <li class="breadcrumb-item"><a href="{{ route ('bendahara.dashboard')}}">Dashboard</a></li>
-                    @elseif(auth()->user()->roles_id == 3)
-                        <li class="breadcrumb-item"><a href="{{ route ('walikelas.dashboard')}}">Bendahara</a></li>
-                    @elseif(auth()->user()->roles_id == 4)
-                        <li class="breadcrumb-item"><a href="{{ route ('siswa.dashboard')}}">Siswa</a></li>
-                    @endif
-                    <li class="breadcrumb-item"><a href="{{ route ('walikelas.tabungan.index')}}">Tabungan</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Stor</li>
+                    <li class="breadcrumb-item"><a href="{{ route('walikelas.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('walikelas.tabungan.index') }}">Tabungan</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Stor Massal</li>
                 </ol>
             </nav>
         </div>
     </div>
 </div>
+
 <div class="page-content">
-    <div class="card shadow pd-0">
-        <div class="card-body">
-            <div class="row">
-                @if(session('success'))
-                    <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle"></i>
-                        {{ session('alert-message') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                <script>
-                    @if(session('alert-duration'))
-                        setTimeout(function() {
-                            document.getElementById('alert').style.display = 'none';
-                        }, {{ session('alert-duration') }});
-                    @endif
-                </script>
-                @if($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
-                        <strong>Terjadi Kesalahan!</strong>
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-            </div>
-            <div class="col-md-12">
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <tr>
-                            <td><h6>Kelas</h6></td>
-                            <td ><h6>{{$kelas->name}}</h6></td>
-                        </tr>
-                        <tr>
-                            <td><h6>Jumlah Siswa</h6></td>
-                            <td ><h6>{{count($siswa)}}</h6></td>
-                        </tr>
-                        <tr>
-                            <td><h6>Walikelas</h6></td>
-                            <td ><h6>{{$walikelas->name ?? '-'}}</h6></td>
-                        </tr>
-                        <tr>
-                            <td><h6>Jumlah Stor Kemarin</h6></td>
-                            <td ><h6>Rp. {{ number_format($jumlahTransaksiKemarin)}}</h6></td>
-                        </tr>
-                    </table>
+    {{-- Info Rombel Card --}}
+    <div class="card stat-card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h5 class="mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Informasi Rombel</h5>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <span class="d-block text-muted small">Nama Rombel</span>
+                    <span class="fw-bold fs-6">{{ $rombel->name ?? '-' }}</span>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="d-block text-muted small">Wali Kelas</span>
+                    <span class="fw-bold fs-6">{{ $rombel->walikelas->name ?? '-' }}</span>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="d-block text-muted small">Total Siswa</span>
+                    <span class="fw-bold fs-6">{{ count($siswa) }} Orang</span>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="d-block text-muted small">Stor Rombel Kemarin</span>
+                    <span class="fw-bold fs-6 text-success">Rp {{ number_format($jumlahTransaksiKemarin, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card shadow">
-        <div class="card-body">
-            <form method="post" action="{{ route('walikelas.tabungan.storMasalTabungan') }}" enctype="multipart/form-data">
+
+    {{-- Alert & Errors --}}
+    @if(session('success'))
+        <div id="alert" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle me-2"></i>{{ session('alert-message') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show pb-1 shadow-sm" role="alert">
+            <strong><i class="bi bi-exclamation-triangle me-2"></i>Terjadi Kesalahan!</strong>
+            <ul class="mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Main Card Tabel --}}
+    <div class="card stat-card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <form method="POST" action="{{ route('walikelas.tabungan.storMasalTabungan') }}" id="formStorMasal">
                 @csrf
-                <div class="table-responsive-lg">
-                    <table id="table-data" class="table table-stripped">
+                <input type="hidden" name="rombel_id" value="{{ $rombel->id }}">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="width: 100%;">
                         <thead>
-                            <tr class="text-center">
-                                <th class="d-none d-md-table-cell">No</th>
+                            <tr>
+                                <th class="text-center" width="60">No</th>
                                 <th class="d-none d-md-table-cell">Nama</th>
-                                <th class="d-none d-md-table-cell">Saldo Awal</th>
-                                <th>Kode</th>
-                                <th>Stor</th>
+                                <th class="text-end d-none d-md-table-cell" width="200">Saldo Saat Ini</th>
+                                <th class="text-center" width="150">Kode Rombel</th>
+                                <th class="text-end" width="250">Input</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php $no=1; $no1=0; $no2=0; $no3=0; $no4=0; @endphp
-                            @foreach($siswa as $siswas)
+                            @forelse($siswa as $index => $siswas)
+                                @php
+                                    $kodeUnik = $siswas->rombel->first()->pivot->kode ?? $siswas->username;
+                                @endphp
                                 <tr>
-                                    <td class="text-center d-none d-md-table-cell">{{$no++}}</td>
-                                    <td class="text-center d-none d-md-table-cell">
-                                        <input type="text" class="form-control" name="input[{{$no2++}}][nama]" value="{{$siswas->name}}"
-                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1" />
+                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="fw-medium d-none d-md-table-cell">{{ $siswas->name }}</td>
+                                    <td class="text-end text-muted d-none d-md-table-cell">
+                                        Rp {{ number_format($siswas->tabungan->saldo ?? 0, 0, ',', '.') }}
                                     </td>
-                                    <td class="text-center d-none d-md-table-cell">
-                                        <input type="text" class="form-control text-center" name="input[{{$no3++}}][saldo]" value="{{ number_format($siswas->tabungan->saldo ?? 0) }}"
-                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary px-2 py-1">{{ $kodeUnik }}</span>
+                                        <input type="hidden" name="input[{{ $kodeUnik }}][kode]" value="{{ $kodeUnik }}">
                                     </td>
-                                    <td class="text-center col-md-2">
-                                        <input type="text" class="form-control text-center" name="input[{{$no1++}}][username]" value="{{$siswas->username}}"
-                                               style="border: none; outline: none; background: transparent;" readonly tabindex="-1"/>
-                                    </td>
-                                    <td class="text-center col-md-3 col-9">
-                                        <input type="text" class="form-control text-center" name="input[{{$no4++}}][stor]" id="stor_{{$no4}}"
-                                               oninput="updateCalculation(this)" autocomplete="off" />
+                                    <td>
+                                        <div class="input-group input-group-sm justify-content-end">
+                                            <span class="input-group-text bg-transparent border-end-0 text-muted">Rp</span>
+                                            <input type="text"
+                                                   name="input[{{ $kodeUnik }}][stor]"
+                                                   class="form-control text-end fw-bold stor-input border-start-0"
+                                                   placeholder="0"
+                                                   style="max-width: 180px;"
+                                                   autocomplete="off"
+                                                   oninput="updateCalculation()">
+                                        </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-people display-6 d-block mb-2"></i>
+                                        Tidak ada data siswa di rombel ini.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
-                        <tfoot>
+                        <tfoot class="border-top">
                             <tr>
-                                <td colspan="5" class="text-end">
-                                    <strong>Jumlah Stor: </strong><span id="total-stor">0</span><br>
-                                    <strong>Jumlah Nabung: </strong><span id="filled-count">0</span> dari <span id="total-count">{{ count($siswa) }}</span>
+                                <td colspan="4" class="text-end fw-bold align-middle d-none d-md-table-cell">TOTAL PENYETORAN :</td>
+                                <td colspan="2" class="text-end fw-bold align-middle d-md-none">TOTAL :</td>
+                                <td class="text-end p-4 align-middle">
+                                    <div class="d-flex flex-column">
+                                        <span class="fs-4 fw-bolder text-primary" id="total-stor">Rp 0</span>
+                                        <span class="small text-muted"><span id="filled-count" class="fw-bold">0</span> dari {{ count($siswa) }} Siswa</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('walikelas.tabungan.index') }}" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-primary">Stor Tabungan</button>
+
+                <div class="p-4 border-top d-flex justify-content-between gap-2">
+                    <a href="{{ route('walikelas.tabungan.index') }}" class="btn btn-light px-4">Kembali</a>
+                    <button type="submit" class="btn btn-primary px-5" id="btnSubmit">
+                        <i class="bi bi-save me-2"></i>Stor Tabungan
+                    </button>
                 </div>
             </form>
         </div>
@@ -141,84 +160,45 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $('#searchForm').on('submit', function(e) {
-            e.preventDefault();
+    function updateCalculation() {
+        let totalStor = 0;
+        let filledCount = 0;
 
-            var username = $('#username').val();
+        const inputs = document.querySelectorAll('.stor-input');
 
-            $.ajax({
-                url: "{{ route('walikelas.search') }}",
-                method: "GET",
-                data: { username: username },
-                success: function(data) {
-                    if (data) {
-                        console.log(data);
-                        if(data.name !== 'Tidak Ada' && data.kelas !== 'Tidak Ada' && data.tabungan !== 'Tidak Ada') {
-                            $('#name').val(data.name);
-                            $('#kelas').val(data.kelas);
-                            $('#jumlah_tabungan').val(data.tabungan);
-                        } else {
-                            $('#tidak-ada').html('<div class="alert alert-danger">Data tidak ditemukan</div>');
-                            setTimeout(function() {
-                                $('#tidak-ada').empty();
-                            }, 2000);
-                            $('#name').val('');
-                            $('#kelas').val('');
-                            $('#jumlah_tabungan').val('');
-                        }
-                        $('#jumlah_stor').focus();
-                    } else {
-                        alert('User tidak ditemukan');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan: ' + error);
+        inputs.forEach(function(input) {
+            let cleanValue = input.value.replace(/\D/g, '');
+
+            if(cleanValue !== "") {
+                input.value = new Intl.NumberFormat('id-ID').format(cleanValue);
+                let numValue = parseInt(cleanValue, 10);
+                if (numValue > 0) {
+                    filledCount++;
+                    totalStor += numValue;
                 }
-            });
-        });
-
-        $('#username').on('keypress', function(e) {
-            if(e.which === 13) {
-                $('#jumlah_stor').focus();
+            } else {
+                input.value = "";
             }
         });
+
+        document.getElementById('total-stor').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalStor);
+        document.getElementById('filled-count').textContent = filledCount;
+    }
+
+    document.getElementById('formStorMasal').addEventListener('submit', function() {
+        let btn = document.getElementById('btnSubmit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
     });
 
     document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {
-            const firstStorInput = document.querySelector('input[name^="input"][name$="[stor]"]');
-            if (firstStorInput) {
-                firstStorInput.focus();
+            const firstInput = document.querySelector('.stor-input');
+            if (firstInput) {
+                firstInput.focus();
             }
-        }, 1000);
+        }, 500);
     });
-
-    function removeThousandsSeparator(value) {
-        return value.replace(/[^0-9.-]+/g, '');
-    }
-
-    function updateCalculation(inputElement) {
-        let totalStor = 0;
-        let filledCount = 0;
-        const numberFormat = new Intl.NumberFormat();
-
-        document.querySelectorAll('input[id^="stor_"]').forEach(function(input) {
-            let value = removeThousandsSeparator(input.value);
-            value = parseFloat(value) || 0;
-            if (value > 0) {
-                filledCount++;
-            }
-            totalStor += value;
-        });
-
-        document.getElementById('total-stor').textContent = numberFormat.format(totalStor);
-
-        document.getElementById('filled-count').textContent = filledCount;
-
-        inputElement.value = numberFormat.format(removeThousandsSeparator(inputElement.value));
-    }
 </script>
 @endsection
