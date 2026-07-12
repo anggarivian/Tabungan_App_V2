@@ -513,189 +513,127 @@ class ExportController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
+    private function hitungSaldoBersihSiswa(int $userId, int $periodeId, string $pembayaran): int
+    {
+        $base = function ($tipe) use ($userId, $periodeId, $pembayaran) {
+            return \App\Models\Transaksi::where('user_id', $userId)
+                ->where('periode_id', $periodeId)
+                ->where('pembayaran', $pembayaran)
+                ->where('tipe_transaksi', $tipe) // 'Stor' atau 'Tarik'
+                ->where('status', 'success')
+                ->sum('jumlah_transaksi');
+        };
+
+        // Menggunakan kapital huruf depan ('Stor' dan 'Tarik') agar sesuai dengan standar database sebelumnya
+        return $base('Stor') - $base('Tarik'); 
+    }
+
     public function siswa_exportTabungan(Request $request)
     {
         $validated = $request->validate([
             'export_type' => 'required|in:pdf,excel',
-            'siswa_id' => 'nullable|exists:users,id',
+            'periode_id'  => 'required|exists:periodes,id',
         ]);
+
         $exportType = $validated['export_type'];
+        $periodeId  = $validated['periode_id'];
+        $user       = auth()->user();
+
+        // Tetapkan exportOption secara statis karena ini khusus siswa
         $exportOption = 'siswa';
-        $siswaId = $validated['siswa_id'];
-        $kelasId = auth()->user()->kelas->id;
 
-        $query = Tabungan::where('user_id', $siswaId);
-        $siswas = $query->get();
-        $user = User::find($siswaId);
+        $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
+            ->where('periode_id', $periodeId)
+            ->first();
 
-        $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
-        $jumlahPenabungAll = User::where('roles_id', 4 )->count();
-        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+        $siswas = collect($tabungan ? [$tabungan] : []);
 
-        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
+        $rombelInfo = $user->rombels()->wherePivot('periode_id', $periodeId)->first();
 
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunai   = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Tunai');
+        $jumlahSaldoDigital = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Digital');
 
         if ($exportType == 'pdf') {
-            $pdf = PDF::loadView('export.tabungan', compact('siswas', 'exportOption', 'kelasId', 'user', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
-            return $pdf->download('laporan_tabungan.pdf');
+            $pdf = \PDF::loadView('export.tabungan', compact(
+                'siswas', 'user', 'periodeId', 'rombelInfo',
+                'jumlahSaldoTunai', 'jumlahSaldoDigital', 'exportOption' // <-- Tambahkan di sini
+            ));
+            return $pdf->download('buku_tabungan_saya.pdf');
         } elseif ($exportType == 'excel') {
-            return Excel::download(new TabunganExport($siswas, $exportType), 'laporan_tabungan.xlsx');
+            return \Excel::download(new \App\Exports\TabunganExport($siswas, $exportType), 'buku_tabungan_saya.xlsx');
         }
 
-        return back()->with('error', 'Invalid export type');
+        return back()->with('error', 'Tipe export tidak valid');
     }
-
-    /**
-    * Menangani Export Data Transaksi oleh Siswa.
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\RedirectResponse
-    */
 
     public function siswa_exportTransaksi(Request $request)
     {
         $validated = $request->validate([
             'export_type' => 'required|in:pdf,excel',
-            'siswa_id' => 'nullable|exists:users,id',
-            'date_range' => 'nullable|string',
+            'periode_id'  => 'required|exists:periodes,id',
         ]);
 
         $exportType = $validated['export_type'];
+        $periodeId  = $validated['periode_id'];
+        $user       = auth()->user();
+        
+        // Definisikan exportOption
         $exportOption = 'siswa';
-        $siswaId = $validated['siswa_id'];
-        $dateRange = $validated['date_range'];
-        $kelasId = auth()->user()->kelas->id;
 
-        $startDate = null;
-        $endDate = null;
+        $transaksis = \App\Models\Transaksi::where('user_id', $user->id)
+            ->where('periode_id', $periodeId)
+            ->where('status', 'success')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if ($dateRange) {
-            list($startDate, $endDate) = explode(' - ', $dateRange);
-        }
-
-        $query = Transaksi::where('user_id', $siswaId);
-
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
-        }
-
-        $transaksis = $query->get();
-        $user = User::find($siswaId);
-
-        $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
-        $jumlahPenabungAll = User::where('roles_id', 4 )->count();
-        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $jumlahSaldoTunai   = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Tunai');
+        $jumlahSaldoDigital = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Digital');
 
         if ($exportType == 'pdf') {
-            $pdf = PDF::loadView('export.transaksi', compact('transaksis', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll'));
-            return $pdf->download('laporan_transaksi.pdf');
+            $pdf = \PDF::loadView('export.transaksi', compact(
+                'transaksis', 'user', 'periodeId', 'exportOption', // Tambahkan exportOption
+                'jumlahSaldoTunai', 'jumlahSaldoDigital'
+            ));
+            return $pdf->download('riwayat_transaksi_saya.pdf');
         } elseif ($exportType == 'excel') {
-            return Excel::download(new TransaksiExport($transaksis, $exportType, $user), 'laporan_transaksi.xlsx');
+            return \Excel::download(new \App\Exports\TransaksiExport($transaksis, $exportType, $user), 'riwayat_transaksi_saya.xlsx');
         }
 
-        return back()->with('error', 'Invalid export type');
+        return back()->with('error', 'Tipe export tidak valid');
     }
-
-    /**
-    * Menangani Export Data Pengajuan oleh Siswa.
-    *
-    * @param Request $request
-    * @return \Illuminate\Http\RedirectResponse
-    */
 
     public function siswa_exportPengajuan(Request $request)
     {
         $validated = $request->validate([
             'export_type' => 'required|in:pdf,excel',
-            'siswa_id' => 'nullable|exists:users,id',
-            'kelas_id' => 'nullable|exists:kelas,id',
-            'date_range' => 'nullable|string',
+            'periode_id'  => 'required|exists:periodes,id',
         ]);
 
         $exportType = $validated['export_type'];
+        $periodeId  = $validated['periode_id'];
+        $user       = auth()->user();
+        
+        // Definisikan exportOption
         $exportOption = 'siswa';
-        $siswaId = $validated['siswa_id'];
-        $kelasId = auth()->user()->kelas->id;
-        $dateRange = $validated['date_range'];
 
-        $startDate = null;
-        $endDate = null;
+        $pengajuans = \App\Models\Pengajuan::where('user_id', $user->id)
+            ->where('periode_id', $periodeId)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if ($dateRange) {
-            list($startDate, $endDate) = explode(' - ', $dateRange);
-        }
-
-        $query = Pengajuan::where('user_id', $siswaId);
-
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
-        }
-
-        $pengajuans = $query->get();
-        $user = User::find($siswaId);
-
-        $jumlahPenabung = User::where('roles_id', 4 )->where('kelas_id', $kelasId)->count();
-        $jumlahPenabungAll = User::where('roles_id', 4 )->count();
-        $jumlahSaldoTunai = Transaksi::where('pembayaran', 'tunai')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoDigital = Transaksi::where('pembayaran', 'digital')
-            ->where('tipe_transaksi', 'stor')
-            ->whereHas('user', function ($query) use ($kelasId) {
-                $query->where('kelas_id', $kelasId);
-            })
-            ->sum('jumlah_transaksi');
-
-        $jumlahSaldoTunaiAll = Transaksi::where('pembayaran', 'tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-        $jumlahSaldoDigitalAll = Transaksi::where('pembayaran', 'digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
-
-        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
-        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+        $jumlahSaldoTunai   = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Tunai');
+        $jumlahSaldoDigital = $this->hitungSaldoBersihSiswa($user->id, $periodeId, 'Digital');
 
         if ($exportType == 'pdf') {
-            $pdf = PDF::loadView('export.pengajuan', compact('pengajuans', 'user', 'exportOption', 'kelasId', 'startDate', 'endDate', 'jumlahPenabung','jumlahPenabungAll', 'jumlahSaldoTunai', 'jumlahSaldoDigital', 'jumlahSaldoTunaiAll', 'jumlahSaldoDigitalAll', 'saldoTunai', 'saldoDigital'));
-            return $pdf->download('laporan_pengajuan.pdf');
+            $pdf = \PDF::loadView('export.pengajuan', compact(
+                'pengajuans', 'user', 'periodeId', 'exportOption', // Tambahkan exportOption
+                'jumlahSaldoTunai', 'jumlahSaldoDigital'
+            ));
+            return $pdf->download('riwayat_pengajuan_saya.pdf');
         } elseif ($exportType == 'excel') {
-            return Excel::download(new PengajuanExport($pengajuans, $exportType, $user), 'laporan_pengajuan.xlsx');
+            return \Excel::download(new \App\Exports\PengajuanExport($pengajuans, $exportType, $user), 'riwayat_pengajuan_saya.xlsx');
         }
 
-        return back()->with('error', 'Invalid export type');
+        return back()->with('error', 'Tipe export tidak valid');
     }
 }

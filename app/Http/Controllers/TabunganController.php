@@ -52,83 +52,119 @@ class TabunganController extends Controller
     */
 
     public function bendahara_index()
-    {
-        $periodeId = PeriodeHelper::id();
-        $periodeAktif = Periode::find($periodeId);
+{
+    $periodeId = PeriodeHelper::id();
+    $periodeAktif = Periode::find($periodeId);
 
-        // fix: guard kalau belum ada periode aktif sama sekali
-        if (!$periodeId) {
-            return view('bendahara.tabungan.index', [
-                'periodeAktif'          => null,
-                'transaksi_masuk'       => 0,
-                'transaksi_keluar'      => 0,
-                'jumlah_saldo_tunai'    => 0,
-                'jumlah_saldo_digital'  => 0,
-                'rombelList'            => [],
-                'rombels'               => collect(),
-                'storKali'              => 0,
-                'tarikKali'             => 0,
-            ]);
-        }
+    // fix: guard kalau belum ada periode aktif sama sekali
+    if (!$periodeId) {
+        return view('bendahara.tabungan.index', [
+            'periodeAktif'          => null,
+            'transaksi_masuk'       => 0,
+            'transaksi_keluar'      => 0,
+            'jumlah_saldo_tunai'    => 0,
+            'jumlah_saldo_digital'  => 0,
+            'rombelList'            => [],
+            'rombels'               => collect(),
+            'storKali'              => 0,
+            'tarikKali'             => 0,
+            'rekapRombel'           => [], // fix: default kosong biar blade nggak error
+        ]);
+    }
 
-        // fix: tambahkan periode_id eksplisit, jangan cuma andalkan whereDate(created_at, today())
-        $baseGlobalQuery = Transaksi::where('periode_id', $periodeId)
+    // fix: tambahkan periode_id eksplisit, jangan cuma andalkan whereDate(created_at, today())
+    $baseGlobalQuery = Transaksi::where('periode_id', $periodeId)
+        ->whereDate('created_at', Carbon::today())
+        ->where('status', 'success');
+
+    $transaksi_masuk  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
+    $transaksi_keluar = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
+
+    $storKali  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->count();
+    $tarikKali = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->count();
+
+    $jumlah_saldo_tunai = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi')
+                        - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+
+    $jumlah_saldo_digital = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Digital')->sum('jumlah_transaksi')
+                        - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+
+    $rombels = Rombel::where('periode_id', $periodeId)->orderBy('name')->get();
+    $rombelList = [];
+
+    foreach ($rombels as $rombel) {
+        // fix: filter periode_id di query Transaksi itu sendiri, sekaligus dobel-cek di whereHas
+        $baseRombelQuery = Transaksi::where('periode_id', $periodeId)
+            ->whereHas('user.rombel', function ($q) use ($rombel, $periodeId) {
+                $q->where('rombels.id', $rombel->id)
+                ->where('rombels.periode_id', $periodeId);
+            })
             ->whereDate('created_at', Carbon::today())
             ->where('status', 'success');
 
-        $transaksi_masuk  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
-        $transaksi_keluar = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
+        $transaksi_hari_ini = (clone $baseRombelQuery)
+            ->with('user') // fix: eager load, cegah N+1 di blade
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        $storKali  = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->count();
-        $tarikKali = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->count();
+        $stor_rombel  = (clone $baseRombelQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
+        $tarik_rombel = (clone $baseRombelQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
 
-        $jumlah_saldo_tunai = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi')
-                            - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Tunai')->sum('jumlah_transaksi');
+        $rombelList[$rombel->id] = [
+            'nama_rombel' => $rombel->name,
+            'data'  => $transaksi_hari_ini,
+            'stor'  => $stor_rombel,
+            'tarik' => $tarik_rombel,
+        ];
+    }
 
-        $jumlah_saldo_digital = (clone $baseGlobalQuery)->where('tipe_transaksi', 'Stor')->where('pembayaran', 'Digital')->sum('jumlah_transaksi')
-                            - (clone $baseGlobalQuery)->where('tipe_transaksi', 'Tarik')->where('pembayaran', 'Digital')->sum('jumlah_transaksi');
+    // fix: pindahkan logic rekap dari getRekapRombelData() kesini, langsung dihitung server-side
+    $transaksiRekap = DB::table('transaksis')
+        ->join('rombel_user', 'transaksis.user_id', '=', 'rombel_user.user_id')
+        ->join('rombels', 'rombel_user.rombel_id', '=', 'rombels.id')
+        ->where('transaksis.periode_id', $periodeId)
+        ->where('rombels.periode_id', $periodeId) // pastikan rombelnya di periode yg sama
+        ->where('transaksis.status', 'success')
+        ->where('transaksis.tipe_transaksi', 'Stor')
+        ->select(
+            DB::raw('DATE(transaksis.created_at) as tanggal'),
+            'rombels.id as rombel_id',
+            DB::raw('SUM(transaksis.jumlah_transaksi) as total')
+        )
+        ->groupBy(DB::raw('DATE(transaksis.created_at)'), 'rombels.id')
+        ->orderBy(DB::raw('DATE(transaksis.created_at)'), 'desc')
+        ->get();
 
-        $rombels = Rombel::where('periode_id', $periodeId)->orderBy('name')->get();
-        $rombelList = [];
+    // Susun ulang jadi format pivot per tanggal (reuse $rombels yg sudah diambil di atas)
+    $rekapRombel = [];
+    foreach ($transaksiRekap as $t) {
+        $tgl = $t->tanggal;
 
-        foreach ($rombels as $rombel) {
-            // fix: filter periode_id di query Transaksi itu sendiri, sekaligus dobel-cek di whereHas
-            $baseRombelQuery = Transaksi::where('periode_id', $periodeId)
-                ->whereHas('user.rombel', function ($q) use ($rombel, $periodeId) {
-                    $q->where('rombels.id', $rombel->id)
-                    ->where('rombels.periode_id', $periodeId);
-                })
-                ->whereDate('created_at', Carbon::today())
-                ->where('status', 'success');
-
-            $transaksi_hari_ini = (clone $baseRombelQuery)
-                ->with('user') // fix: eager load, cegah N+1 di blade
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            $stor_rombel  = (clone $baseRombelQuery)->where('tipe_transaksi', 'Stor')->sum('jumlah_transaksi');
-            $tarik_rombel = (clone $baseRombelQuery)->where('tipe_transaksi', 'Tarik')->sum('jumlah_transaksi');
-
-            $rombelList[$rombel->id] = [
-                'nama_rombel' => $rombel->name,
-                'data'  => $transaksi_hari_ini,
-                'stor'  => $stor_rombel,
-                'tarik' => $tarik_rombel,
-            ];
+        if (!isset($rekapRombel[$tgl])) {
+            $rekapRombel[$tgl] = ['tanggal' => $tgl, 'total_semua' => 0];
+            foreach ($rombels as $r) {
+                $rekapRombel[$tgl]['rombel_' . $r->id] = 0;
+            }
         }
 
-        return view('bendahara.tabungan.index', compact(
-            'periodeAktif',
-            'transaksi_masuk',
-            'transaksi_keluar',
-            'jumlah_saldo_tunai',
-            'jumlah_saldo_digital',
-            'rombelList',
-            'rombels',
-            'storKali',
-            'tarikKali'
-        ));
+        $rekapRombel[$tgl]['rombel_' . $t->rombel_id] = (int) $t->total;
+        $rekapRombel[$tgl]['total_semua'] += (int) $t->total;
     }
+    $rekapRombel = array_values($rekapRombel);
+
+    return view('bendahara.tabungan.index', compact(
+        'periodeAktif',
+        'transaksi_masuk',
+        'transaksi_keluar',
+        'jumlah_saldo_tunai',
+        'jumlah_saldo_digital',
+        'rombelList',
+        'rombels',
+        'storKali',
+        'tarikKali',
+        'rekapRombel'
+    ));
+}
 
     /**
     * Import Data Transaksi Tabungan oleh Bendahara.
@@ -168,36 +204,45 @@ class TabunganController extends Controller
     // Tampilkan form stor masal
     public function bendahara_storMasal($id)
     {
-        $periodeId = \App\Helpers\PeriodeHelper::id();
-        
-        // 1. Ambil data Rombel sekalian bawa relasi walikelasnya
-        $rombel = \App\Models\Rombel::with('walikelas')->findOrFail($id);
+        $periodeId = PeriodeHelper::id();
 
-        // 2. Ambil data siswa
-        $siswa = \App\Models\User::where('roles_id', 4)
-            ->whereHas('rombel', function($q) use ($id) {
-                $q->where('rombels.id', $id);
+        if (!$periodeId) {
+            abort(400, 'Tidak ada periode aktif.');
+        }
+
+        // fix: pastikan rombel yang diakses memang ada DI PERIODE AKTIF,
+        // bukan sekadar findOrFail(id) tanpa peduli periode
+        $rombel = Rombel::with('walikelas')
+            ->where('id', $id)
+            ->where('periode_id', $periodeId)
+            ->firstOrFail();
+
+        $siswa = User::where('roles_id', 4)
+            ->whereHas('rombel', function ($q) use ($id, $periodeId) {
+                $q->where('rombels.id', $id)
+                ->where('rombels.periode_id', $periodeId); // fix: dobel-cek periode juga di sini
             })
             ->with([
-                'rombel' => function($q) use ($id) {
-                    $q->where('rombels.id', $id);
+                'rombel' => function ($q) use ($id, $periodeId) {
+                    $q->where('rombels.id', $id)
+                    ->where('rombels.periode_id', $periodeId);
                 },
-                'tabungan' => function($q) use ($periodeId) {
+                'tabungan' => function ($q) use ($periodeId) {
                     $q->where('periode_id', $periodeId);
                 }
             ])
             ->get()
-            // Urutkan berdasarkan kode absen (1A01, 1A02)
-            ->sortBy(function($user) {
+            ->sortBy(function ($user) {
                 return $user->rombel->first()->pivot->kode ?? $user->name;
             });
 
-        // 3. Hitung transaksi khusus "Stor" di H-1 untuk Rombel ini
-        $kemarin = \Carbon\Carbon::yesterday()->toDateString();
-        $jumlahTransaksiKemarin = \App\Models\Transaksi::whereDate('created_at', $kemarin)
+        $kemarin = Carbon::yesterday()->toDateString();
+        $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
+            ->where('periode_id', $periodeId) // fix: konsisten filter periode
             ->where('tipe_transaksi', 'Stor')
-            ->whereHas('user.rombel', function($q) use ($id) {
-                $q->where('rombels.id', $id);
+            ->whereHas('user.rombel', function ($q) use ($id, $periodeId) {
+                $q->where('rombels.id', $id)
+                ->where('rombels.periode_id', $periodeId);
             })
             ->where('status', 'success')
             ->sum('jumlah_transaksi');
@@ -233,14 +278,19 @@ class TabunganController extends Controller
         $user = User::findByKode($kode, $periodeId);
 
         if ($user) {
-            $user->load(['tabungan', 'rombel' => function ($q) use ($periodeId) {
-                $q->where('rombels.periode_id', $periodeId);
-            }]);
+            // ambil rombel periode aktif langsung dari relasi many-to-many
+            $rombelSekarang = $user->rombel()
+                ->where('rombels.periode_id', $periodeId)
+                ->first();
 
-            $namaRombel = $user->rombel->first()->name ?? 'Tidak Ada';
-            $saldo = $user->tabungan ? $user->tabungan->saldo : 0;
+            // fix: query eksplisit ke tabel Tabungan, jangan gantung ke $user->tabungan
+            // (aman walau relasi di model berubah jadi hasMany)
+            $tabungan = Tabungan::where('user_id', $user->id)
+                ->where('periode_id', $periodeId)
+                ->first();
 
-            // riwayat transaksi, urut LAMA -> BARU biar transaksi terbaru ada di paling bawah tabel
+            $saldo = $tabungan->saldo ?? 0;
+
             $riwayat = Transaksi::where('user_id', $user->id)
                 ->where('periode_id', $periodeId)
                 ->where('status', 'success')
@@ -259,7 +309,7 @@ class TabunganController extends Controller
 
             return response()->json([
                 'name'     => $user->name,
-                'rombel'   => $namaRombel,
+                'rombel'   => $rombelSekarang->name ?? 'Tidak Ada',
                 'tabungan' => number_format($saldo, 0, ',', '.'),
                 'riwayat'  => $riwayat,
             ]);
@@ -700,13 +750,12 @@ class TabunganController extends Controller
     {
         $periodeId = PeriodeHelper::id();
 
-        // ambil rombel milik walikelas ini di periode aktif
         $rombelQuery = Rombel::with('walikelas')
             ->where('walikelas_id', auth()->id())
             ->where('periode_id', $periodeId);
 
         if ($id) {
-            $rombelQuery->where('id', $id); // kalau ada id spesifik, tetap wajib miliknya sendiri
+            $rombelQuery->where('id', $id);
         }
 
         $rombel = $rombelQuery->first();
@@ -734,6 +783,7 @@ class TabunganController extends Controller
 
         $kemarin = Carbon::yesterday()->toDateString();
         $jumlahTransaksiKemarin = Transaksi::whereDate('created_at', $kemarin)
+            ->where('periode_id', $periodeId) // fix: konsisten filter periode juga di sini
             ->where('tipe_transaksi', 'Stor')
             ->whereHas('user.rombel', function ($q) use ($rombel) {
                 $q->where('rombels.id', $rombel->id);
@@ -1053,22 +1103,22 @@ class TabunganController extends Controller
         $user = auth()->user();
         $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
-        // Cari pengajuan pending di periode aktif
-        $pengajuans = \App\Models\Pengajuan::where('status', 'pending')
-            ->where('user_id', $user->id)
-            ->where('periode_id', $periodeAktif)
-            ->first();
-
-        // Cari tabungan spesifik di periode aktif
         $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
             ->where('periode_id', $periodeAktif)
             ->first();
 
-        // Ambil nominal, jika belum ada tabungan set jadi 0
         $nominal = $tabungan ? $tabungan->saldo : 0;
         $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
-        
-        return view('siswa.tabungan.tarik', compact('nominal', 'terbilang'));
+        $rombel = $user->rombel()->where('rombels.periode_id', $periodeAktif)->first();
+
+        // Ambil pengajuan terakhir untuk mengecek status (Pending, Processing, Succeeded, Tolak)
+        $pengajuan = \App\Models\Pengajuan::where('user_id', $user->id)
+            ->where('periode_id', $periodeAktif)
+            ->where('status', '!=', 'Batal')
+            ->latest()
+            ->first();
+
+        return view('siswa.tabungan.tarik', compact('nominal', 'terbilang', 'pengajuan', 'rombel'));
     }
     
     
@@ -1083,31 +1133,27 @@ class TabunganController extends Controller
         $user = auth()->user();
         $periodeAktif = \App\Helpers\PeriodeHelper::id();
 
-        // 1. Ambil data Tabungan siswa pada periode aktif
         $tabungan = \App\Models\Tabungan::where('user_id', $user->id)
             ->where('periode_id', $periodeAktif)
             ->first();
 
         $nominal = $tabungan ? $tabungan->saldo : 0;
         $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
-
-        // 2. Ambil data Rombel aktif siswa
         $rombel = $user->rombel()->where('rombels.periode_id', $periodeAktif)->first();
 
         $invoice = null;
-
-        // 3. Ambil transaksi pending terbaru milik siswa di periode aktif
-        $pendingTransaksi = \App\Models\Transaksi::where('user_id', $user->id)
+        
+        // Ambil transaksi aktif (Pending atau Processing)
+        $transaksiAktif = \App\Models\Transaksi::where('user_id', $user->id)
             ->where('periode_id', $periodeAktif)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'processing'])
             ->latest()
             ->first();
 
-        if ($pendingTransaksi && $pendingTransaksi->external_id) {
-            // Tarik data live dari server Xendit untuk sinkronisasi real-time
+        if ($transaksiAktif && $transaksiAktif->external_id) {
             $response = \Illuminate\Support\Facades\Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
                 ->get('https://api.xendit.co/v2/invoices', [
-                    'external_id' => $pendingTransaksi->external_id,
+                    'external_id' => $transaksiAktif->external_id,
                 ]);
 
             if ($response->successful()) {
@@ -1117,28 +1163,24 @@ class TabunganController extends Controller
                     $xenditStatus = $xenditInvoice['status'] ?? 'PENDING';
 
                     if ($xenditStatus === 'EXPIRED') {
-                        // Skenario A: Invoice sudah kedaluwarsa saat siswa meninggalkan aplikasi
-                        $pendingTransaksi->status = 'Expired';
-                        $pendingTransaksi->save();
+                        $transaksiAktif->status = 'Expired';
+                        $transaksiAktif->save();
+                        $transaksiAktif = null; 
                     } elseif ($xenditStatus === 'PAID' || $xenditStatus === 'SETTLED') {
-                        // Skenario B: Ternyata sudah dibayar tapi webhook terlewat, langsung sukseskan di sini
-                        if ($pendingTransaksi->status !== 'success') {
-                            \Illuminate\Support\Facades\DB::transaction(function() use ($pendingTransaksi, $tabungan) {
-                                $pendingTransaksi->status = 'success';
-                                $pendingTransaksi->save();
-
+                        if ($transaksiAktif->status !== 'success') {
+                            \Illuminate\Support\Facades\DB::transaction(function() use ($transaksiAktif, $tabungan) {
+                                $transaksiAktif->status = 'success';
+                                $transaksiAktif->save();
                                 if ($tabungan) {
-                                    $tabungan->saldo += $pendingTransaksi->jumlah_transaksi;
+                                    $tabungan->saldo += $transaksiAktif->jumlah_transaksi;
                                     $tabungan->save();
                                 }
-                                \App\Jobs\SendWhatsAppMessage::dispatch($pendingTransaksi);
                             });
-                            // Refresh data saldo untuk view form awal
                             $nominal = $tabungan ? $tabungan->refresh()->saldo : 0;
                             $terbilang = \App\Helpers\RupiahHelper::terbilangRupiah($nominal);
                         }
+                        $transaksiAktif = null; 
                     } else {
-                        // Skenario C: Invoice benar-benar masih pending aktif, kunci tampilan ke "Lanjutkan Pembayaran"
                         $invoice = $xenditInvoice;
                         $invoice['expiry_date_carbon'] = \Carbon\Carbon::parse($invoice['expiry_date']);
                     }
@@ -1146,7 +1188,7 @@ class TabunganController extends Controller
             }
         }
 
-        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice', 'rombel'));
+        return view('siswa.tabungan.stor', compact('nominal', 'terbilang', 'invoice', 'rombel', 'transaksiAktif'));
     }
 
     /**

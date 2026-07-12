@@ -33,6 +33,33 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
     {{-- Info Rombel Card --}}
     <div class="card stat-card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
@@ -104,7 +131,7 @@
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td class="fw-medium d-none d-md-table-cell">{{ $siswas->name }}</td>
                                     <td class="text-end text-muted d-none d-md-table-cell">
-                                        Rp {{ number_format($siswas->tabungan->saldo ?? 0, 0, ',', '.') }}
+                                        Rp {{ number_format($siswas->tabungan->first()->saldo ?? 0, 0, ',', '.') }}
                                     </td>
                                     <td class="text-center">
                                         <span class="badge bg-secondary px-2 py-1">{{ $kodeUnik }}</span>
@@ -149,7 +176,7 @@
 
                 <div class="p-4 border-top d-flex justify-content-between gap-2">
                     <a href="{{ route('walikelas.tabungan.index') }}" class="btn btn-light px-4">Kembali</a>
-                    <button type="submit" class="btn btn-primary px-5" id="btnSubmit">
+                    <button type="submit" class="btn btn-primary px-5" id="btnSubmit" {{ $isReadOnly ? 'disabled' : '' }}>
                         <i class="bi bi-save me-2"></i>Stor Tabungan
                     </button>
                 </div>

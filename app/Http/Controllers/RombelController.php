@@ -189,4 +189,52 @@ class RombelController extends Controller
             'alert-duration' => 3000,
         ]);
     }
+
+    // Tambahkan Request $request di parameter fungsi
+    public function getRekapRombelData(\Illuminate\Http\Request $request)
+    {
+        // 1. Ambil ID periode dari request (jika ada filter), kalau kosong baru pakai yang aktif
+        $periodeAktif = $request->input('periode_id', \App\Helpers\PeriodeHelper::id());
+        
+        // Ambil semua rombel di periode tersebut untuk header kolom
+        $rombels = \App\Models\Rombel::where('periode_id', $periodeAktif)->orderBy('name')->get();
+        
+        // Ambil data transaksi (Stor) dan gabungkan dengan relasi rombel
+        $transaksis = \Illuminate\Support\Facades\DB::table('transaksis')
+            ->join('rombel_user', 'transaksis.user_id', '=', 'rombel_user.user_id')
+            ->join('rombels', 'rombel_user.rombel_id', '=', 'rombels.id')
+            ->where('transaksis.periode_id', $periodeAktif)
+            ->where('rombels.periode_id', $periodeAktif) // Pastikan rombelnya di periode yg sama
+            ->where('transaksis.status', 'success')
+            ->where('transaksis.tipe_transaksi', 'Stor')
+            ->select(
+                \Illuminate\Support\Facades\DB::raw('DATE(transaksis.created_at) as tanggal'),
+                'rombels.id as rombel_id',
+                \Illuminate\Support\Facades\DB::raw('SUM(transaksis.jumlah_transaksi) as total')
+            )
+            ->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(transaksis.created_at)'), 'rombels.id')
+            ->orderBy(\Illuminate\Support\Facades\DB::raw('DATE(transaksis.created_at)'), 'desc')
+            ->get();
+
+        // Menyusun ulang data menjadi format Pivot Table per Tanggal
+        $data = [];
+        foreach ($transaksis as $t) {
+            $tgl = $t->tanggal;
+            
+            if (!isset($data[$tgl])) {
+                $data[$tgl] = ['tanggal' => $tgl, 'total_semua' => 0];
+                foreach ($rombels as $r) {
+                    $data[$tgl]['rombel_'.$r->id] = 0;
+                }
+            }
+            
+            $data[$tgl]['rombel_'.$t->rombel_id] = (int) $t->total;
+            $data[$tgl]['total_semua'] += (int) $t->total;
+        }
+
+        return response()->json([
+            'rombels' => $rombels,
+            'rekap' => array_values($data)
+        ]);
+    }
 }

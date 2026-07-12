@@ -74,9 +74,12 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->where('status_siswa', 'aktif')->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-
+        $periodeId = PeriodeHelper::id();
+        $jumlah_saldo_tunai = \App\Models\Tabungan::where('periode_id', $periodeId)
+            ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
+            })
+            ->sum('saldo');
         // Chart -----------------------------------------------------------------------------------------------
         $frekuensi = Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
             ->where('tipe_transaksi', 'stor')->where('periode_id',PeriodeHelper::id())
@@ -117,7 +120,6 @@ class DashboardController extends Controller
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
-            'jumlah_saldo_digital',
             'storKali',
             'tarikKali'
         ))->with([
@@ -139,8 +141,12 @@ class DashboardController extends Controller
         $jumlah_penabung = User::where('roles_id', 4)->count();
         $transaksi_masuk = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
         $transaksi_keluar = Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_tunai = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Tunai')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
-        $jumlah_saldo_digital = Transaksi::where('tipe_transaksi', 'Stor')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi') - Transaksi::where('tipe_transaksi', 'Tarik')->where('status', 'success')->where('pembayaran', 'Digital')->where('periode_id',PeriodeHelper::id())->sum('jumlah_transaksi');
+        $periodeId = PeriodeHelper::id();
+        $jumlah_saldo_tunai = \App\Models\Tabungan::where('periode_id', $periodeId)
+            ->whereHas('user.rombel', function ($q) use ($periodeId) {
+                $q->where('rombels.periode_id', $periodeId);
+            })
+            ->sum('saldo');
         $premi = Tabungan::where('periode_id',PeriodeHelper::id())->sum('premi');
         $bendahara = Tabungan::where('user_id', 2)->first();
 
@@ -184,7 +190,6 @@ class DashboardController extends Controller
             'transaksi_masuk',
             'transaksi_keluar',
             'jumlah_saldo_tunai',
-            'jumlah_saldo_digital',
             'premi',
             'bendahara',
             'storKali',
@@ -205,131 +210,85 @@ class DashboardController extends Controller
      */
     public function walikelas()
     {
-        $walikelas = auth()->user();
+        $walikelasId = auth()->id();
         $periodeId = \App\Helpers\PeriodeHelper::id();
 
-        // Cari Rombel yang dipegang wali kelas ini pada periode aktif saat ini
-        $rombel = \App\Models\Rombel::where('walikelas_id', $walikelas->id)
-            ->where('periode_id', $periodeId)
+        // fix: kolom yang benar walikelas_id, bukan user_id
+        $rombelDiampu = \App\Models\Rombel::where('periode_id', $periodeId)
+            ->where('walikelas_id', $walikelasId)
             ->first();
 
-        // Jika wali kelas belum diplot ke rombel manapun di periode ini, set default ID 0 biar gak crash
-        $rombelId = $rombel ? $rombel->id : 0;
+        $jumlah_penabung = 0;
+        $jumlah_saldo_tunai = 0;
+        $transaksi_masuk = 0;
+        $transaksi_keluar = 0;
+        $storKali = 0;
+        $tarikKali = 0;
+        $frekuensi = collect();
+        $total = collect();
 
-        // 1. Jumlah Penabung (Siswa dengan Role 4 yang terdaftar di rombel aktif milik wali kelas)
-        $jumlah_penabung = \App\Models\User::where('roles_id', 4)
-            ->whereHas('rombel', function ($query) use ($rombelId, $periodeId) {
-                $query->where('rombels.id', $rombelId)->where('rombels.periode_id', $periodeId);
-            })
-            ->count();
+        if ($rombelDiampu) {
+            $rombelId = $rombelDiampu->id;
 
-        // 2. Akumulasi Transaksi Masuk (Stor) di Rombel ini
-        $transaksi_masuk = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })
-            ->sum('jumlah_transaksi');
+            $transaksi_masuk = \App\Models\Transaksi::where('periode_id', $periodeId)
+                ->where('tipe_transaksi', 'Stor')
+                ->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) {
+                    $q->where('rombels.id', $rombelId);
+                })->sum('jumlah_transaksi');
 
-        // 3. Akumulasi Transaksi Keluar (Tarik) di Rombel ini
-        $transaksi_keluar = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })
-            ->sum('jumlah_transaksi');
+            $transaksi_keluar = \App\Models\Transaksi::where('periode_id', $periodeId)
+                ->where('tipe_transaksi', 'Tarik')
+                ->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) {
+                    $q->where('rombels.id', $rombelId);
+                })->sum('jumlah_transaksi');
 
-        // 4. Hitung Saldo Bersih Tunai Rombel (Stor - Tarik)
-        $jumlah_saldo_tunai = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Stor')
-            ->where('pembayaran', 'Tunai')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->sum('jumlah_transaksi') 
-            - 
-            \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Tarik')
-            ->where('pembayaran', 'Tunai')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->sum('jumlah_transaksi');
+            // fix: relasi di model Rombel namanya siswa(), bukan users()
+            $jumlah_penabung = $rombelDiampu->siswa()->where('roles_id', 4)->count();
 
-        // 5. Hitung Saldo Bersih Digital Rombel (Stor - Tarik)
-        $jumlah_saldo_digital = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Stor')
-            ->where('pembayaran', 'Digital')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->sum('jumlah_transaksi') 
-            - 
-            \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Tarik')
-            ->where('pembayaran', 'Digital')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->sum('jumlah_transaksi');
+            $jumlah_saldo_tunai = \App\Models\Tabungan::where('periode_id', $periodeId)
+                ->whereHas('user.rombel', function ($q) use ($rombelId) {
+                    $q->where('rombels.id', $rombelId);
+                })->sum('saldo');
 
-        // 6. Frekuensi Setor Grafik (Ubah 'stor' jadi 'Stor' sesuai standard db)
-        $frekuensi = \App\Models\Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
-            ->where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'x' => $item->date,
-                    'y' => $item->total
-                ];
-            });
+            $frekuensi = \App\Models\Transaksi::selectRaw('DATE(created_at) as date, SUM(jumlah_transaksi) as total')
+                ->where('periode_id', $periodeId)
+                ->where('tipe_transaksi', 'Stor')
+                ->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) {
+                    $q->where('rombels.id', $rombelId);
+                })
+                ->groupBy('date')->orderBy('date', 'asc')->get()
+                ->map(fn($item) => ['x' => $item->date, 'y' => $item->total]);
 
-        // 7. Akumulasi Total Saldo Grafik harian
-        $total = \App\Models\Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "Stor" THEN jumlah_transaksi WHEN tipe_transaksi = "Tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
-            ->where('periode_id', $periodeId)
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get()
-            ->reduce(function ($carry, $item) {
-                $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
-                $carry->push([
-                    'x' => $item->date,
-                    'y' => (string) ($lastTotal + $item->daily_total)
-                ]);
-                return $carry;
-            }, collect());
+            $total = \App\Models\Transaksi::selectRaw('DATE(created_at) as date, SUM(CASE WHEN tipe_transaksi = "Stor" THEN jumlah_transaksi WHEN tipe_transaksi = "Tarik" THEN -jumlah_transaksi ELSE 0 END) as daily_total')
+                ->where('periode_id', $periodeId)
+                ->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) {
+                    $q->where('rombels.id', $rombelId);
+                })
+                ->groupBy('date')->orderBy('date', 'asc')->get()
+                ->reduce(function ($carry, $item) {
+                    $lastTotal = $carry->isNotEmpty() ? $carry->last()['y'] : 0;
+                    $carry->push(['x' => $item->date, 'y' => (string) ($lastTotal + $item->daily_total)]);
+                    return $carry;
+                }, collect());
 
-        // 8. Berapa kali transaksi dilakukan di rombel ini
-        $storKali = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Stor')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->count();
+            $storKali = \App\Models\Transaksi::where('periode_id', $periodeId)
+                ->where('tipe_transaksi', 'Stor')->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) { $q->where('rombels.id', $rombelId); })
+                ->count();
 
-        $tarikKali = \App\Models\Transaksi::where('periode_id', $periodeId)
-            ->where('tipe_transaksi', 'Tarik')
-            ->where('status', 'success')
-            ->whereHas('user.rombel', function ($query) use ($rombelId) {
-                $query->where('rombels.id', $rombelId);
-            })->count();
+            $tarikKali = \App\Models\Transaksi::where('periode_id', $periodeId)
+                ->where('tipe_transaksi', 'Tarik')->where('status', 'success')
+                ->whereHas('user.rombel', function ($q) use ($rombelId) { $q->where('rombels.id', $rombelId); })
+                ->count();
+        }
 
         return view('walikelas.index', compact(
             'jumlah_penabung', 'transaksi_masuk', 'transaksi_keluar',
-            'jumlah_saldo_tunai', 'jumlah_saldo_digital', 'storKali', 'tarikKali'
+            'jumlah_saldo_tunai', 'storKali', 'tarikKali'
         ))->with([
             'title' => 'Dashboard',
             'active' => 'dashboard',
@@ -337,7 +296,6 @@ class DashboardController extends Controller
             'chart_total' => $total,
         ]);
     }
-
     // Siswa Dashboard -----------------------------------------------------------------------------------------------
     /**
      * Menampilkan Dashboard Role Siswa.

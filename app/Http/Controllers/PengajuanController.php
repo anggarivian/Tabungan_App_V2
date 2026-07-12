@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Xendit\Payout\CreatePayoutRequest;
+use Xendit\BalanceAndTransaction\BalanceApi;
 
 class PengajuanController extends Controller
 {
@@ -74,10 +75,22 @@ class PengajuanController extends Controller
             });
         }
 
+        // --- TAMBAHAN: Tarik Saldo Xendit ---
+        $saldoXendit = 0;
+        try {
+            \Xendit\Configuration::setXenditKey(config('services.xendit.secret_key'));
+            $balanceApi = new \Xendit\BalanceAndTransaction\BalanceApi();
+            $balance = $balanceApi->getBalance('CASH');
+            $saldoXendit = $balance['balance'] ?? 0;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal memuat saldo Xendit: ' . $e->getMessage());
+            $saldoXendit = null; // Set null sebagai penanda error/gangguan
+        }
+
         $query->orderBy('created_at', 'desc');
         $pengajuan = $query->paginate($perPage)->withQueryString();
 
-        return view('bendahara.kelola_pengajuan', compact('pengajuan'));
+        return view('bendahara.kelola_pengajuan', compact('pengajuan', 'saldoXendit'));
     }
 
     /**
@@ -92,6 +105,20 @@ class PengajuanController extends Controller
             ->where('rombels.periode_id', $pengajuan->periode_id)
             ->first();
 
+        $saldoXendit = 0;
+        if ($pengajuan->pembayaran === 'Digital') {
+            try {
+                \Xendit\Configuration::setXenditKey(config('services.xendit.secret_key'));
+                $balanceApi = new \Xendit\BalanceAndTransaction\BalanceApi();
+                
+                // Mengambil tipe saldo kas utama Xendit
+                $balance = $balanceApi->getBalance('CASH'); 
+                $saldoXendit = $balance['balance'] ?? 0;
+            } catch (\Exception $e) {
+                $saldoXendit = 0; // Jika API Xendit gagal/terputus, set ke 0 demi keamanan
+            }
+        }
+
         return response()->json([
             'pengajuan_id'      => $pengajuan->id,
             'user_id'           => $pengajuan->user->id ?? '-',
@@ -101,6 +128,7 @@ class PengajuanController extends Controller
             'tabungan'          => $pengajuan->tabungan->saldo ?? 0, 
             'jumlah_penarikan'  => $pengajuan->jumlah_penarikan,
             'status'            => $pengajuan->status,
+            'saldo_xendit'      => $saldoXendit,
             'pembayaran'        => $pengajuan->pembayaran,
             'metode_digital'    => $pengajuan->metode_digital ?? '-',
             'type_tujuan'       => $pengajuan->bank_code ?? $pengajuan->ewallet_type ?? '-',

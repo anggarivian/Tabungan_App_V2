@@ -135,14 +135,12 @@
                                         Edit
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        class="btn btn-secondary btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#rekapModal"
-                                        data-nama="{{ $periode->nama }}"
-                                        data-id="{{ $periode->id }}">
-                                        Rekap
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rekapModal"
+                                            data-nama="{{ $periode->nama }}"
+                                            data-id="{{ $periode->id }}">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i> Rekap
                                     </button>
                                 </td>
                             </tr>
@@ -333,92 +331,75 @@
 @endsection
 
 @section('js')
-    @if(session('success') || session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
 
-                const alert = document.querySelector('.alert');
-
-                if(alert){
-                    setTimeout(function (){
-
-                        const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                        bsAlert.close();
-
-                    },3000);
-                }
-
-            });
-        </script>
-    @endif
-
-    <script>
-        
-        document.getElementById('editPeriodeModal').addEventListener('show.bs.modal', function (event) {
-
-            var button = event.relatedTarget;
-
-            var id = button.getAttribute('data-id');
-            var nama = button.getAttribute('data-nama');
-            var mulai = button.getAttribute('data-mulai');
-            var selesai = button.getAttribute('data-selesai');
-
-            document.getElementById('editNama').value = nama;
-            document.getElementById('editMulai').value = mulai;
-            document.getElementById('editSelesai').value = selesai;
-
-            document.getElementById('editPeriodeForm').action =
-                "{{ url('bendahara/periode') }}/" + id;
-        });
-    </script>
-
-    @if ($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var tambahPeriodeModal = new bootstrap.Modal(document.getElementById('tambahPeriodeModal'));
-            tambahPeriodeModal.show();
-        });
-    </script>
-    @endif
+    // Alert otomatis hilang (tetap dipertahankan)
+    const alert = document.querySelector('.alert');
+    if(alert){
+        setTimeout(function (){
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        }, 3000);
+    }
 
-    <script>
-        // Isi modal konfirmasi aktifkan periode secara dinamis
-        document.getElementById('konfirmasiAktifkanModal').addEventListener('show.bs.modal', function (event) {
+    // Script Modal Edit Periode (tetap dipertahankan)
+    const editPeriodeModal = document.getElementById('editPeriodeModal');
+    if(editPeriodeModal) {
+        editPeriodeModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
-            var action = button.getAttribute('data-action');
-            var nama = button.getAttribute('data-nama');
-
-            document.getElementById('konfirmasiNamaPeriode').textContent = nama;
-            document.getElementById('konfirmasiAktifkanForm').setAttribute('action', action);
-        });
-
-        // Isi modal rekap secara dinamis (masih placeholder, belum ada endpoint generate PDF)
-        document.getElementById('rekapModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var nama = button.getAttribute('data-nama');
             var id = button.getAttribute('data-id');
+            document.getElementById('editNama').value = button.getAttribute('data-nama');
+            document.getElementById('editMulai').value = button.getAttribute('data-mulai');
+            document.getElementById('editSelesai').value = button.getAttribute('data-selesai');
+            document.getElementById('editPeriodeForm').action = "{{ url('bendahara/periode') }}/" + id;
+        });
+    }
 
+    // Script Modal Konfirmasi Aktifkan (tetap dipertahankan)
+    const konfirmasiAktifkanModal = document.getElementById('konfirmasiAktifkanModal');
+    if(konfirmasiAktifkanModal) {
+        konfirmasiAktifkanModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            document.getElementById('konfirmasiNamaPeriode').textContent = button.getAttribute('data-nama');
+            document.getElementById('konfirmasiAktifkanForm').setAttribute('action', button.getAttribute('data-action'));
+        });
+    }
+
+    // SCRIPT MODAL REKAP (Diperbarui)
+    const rekapModal = document.getElementById('rekapModal');
+    if(rekapModal) {
+        rekapModal.addEventListener('show.bs.modal', function (event) {
+            let button = event.relatedTarget;
+            let id = button.getAttribute('data-id');
+            let nama = button.getAttribute('data-nama');
+
+            // Set judul modal
             document.getElementById('rekapNamaPeriode').textContent = nama;
 
-            var loading = document.getElementById('rekapLoading');
-            var viewer = document.getElementById('rekapPdfViewer');
-            var downloadBtn = document.getElementById('rekapDownloadBtn');
+            let loading = document.getElementById('rekapLoading');
+            let viewer = document.getElementById('rekapPdfViewer');
+            let downloadBtn = document.getElementById('rekapDownloadBtn');
 
+            // Tampilkan loading, sembunyikan iframe lama
             loading.style.display = 'block';
             viewer.style.display = 'none';
             viewer.src = '';
 
-            // TODO: ganti dengan route generate PDF yang sebenarnya, contoh:
-            // var pdfUrl = "{{ url('bendahara/periode') }}/" + id + "/rekap/pdf";
-            var pdfUrl = '#';
+            // Buat URL yang mengarah ke route DOMPDF
+            let pdfUrl = `/bendahara/periode/${id}/rekap/pdf`;
             downloadBtn.setAttribute('href', pdfUrl);
 
-            // Simulasi proses generate PDF (dummy timeout, hapus setelah endpoint asli tersedia)
-            setTimeout(function () {
+            // Jika PDF sudah selesai dimuat oleh iframe, hilangkan loading
+            viewer.onload = function() {
                 loading.style.display = 'none';
                 viewer.style.display = 'block';
-                viewer.src = pdfUrl;
-            }, 800);
+            };
+
+            // Tembak URL ke iframe untuk memulai proses generate dari Controller
+            viewer.src = pdfUrl;
         });
+    }
+});
     </script>
 @endsection

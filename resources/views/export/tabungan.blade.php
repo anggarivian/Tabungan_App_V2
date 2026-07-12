@@ -86,7 +86,7 @@
                 <p>Cianjur, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
                 <p>Bendahara Sekolah</p>
                 <br><br><br>
-                <p><strong>Tresna Komala, S.Pd</strong></p>
+                <p><strong>___________________</strong></p>
             </td>
         </tr>
     </table>

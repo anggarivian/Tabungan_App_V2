@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SakuRame - Sistem Tabungan Digital Sekolah</title>
 
-    <meta name="theme-color" content="#6777ef"/>
+    <meta name="theme-color" content="#485CBC"/>
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192x192.png') }}">
     <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
@@ -233,144 +233,132 @@
         color: var(--primary);
     }
 
-    /* ===== LOGIN FORM ===== */
-    .login-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
-    }
-
-    .login-header {
-        text-align: left;
-        margin-bottom: 2rem;
-    }
-
-    .welcome-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .welcome-subtitle {
-        color: #475569;
-        font-size: 0.9rem;
-        margin-bottom: 0;
-    }
-
-    /* Login Form Elements */
-    .login-form {
-        width: 100%;
-    }
-
-    .login-form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .login-form-label {
-        display: block;
-        font-weight: 600;
-        color: var(--dark);
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .login-input-wrapper {
+    /* ===== HERO VISUAL (illustration + CTA, replaces the old inline login form) ===== */
+    .hero-visual {
         position: relative;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        border-radius: 10px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        background: #fff;
-    }
-
-    .login-input-wrapper:hover {
-        transform: translateY(-2px);
-        border-color: var(--primary);
-        box-shadow: 0 4px 12px rgba(72, 92, 188, 0.15);
-    }
-
-    .login-input-icon {
-        position: absolute;
-        left: 1rem;
-        color: #475569;
-        font-size: 0.9rem;
-        z-index: 2;
-    }
-
-    .login-form-input {
-        width: 100%;
-        padding: 1rem 1rem 1rem 2.5rem;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        border-radius: 0.75rem;
-        font-size: 0.9rem;
-        background-color: var(--light);
-        font-family: system-ui, sans-serif;
-    }
-
-    .login-form-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        background-color: white;
-        box-shadow: 0 0 0 3px rgba(72, 92, 188, 0.1);
-    }
-
-    .login-form-input::placeholder {
-        color: #94a3b8;
-    }
-
-    .login-password-toggle {
-        position: absolute;
-        right: 1rem;
-        background: none;
-        border: none;
-        color: #475569;
-        cursor: pointer;
-        font-size: 0.9rem;
-        z-index: 2;
-    }
-
-    .login-password-toggle:hover {
-        color: var(--primary);
-    }
-
-    .login-btn {
-        width: 100%;
+        text-align: center;
         padding: 1rem;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        border: none;
-        border-radius: 0.75rem;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-bottom: 1.5rem;
-        font-family: system-ui, sans-serif;
+    }
+
+    .coin-float {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.9), rgba(255,184,76,.35) 55%, transparent 72%);
+        opacity: .55;
+        animation: heroDrift 9s ease-in-out infinite;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .coin-float.a { width: 90px; height: 90px; top: -6px; left: 0; animation-delay: 0s; }
+    .coin-float.b { width: 60px; height: 60px; bottom: 60px; right: -4px; animation-delay: 1.2s; }
+    .coin-float.c { width: 44px; height: 44px; bottom: 0; left: 18%; animation-delay: 2.4s; }
+
+    @keyframes heroDrift {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(8px, -14px); }
+    }
+
+    .hero-illustration {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 1.75rem;
+    }
+
+    .piggy-bob {
+        animation: piggyBob 3.4s ease-in-out infinite;
+        transform-origin: center;
+    }
+
+    @keyframes piggyBob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-7px); }
+    }
+
+    .coin-drop {
+        animation: coinDrop 2.6s ease-in infinite;
+        transform-origin: center;
+    }
+
+    .coin-drop.c2 { animation-delay: .7s; }
+    .coin-drop.c3 { animation-delay: 1.4s; }
+
+    @keyframes coinDrop {
+        0%   { opacity: 0; transform: translate(0, -26px) rotate(-12deg); }
+        25%  { opacity: 1; transform: translate(0, -8px) rotate(-4deg); }
+        70%  { opacity: 1; transform: translate(0, 6px) rotate(4deg); }
+        100% { opacity: 0; transform: translate(0, 14px) rotate(8deg); }
+    }
+
+    .sparkle {
+        animation: sparkleTwinkle 2.2s ease-in-out infinite;
+    }
+
+    .sparkle.s2 { animation-delay: .8s; }
+    .sparkle.s3 { animation-delay: 1.5s; }
+
+    @keyframes sparkleTwinkle {
+        0%, 100% { opacity: .25; transform: scale(.85); }
+        50% { opacity: 1; transform: scale(1); }
+    }
+
+    .hero-cta {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: white;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.02rem;
+        padding: 0.9rem 2.1rem;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 12px 26px -8px rgba(0, 0, 0, 0.35);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .login-btn:hover {
-        background: var(--secondary);
-        transform: translateY(-2px);
-    }
-
-    .login-forgot-password {
-        text-align: center;
-    }
-
-    .login-forgot-password a {
-        color: #475569;
-        text-decoration: none;
-        font-size: 0.85rem;
-    }
-
-    .login-forgot-password a:hover {
+    .hero-cta:hover {
         color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-cta i {
+        transition: transform 0.3s ease;
+    }
+
+    .hero-cta:hover i {
+        transform: translateX(4px);
+    }
+
+    .hero-alert {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 320px;
+        border-radius: 0.75rem;
+        padding: 0.8rem 1rem;
+        font-size: 0.88rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-alert.alert-danger { color: #d32f2f; border-left: 4px solid #d32f2f; }
+    .hero-alert.alert-success { color: #2e7d32; border-left: 4px solid #2e7d32; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .coin-float, .piggy-bob, .coin-drop, .sparkle {
+            animation: none !important;
+        }
     }
 
     /* ===== FOOTER ===== */
@@ -455,17 +443,17 @@
             margin: 0 0.4rem;
         }
 
-        .login-card {
-            margin: 1rem;
-            padding: 1.5rem;
+        .hero-illustration {
+            max-width: 240px;
+        }
+
+        .hero-cta {
+            padding: 0.8rem 1.75rem;
+            font-size: 0.95rem;
         }
 
         .scale-down-mobile {
             transform: scale(0.7);
-        }
-
-        .welcome-title {
-            font-size: 1.3rem;
         }
     }
 
@@ -497,12 +485,8 @@
             font-size: 0.8rem;
         }
 
-        .login-card {
-            padding: 1rem;
-        }
-
-        .welcome-title {
-            font-size: 1.2rem;
+        .hero-illustration {
+            max-width: 200px;
         }
     }
 </style>
@@ -544,24 +528,19 @@
         </div>
     </nav>
 
-    <!-- Hero Section dengan Mini Card Transparan -->
+    <!-- Hero Section dengan Ilustrasi Tabungan -->
     <section class="hero text-white py-7 py-lg-8">
         <div class="container">
             <div class="row align-items-center">
-                <!-- Login Form Section (Pindah ke atas di ponsel) -->
-                <div class="col-lg-6 order-2 order-lg-1 mb-3 mb-lg-0 d-flex align-items-center justify-content-center" data-aos="fade-left">
-                    <div class="login-card">
-                        <!-- Header dengan Logo dan Judul -->
-                        <div class="login-header">
-                            <h2 class="welcome-title">Selamat Datang</h2>
-                            <p class="welcome-subtitle">Silahkan login dengan akun anda.</p>
-                        </div>
+                <!-- Hero Visual Section (Pindah ke atas di ponsel) -->
+                <div class="col-lg-6 order-2 order-lg-1 mb-4 mb-lg-0" data-aos="fade-left">
+                    <div class="hero-visual">
 
                         <!-- Alert Error -->
                         @if(session()->has('LoginError'))
-                            <div class="alert alert-danger d-flex align-items-center">
-                                <ion-icon name="alert-circle-outline" style="font-size: 1.3rem;"></ion-icon>
-                                <span class="ms-2">{{ session('LoginError') }}</span>
+                            <div class="hero-alert alert-danger">
+                                <i class="fas fa-circle-exclamation me-2"></i>
+                                <span>{{ session('LoginError') }}</span>
                             </div>
                         @endif
 
@@ -570,54 +549,93 @@
                             <script>
                                 localStorage.removeItem("pwaPopupShown");
                             </script>
-                            <div class="alert alert-success d-flex align-items-center">
-                                <ion-icon name="checkmark-circle-outline" style="font-size: 1.3rem;"></ion-icon>
-                                <span class="ms-2">Berhasil Logout!</span>
+                            <div class="hero-alert alert-success">
+                                <i class="fas fa-circle-check me-2"></i>
+                                <span>Berhasil Logout!</span>
                             </div>
                         @endif
 
-                        <!-- Form Login -->
-                        <form action="{{ route('getin') }}" method="POST" class="login-form">
-                            @csrf
+                        <span class="coin-float a"></span>
+                        <span class="coin-float b"></span>
+                        <span class="coin-float c"></span>
 
-                            @auth
-                                <a href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}" class="btn btn-secondary w-100">
-                                    Masuk ke Dashboard
-                                </a>
-                            @else
+                        <!-- Ilustrasi 2D: celengan & koin -->
+                        <svg class="hero-illustration" viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi celengan dan koin tabungan">
+                            <ellipse cx="215" cy="292" rx="118" ry="16" fill="rgba(15,23,42,0.08)"/>
 
-                                <div class="login-form-group">
-                                    <label class="login-form-label">Username / ID Tabungan</label>
-                                    <div class="login-input-wrapper">
-                                        <i class="fas fa-user login-input-icon"></i>
-                                        <input type="text" class="login-form-input" name="username"
-                                            placeholder="Masukkan username atau ID" required>
-                                    </div>
-                                </div>
+                            <g class="coin-drop c1">
+                                <circle cx="190" cy="82" r="17" fill="var(--accent)"/>
+                                <circle cx="190" cy="82" r="17" fill="none" stroke="#C9861E" stroke-width="2"/>
+                                <line x1="181" y1="82" x2="199" y2="82" stroke="#C9861E" stroke-width="2" stroke-linecap="round"/>
+                            </g>
+                            <g class="coin-drop c2">
+                                <circle cx="219" cy="58" r="13" fill="var(--accent)"/>
+                                <circle cx="219" cy="58" r="13" fill="none" stroke="#C9861E" stroke-width="1.6"/>
+                                <line x1="213" y1="58" x2="225" y2="58" stroke="#C9861E" stroke-width="1.6" stroke-linecap="round"/>
+                            </g>
+                            <g class="coin-drop c3">
+                                <circle cx="246" cy="88" r="11" fill="var(--accent)"/>
+                                <circle cx="246" cy="88" r="11" fill="none" stroke="#C9861E" stroke-width="1.4"/>
+                                <line x1="241" y1="88" x2="251" y2="88" stroke="#C9861E" stroke-width="1.4" stroke-linecap="round"/>
+                            </g>
 
-                                <div class="login-form-group">
-                                    <label class="login-form-label">Password</label>
-                                    <div class="login-input-wrapper position-relative">
-                                        <i class="fas fa-lock login-input-icon"></i>
-                                        <input type="password" class="login-form-input" name="password"
-                                            placeholder="••••••••" required id="passwordInput">
-                                        <button type="button" class="login-password-toggle" id="togglePassword" style="background: none; border: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
-                                            <i class="fas fa-eye" id="eyeIcon"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <g class="piggy-bob">
+                                <!-- kaki -->
+                                <rect x="138" y="245" width="18" height="30" rx="8" fill="var(--secondary)"/>
+                                <rect x="182" y="252" width="16" height="24" rx="8" fill="var(--secondary)"/>
+                                <rect x="255" y="252" width="16" height="24" rx="8" fill="var(--secondary)"/>
+                                <rect x="296" y="245" width="18" height="30" rx="8" fill="var(--secondary)"/>
 
-                                <button type="submit" class="login-btn">
-                                    Masuk
-                                </button>
-                            @endauth
+                                <!-- ekor -->
+                                <path d="M318 178 Q340 168 332 152 Q326 142 336 136" stroke="var(--secondary)" stroke-width="6" fill="none" stroke-linecap="round"/>
 
-                            <div class="login-forgot-password mt-2 text-center">
-                                <a href="#">
-                                    Lupa Password? Segera Hubungi Bendahara.
-                                </a>
-                            </div>
-                        </form>
+                                <!-- badan -->
+                                <ellipse cx="220" cy="195" rx="118" ry="80" fill="var(--primary)"/>
+
+                                <!-- highlight perut -->
+                                <ellipse cx="240" cy="225" rx="70" ry="34" fill="rgba(255,255,255,0.15)"/>
+
+                                <!-- telinga -->
+                                <path d="M170 130 L157 90 L200 122 Z" fill="var(--secondary)"/>
+                                <path d="M215 120 L212 84 L245 112 Z" fill="var(--secondary)"/>
+
+                                <!-- lubang koin -->
+                                <rect x="196" y="118" width="46" height="10" rx="5" fill="#1e293b" opacity="0.55"/>
+
+                                <!-- moncong -->
+                                <ellipse cx="105" cy="205" rx="34" ry="26" fill="var(--secondary)"/>
+                                <circle cx="93" cy="205" r="4" fill="#1e293b" opacity="0.5"/>
+                                <circle cx="115" cy="205" r="4" fill="#1e293b" opacity="0.5"/>
+
+                                <!-- mata -->
+                                <path d="M148 168 Q155 161 162 168" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+                                <!-- pipi -->
+                                <ellipse cx="150" cy="190" rx="10" ry="6" fill="var(--accent)" opacity="0.35"/>
+                            </g>
+
+                            <g class="sparkle s1" fill="var(--accent)">
+                                <path d="M95 140 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 z"/>
+                            </g>
+                            <g class="sparkle s2" fill="var(--accent)">
+                                <path d="M348 245 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z"/>
+                            </g>
+                            <g class="sparkle s3" fill="var(--accent)">
+                                <path d="M75 230 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z"/>
+                            </g>
+                        </svg>
+
+                        @auth
+                            <a href="{{ route(Auth::user()->roles_id == 1 ? 'kepsek.dashboard' : (Auth::user()->roles_id == 2 ? 'bendahara.dashboard' : (Auth::user()->roles_id == 3 ? 'walikelas.dashboard' : 'siswa.dashboard'))) }}" class="hero-cta">
+                                Lanjut ke Dashboard
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        @else
+                            <a href="/login" class="hero-cta">
+                                Masuk ke Akun
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        @endauth
 
                     </div>
                 </div>
@@ -696,23 +714,6 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const togglePassword = document.getElementById("togglePassword");
-        const passwordInput = document.getElementById("passwordInput");
-        const eyeIcon = document.getElementById("eyeIcon");
-
-        togglePassword.addEventListener("click", function () {
-            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-            passwordInput.setAttribute("type", type);
-
-            // Toggle icon class
-            eyeIcon.classList.toggle("fa-eye");
-            eyeIcon.classList.toggle("fa-eye-slash");
-        });
-    });
-</script>
 
     <script>
         if ("serviceWorker" in navigator) {
@@ -822,53 +823,6 @@
             } else {
                 alert("Install tidak tersedia di browser ini. Silakan gunakan Chrome atau Edge.");
             }
-        });
-    </script>
-    <script>
-        // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        });
-    </script>
-    <script>
-        // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('passwordInput');
-            const eyeIcon = document.getElementById('eyeIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        });
-    </script>
-
-    <!-- Toggle Password Script -->
-    <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const passwordInput = document.getElementById('passwordInput');
-            const eyeIcon = document.getElementById('eyeIcon');
-            const isPassword = passwordInput.type === 'password';
-
-            passwordInput.type = isPassword ? 'text' : 'password';
-            eyeIcon.classList.toggle('fa-eye');
-            eyeIcon.classList.toggle('fa-eye-slash');
         });
     </script>
 </body>

@@ -97,6 +97,33 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
     <div class="card stat-card shadow-sm border-0">
         <div class="card-body p-4">
             <div class="row g-4">
@@ -196,7 +223,7 @@
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <a href="{{ route('bendahara.tabungan.index') }}" class="btn btn-light px-4">Batal</a>
-                            <button type="submit" class="btn btn-danger px-5"><i class="bi bi-box-arrow-right me-2"></i>Tarik Dana</button>
+                            <button type="submit" class="btn btn-danger px-5" {{ $isReadOnly ? 'disabled' : '' }}><i class="bi bi-box-arrow-right me-2"></i>Tarik Dana</button>
                         </div>
                     </form>
                 </div>

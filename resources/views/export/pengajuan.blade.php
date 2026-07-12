@@ -88,9 +88,9 @@
         <tr>
             <td>
                 <p>Cianjur, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
-                <p>Kepala Sekolah</p>
+                <p>Bendahara Sekolah</p>
                 <br><br><br>
-                <p><strong>SUHENDI YUSUF, S.Pd, MM</strong></p>
+                <p><strong>___________________</strong></p>
             </td>
         </tr>
     </table>

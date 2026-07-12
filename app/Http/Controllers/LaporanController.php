@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Kelas;
 use App\Models\Rombel;
 use App\Models\Periode;
+use App\Models\Tabungan;
 use App\Models\Pengajuan;
 use App\Models\Transaksi;
 use App\Helpers\PeriodeHelper;
@@ -184,25 +185,25 @@ class LaporanController extends Controller
         $perPage       = $request->input('perPage', 10);
 
         $periodeList   = \App\Models\Periode::orderBy('tanggal_mulai', 'desc')->get();
-        $periodeId     = $request->input('periode_id', PeriodeHelper::id());
+        $periodeId     = $request->input('periode_id', \App\Helpers\PeriodeHelper::id());
 
         // Rombel yang tersedia mengikuti periode yang lagi dipilih
         $rombelList    = \App\Models\Rombel::where('periode_id', $periodeId)->orderBy('name')->get();
 
-        $query = Pengajuan::with(['user.rombels.kelas', 'user.tabungan' => function ($q) use ($periodeId) {
+        $query = \App\Models\Pengajuan::with(['user.rombels.kelas', 'user.tabungan' => function ($q) use ($periodeId) {
                 $q->where('periode_id', $periodeId);
             }])
             ->where('periode_id', $periodeId)
             ->when($search, function ($q) use ($search) {
                 $q->whereHas('user', function ($qq) use ($search) {
                     $qq->where('name', 'like', "%{$search}%")
-                    ->orWhere('username', 'like', "%{$search}%");
+                       ->orWhere('username', 'like', "%{$search}%");
                 });
             })
             ->when($rombel, function ($q) use ($rombel, $periodeId) {
                 $q->whereHas('user.rombels', function ($qq) use ($rombel, $periodeId) {
                     $qq->where('rombels.id', $rombel)
-                    ->where('rombels.periode_id', $periodeId);
+                       ->where('rombels.periode_id', $periodeId);
                 });
             })
             ->when($status, function ($q) use ($status) {
@@ -738,34 +739,88 @@ class LaporanController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function lap_siswa_transaksi(Request $request){
-        $tipeTransaksi = $request->input('tipe_transaksi');
+    public function lap_siswa_transaksi(Request $request)
+    {
+        $tipeTransaksi  = $request->input('tipe_transaksi');
         $tipePembayaran = $request->input('tipe_pembayaran');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        $perPage = request('perPage', 10);
+        $sortTanggal    = $request->input('sort_tanggal', 'asc'); // asc = urutan buku tabungan (lama -> baru)
+        $startDate      = $request->input('start_date');
+        $endDate        = $request->input('end_date');
+        $perPage        = $request->input('perPage', 10);
 
-        $transaksi = Transaksi::with(['user.kelas'])
-            ->whereHas('user', function ($query) {
-                $query->where('id', auth()->id());
-            })
-            ->when($tipeTransaksi, function ($query) use ($tipeTransaksi) {
-                $query->where('tipe_transaksi', $tipeTransaksi);
-            })
-            ->when($tipePembayaran, function ($query) use ($tipePembayaran) {
-                $query->where('pembayaran', $tipePembayaran);
-            })
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
+        $userId = auth()->id();
+
+        // Daftar periode dimana siswa ini pernah punya tabungan, + selalu sertakan periode aktif
+        // walau siswa belum punya row tabungan disitu (misal baru daftar)
+        $periodeIds = Tabungan::where('user_id', $userId)
+            ->pluck('periode_id')
+            ->push(PeriodeHelper::id()) // pastikan periode aktif selalu muncul walau belum ada tabungan
+            ->filter()
+            ->unique();
+
+        $periodeList = Periode::whereIn('id', $periodeIds)
+            ->orderByDesc('tanggal_mulai')
+            ->get();
+
+        $selectedPeriodeId = $request->input('periode_id') ?? PeriodeHelper::id();
+
+        $query = Transaksi::where('user_id', $userId)
+            ->where('periode_id', $selectedPeriodeId)
             ->where('status', 'success')
-            ->orderBy('created_at', 'asc')
-            ->paginate($perPage);
+            ->when($tipeTransaksi, fn ($q) => $q->where('tipe_transaksi', $tipeTransaksi))
+            ->when($tipePembayaran, fn ($q) => $q->where('pembayaran', $tipePembayaran))
+            ->when($startDate, fn ($q) => $q->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn ($q) => $q->whereDate('created_at', '<=', $endDate));
 
-        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
-        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+        if (in_array($sortTanggal, ['asc', 'desc'])) {
+            $query->orderBy('created_at', $sortTanggal);
+        } else {
+            $query->orderBy('created_at', 'asc');
+        }
 
-        return view('siswa.laporan.lap_transaksi', compact('transaksi', 'saldoTunai', 'saldoDigital'));
+        // Summary sesuai filter aktif, dalam periode yang sedang dilihat
+        $totalTransaksi = (clone $query)->count();
+        $totalStor  = (clone $query)->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi');
+        $totalTarik = (clone $query)->where('tipe_transaksi', 'tarik')->sum('jumlah_transaksi');
+
+        // fix bug lama: dulu salah query kolom (tipe_transaksi bukan pembayaran).
+        // sekarang hitung saldo bersih (stor - tarik) per metode pembayaran, dalam periode terpilih
+        $saldoTunai = Transaksi::where('user_id', $userId)
+                ->where('periode_id', $selectedPeriodeId)
+                ->where('status', 'success')
+                ->where('pembayaran', 'Tunai')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi')
+            - Transaksi::where('user_id', $userId)
+                ->where('periode_id', $selectedPeriodeId)
+                ->where('status', 'success')
+                ->where('pembayaran', 'Tunai')->where('tipe_transaksi', 'tarik')->sum('jumlah_transaksi');
+
+        $saldoDigital = Transaksi::where('user_id', $userId)
+                ->where('periode_id', $selectedPeriodeId)
+                ->where('status', 'success')
+                ->where('pembayaran', 'Digital')->where('tipe_transaksi', 'stor')->sum('jumlah_transaksi')
+            - Transaksi::where('user_id', $userId)
+                ->where('periode_id', $selectedPeriodeId)
+                ->where('status', 'success')
+                ->where('pembayaran', 'Digital')->where('tipe_transaksi', 'tarik')->sum('jumlah_transaksi');
+
+        // Saldo tabungan saat ini (periode yang sedang dilihat)
+        $tabunganPeriodeIni = Tabungan::where('user_id', $userId)
+            ->where('periode_id', $selectedPeriodeId)
+            ->first();
+
+        // Info rombel siswa DI PERIODE YANG SEDANG DILIHAT (bukan rombel sekarang),
+        // biar histori periode lama tetap nunjukin kelas yang benar waktu itu
+        $rombelInfo = auth()->user()->rombels()
+            ->wherePivot('periode_id', $selectedPeriodeId)
+            ->first();
+
+        $transaksi = $query->paginate($perPage)->withQueryString();
+
+        return view('siswa.laporan.lap_transaksi', compact(
+            'transaksi', 'periodeList', 'selectedPeriodeId',
+            'totalTransaksi', 'totalStor', 'totalTarik',
+            'saldoTunai', 'saldoDigital', 'tabunganPeriodeIni', 'rombelInfo'
+        ));
     }
 
     /**
@@ -775,33 +830,70 @@ class LaporanController extends Controller
     * @return \Illuminate\Http\RedirectResponse
     */
 
-    public function lap_siswa_pengajuan(Request $request){
-        $status = $request->input('status');
+    public function lap_siswa_pengajuan(Request $request)
+    {
+        $status        = $request->input('status');
         $sortPenarikan = $request->input('sort_penarikan');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        $sortDate      = $request->input('sort_date', 'desc');
+        $startDate     = $request->input('start_date');
+        $endDate       = $request->input('end_date');
+        $perPage       = $request->input('perPage', 10);
 
-        $perPage = request('perPage', 10);
+        $userId = auth()->id();
 
-        $pengajuan = Pengajuan::with(['user.kelas'])
-            ->whereHas('user', function ($query) {
-                $query->where('id', auth()->id());  // Filter data berdasarkan user yang login
-            })
-            ->when($status, function ($query) use ($status) {
-                $query->where('status', $status);
-            })
-            ->when($sortPenarikan, function ($query) use ($sortPenarikan) {
-                $query->orderBy('jumlah_penarikan', $sortPenarikan);
-            })
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
-            ->paginate($perPage);
+        // Daftar periode dimana siswa ini pernah punya tabungan, + selalu sertakan periode aktif
+        $periodeIds = Tabungan::where('user_id', $userId)
+            ->pluck('periode_id')
+            ->push(PeriodeHelper::id())
+            ->filter()
+            ->unique();
 
-        $saldoTunai = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Tunai')->sum('jumlah_transaksi');
-        $saldoDigital = Transaksi::where('user_id', auth()->id())->where('tipe_transaksi', 'Digital')->sum('jumlah_transaksi');
+        $periodeList = Periode::whereIn('id', $periodeIds)
+            ->orderByDesc('tanggal_mulai')
+            ->get();
 
-        return view('siswa.laporan.lap_pengajuan', compact('pengajuan', 'saldoTunai', 'saldoDigital'));
+        $selectedPeriodeId = $request->input('periode_id') ?? PeriodeHelper::id();
+
+        $query = Pengajuan::with(['user.tabungan' => function ($q) use ($selectedPeriodeId) {
+                $q->where('periode_id', $selectedPeriodeId);
+            }])
+            ->where('user_id', $userId)
+            ->where('periode_id', $selectedPeriodeId)
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($startDate, fn ($q) => $q->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn ($q) => $q->whereDate('created_at', '<=', $endDate));
+
+        if (in_array($sortPenarikan, ['asc', 'desc'])) {
+            $query->orderBy('jumlah_penarikan', $sortPenarikan);
+        } elseif (in_array($sortDate, ['asc', 'desc'])) {
+            $query->orderBy('created_at', $sortDate);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Summary sesuai filter aktif, dalam periode yang sedang dilihat
+        $totalPengajuan = (clone $query)->count();
+        $totalPending   = (clone $query)->where('status', 'Pending')->count();
+        $totalDiterima  = (clone $query)->whereIn('status', ['Terima', 'Diterima', 'SUCCEEDED'])->count();
+        $totalDitolak   = (clone $query)->whereIn('status', ['Tolak', 'tolak'])->count();
+
+        // Saldo tabungan siswa di periode yang sedang dilihat (bukan hasil query salah kolom seperti sebelumnya)
+        $tabunganPeriodeIni = Tabungan::where('user_id', $userId)
+            ->where('periode_id', $selectedPeriodeId)
+            ->first();
+
+        // Info rombel siswa di periode yang sedang dilihat
+        $rombelInfo = auth()->user()->rombels()
+            ->wherePivot('periode_id', $selectedPeriodeId)
+            ->first();
+
+        $pengajuan = $query->paginate($perPage)->withQueryString();
+
+        return view('siswa.laporan.lap_pengajuan', compact(
+            'pengajuan', 'periodeList', 'selectedPeriodeId',
+            'totalPengajuan', 'totalPending', 'totalDiterima', 'totalDitolak',
+            'tabunganPeriodeIni', 'rombelInfo'
+        ));
     }
 
     /**
@@ -813,9 +905,21 @@ class LaporanController extends Controller
 
     public function lap_siswa_export(Request $request)
     {
-        $siswas = auth()->user();
-        $kelas = Kelas::all();
+        $user = auth()->user();
 
-        return view('siswa.laporan.export', compact('siswas', 'kelas'));
+        // Ambil semua periode yang relevan buat siswa ini:
+        // - periode dimana dia pernah punya row tabungan
+        // - selalu sertakan periode aktif, walau belum ada tabungan sama sekali di situ
+        $periodeIds = Tabungan::where('user_id', $user->id)
+            ->pluck('periode_id')
+            ->push(PeriodeHelper::id())
+            ->filter()
+            ->unique();
+
+        $periodes = Periode::whereIn('id', $periodeIds)
+            ->orderByDesc('tanggal_mulai')
+            ->get();
+
+        return view('siswa.laporan.export', compact('user', 'periodes'));
     }
 }

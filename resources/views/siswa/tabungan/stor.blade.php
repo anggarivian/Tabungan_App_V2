@@ -5,7 +5,6 @@
 @section('content')
 <style>
     .success-details {
-        background-color: #f1f5f9;
         padding: 15px 20px;
         border-radius: 8px;
         margin-bottom: 25px;
@@ -33,54 +32,88 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
     <div class="row">
-        @if($invoice != null)
+
+        {{-- SKENARIO 1: STATUS PROCESSING --}}
+        @if($transaksiAktif && $transaksiAktif->status == 'processing')
             <div class="col-12">
-                <div class="card stat-card shadow-sm mb-4">
+                <div class="card shadow border-info mb-4">
+                    <div class="card-body p-5 text-center">
+                        <div class="spinner-border text-info mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                        <h4 class="fw-bold text-info">Pembayaran Sedang Diproses</h4>
+                        <p class="text-muted">Sistem kami sedang memverifikasi pembayaran Anda dengan pihak bank/payment gateway. Saldo Anda akan bertambah otomatis setelah verifikasi selesai.</p>
+                        <button onclick="window.location.reload()" class="btn btn-outline-info mt-2">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Muat Ulang Halaman
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        {{-- SKENARIO 2: STATUS PENDING (INVOICE AKTIF) --}}
+        @elseif($transaksiAktif && $transaksiAktif->status == 'pending' && $invoice != null)
+            <div class="col-12">
+                <div class="card shadow mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold text-primary mb-3">Lanjutkan Pembayaran Anda</h5>
                         <p>Berikut data stor transaksi Anda yang belum diselesaikan:</p>
-                        <p class="mb-4">Saldo Anda Saat Ini: <strong>Rp {{ number_format($nominal, 0, ',', '.') }}</strong> <br><small class="text-muted">({{ $terbilang }})</small></p>
                         
-                        <div class="success-details">
+                        <div class="success-details p-3 rounded mb-3">
                             <div class="row mb-2">
                                 <div class="col-md-4 text-muted">Nomor Invoice:</div>
                                 <div class="col-md-8 fw-bold">{{ $invoice['external_id'] }}</div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-md-4 text-muted">Nama:</div>
-                                <div class="col-md-8">{{ auth()->user()->name }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4 text-muted">Kelas / Rombel:</div>
-                                <div class="col-md-8">{{ $rombel->name ?? 'Belum ada kelas' }}</div>
-                            </div>
-                            <div class="row mb-2">
                                 <div class="col-md-4 text-muted">Jumlah Setoran:</div>
                                 <div class="col-md-8 fw-bold text-success">Rp {{ number_format($invoice['amount'], 0, ',', '.') }}</div>
                             </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4 text-muted">Status:</div>
-                                <div class="col-md-8">
-                                    <span class="badge bg-warning ">Menunggu Pembayaran</span>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-md-4 text-muted">Batas Waktu:</div>
-                                <div class="col-md-8 text-danger fw-medium">
-                                    {{ $invoice['expiry_date_carbon']->format('d M Y, H:i') }}
-                                    ({{ $invoice['expiry_date_carbon']->diffForHumans() }})
+                                <div class="col-md-8 text-danger fw-bold">
+                                    {{ $invoice['expiry_date_carbon']->format('d M Y, H:i') }} WIB 
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <a href="{{ $invoice['invoice_url'] }}" class="btn btn-primary flex-fill">Lanjutkan Pembayaran</a>
-                            <button class="btn btn-secondary flex-fill" onclick="openBatalModal({{ auth()->user()->id }})">Batalkan Transaksi</button>
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <a href="{{ $invoice['invoice_url'] }}" target="_blank" class="btn btn-primary flex-fill fw-bold" {{ $isReadOnly ? 'disabled' : '' }}>
+                                Lanjutkan Pembayaran
+                            </a>
+                            <button class="btn btn-outline-danger flex-fill fw-bold" onclick="openBatalModal({{ auth()->user()->id }})" {{ $isReadOnly ? 'disabled' : '' }}>
+                                Batalkan Transaksi
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+
+        {{-- SKENARIO 3: TIDAK ADA TRANSAKSI AKTIF (TAMPILKAN FORM) --}}
         @else
             <div class="col-12 col-md-8">
                 <div class="card stat-card shadow-sm">
@@ -106,21 +139,21 @@
                             <div class="mb-3 row">
                                 <label class="col-sm-4 col-form-label text-muted">ID / Username</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control " value="{{ auth()->user()->username }}" readonly>
+                                    <input type="text" class="form-control" value="{{ auth()->user()->username }}" readonly>
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
                                 <label class="col-sm-4 col-form-label text-muted">Nama Lengkap</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control " value="{{ auth()->user()->name }}" readonly>
+                                    <input type="text" class="form-control" value="{{ auth()->user()->name }}" readonly>
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
                                 <label class="col-sm-4 col-form-label text-muted">Rombel Aktif</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control " value="{{ $rombel->name ?? 'Belum ada rombel' }}" readonly>
+                                    <input type="text" class="form-control" value="{{ $rombel->name ?? 'Belum ada rombel' }}" readonly>
                                 </div>
                             </div>
 
@@ -128,8 +161,8 @@
                                 <label class="col-sm-4 col-form-label text-muted">Tabungan Saat Ini</label>
                                 <div class="col-sm-8">
                                     <div class="input-group mb-1">
-                                        <span class="input-group-text ">Rp</span>
-                                        <input type="text" class="form-control  fw-bold" value="{{ number_format($nominal, 0, ',', '.') }}" readonly>
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" class="form-control fw-bold" value="{{ number_format($nominal, 0, ',', '.') }}" readonly>
                                     </div>
                                     <small class="fst-italic text-muted">*{{ $terbilang }}</small>
                                 </div>
@@ -148,7 +181,7 @@
                             <div class="row">
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-8">
-                                    <button class="btn btn-primary w-100 py-2 fw-bold" type="submit">
+                                    <button class="btn btn-primary w-100 py-2 fw-bold" type="submit" {{ $isReadOnly ? 'disabled' : '' }}>
                                         <i class="bi bi-shield-check me-2"></i> Lanjutkan Pembayaran
                                     </button>
                                 </div>
@@ -187,12 +220,13 @@
 
                         <div class="alert alert-warning py-2 small mb-0" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                            Perhatikan bahwa metode <strong>Digital</strong> dapat memiliki biaya administrasi antara Rp 1.000 ~ Rp 5.000 yang dibebankan oleh payment gateway.
+                            Metode <strong>Digital</strong> dapat memiliki biaya administrasi antara Rp 1.000 ~ Rp 5.000 yang dibebankan oleh payment gateway.
                         </div>
                     </div>
                 </div>
             </div>
         @endif
+
     </div>
 </div>
 
@@ -212,7 +246,7 @@
                 <form id="batalForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger px-4">Ya, Batalkan</button>
+                    <button type="submit" class="btn btn-danger px-4" {{ $isReadOnly ? 'disabled' : '' }}>Ya, Batalkan</button>
                 </form>
             </div>
         </div>

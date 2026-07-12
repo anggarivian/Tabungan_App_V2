@@ -427,7 +427,7 @@
                                         {{ $pengajuans->user->rombels->first()->name ?? '-' }}
                                     </span>
                                 </td>
-                                <td class="text-end">Rp {{ number_format($pengajuans->user->tabungan->saldo ?? 0, 0, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($pengajuans->user?->tabungan?->first()?->saldo ?? 0, 0, ',', '.') }}</td>
                                 <td class="text-end fw-bold">Rp {{ number_format($pengajuans->jumlah_penarikan ?? 0, 0, ',', '.') }}</td>
                                 <td class="text-center">
                                     @if (in_array($pengajuans->status, ['Pending', 'pending']))

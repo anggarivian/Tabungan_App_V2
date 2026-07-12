@@ -70,45 +70,15 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/></svg>
                             </div>
                             <div>
-                                <h6 class="text-muted mb-1 font-semibold">Total Saldo Aktif</h6>
+                                <h6 class="text-muted mb-1 font-semibold">Total Saldo</h6>
                                 <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo) }}</h5>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Card Saldo Tunai --}}
-                <div class="col-6 col-md-4 mt-3">
-                    <div class="card stat-card shadow-sm h-100 mb-0">
-                        <div class="card-body p-4 d-flex align-items-center">
-                            <div class="icon-box bg-green-light me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/></svg>
-                            </div>
-                            <div>
-                                <h6 class="text-muted mb-1 font-semibold">Saldo Tunai</h6>
-                                <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_tunai) }}</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Card Saldo Digital --}}
-                <div class="col-6 col-md-4 mt-3">
-                    <div class="card stat-card shadow-sm h-100 mb-0">
-                        <div class="card-body p-4 d-flex align-items-center">
-                            <div class="icon-box bg-purple-light me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2Zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7Z"/><path d="M2 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
-                            </div>
-                            <div>
-                                <h6 class="text-muted mb-1 font-semibold">Saldo Digital</h6>
-                                <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_digital) }}</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Card Uang Masuk --}}
-                <div class="col-12 col-md-6 mt-3">
+                <div class="col-12 col-md-4 mt-3">
                     <div class="card stat-card shadow-sm h-100 mb-0">
                         <div class="card-body p-4 d-flex align-items-center">
                             <div class="icon-box bg-green-light me-3">
@@ -124,7 +94,7 @@
                 </div>
 
                 {{-- Card Uang Keluar --}}
-                <div class="col-12 col-md-6 mt-3">
+                <div class="col-12 col-md-4 mt-3">
                     <div class="card stat-card shadow-sm h-100 mb-0">
                         <div class="card-body p-4 d-flex align-items-center">
                             <div class="icon-box bg-red-light me-3">

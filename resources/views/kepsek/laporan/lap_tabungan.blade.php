@@ -333,7 +333,8 @@
                     <tbody>
                         @forelse ($user as $index => $users)
                             @php 
-                                $kodeUnik = $users->rombel->first()->pivot->kode ?? $users->username; 
+                                // Menggunakan null-safe operator (?->) agar tidak crash jika data rombel kosong
+                                $kodeUnik = $users->rombel->first()?->pivot?->kode ?? $users->username; 
                             @endphp
                             <tr>
                                 <td class="text-center">{{ $user->firstItem() + $index }}</td>
@@ -346,8 +347,9 @@
                                         {{ $users->rombel->first()->name ?? '-' }}
                                     </span>
                                 </td>
+                                {{-- Menampilkan hasil dari properti total_saldo hasil denganSum --}}
                                 <td class="text-end fw-bold pe-4">
-                                    Rp {{ number_format($users->tabungan->saldo ?? 0, 0, ',', '.') }}
+                                    Rp {{ number_format($users->total_saldo ?? 0, 0, ',', '.') }}
                                 </td>
                             </tr>
                         @empty

@@ -15,7 +15,7 @@
     .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
 </style>
 
-@php
+@php    
     // Persiapan data agar sesuai dengan struktur database baru (Multi-periode)
     $periodeAktif = \App\Helpers\PeriodeHelper::id();
     $userId = auth()->user()->id;
@@ -52,91 +52,109 @@
 </div>
 
 <div class="page-content">
-    <div class="row">
-        <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-            <div class="card stat-card shadow-sm">
-                <div class="card-body">
-                    @if(session('success'))
-                        <div id="alert" class="alert alert-{{ session('alert-type') }} alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle me-1"></i> {{ session('alert-message') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle me-1"></i> {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                    @if($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
-                            <strong>Terjadi Kesalahan!</strong>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
 
-                    @if($pengajuan && $pengajuan->status == 'Pending')
-                        <h5 class="fw-bold mb-3 text-primary">Menunggu Proses Bendahara</h5>
-                        <p>Detail Pengajuan Penarikan Tabungan :</p>
-                        <div class="success-details">
-                            <table class="table table-borderless mb-0">
-                                @php
-                                    $jumlahTarik = $pengajuan->jumlah_penarikan;
-                                    $biayaAdmin = ceil(($jumlahTarik * 0.05) / 1000) * 1000;
-                                @endphp
-                                <tr>
-                                    <th>ID Tabungan</th>
-                                    <td>{{ $pengajuan->user->username }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Jumlah Penarikan</th>
-                                    <td>Rp. {{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Biaya Admin (5%)<br><small class="text-muted">*Belum termasuk biaya gateway digital</small></th>
-                                    <td>Rp. {{ number_format($biayaAdmin, 0, ',', '.') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Pembayaran</th>
-                                    <td>
-                                        <span class="badge {{ $pengajuan->pembayaran == 'Tunai' ? 'bg-success' : 'bg-primary' }}">
-                                            {{ $pengajuan->pembayaran }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                @if($pengajuan->pembayaran == 'Digital')
-                                    <tr>
-                                        <th>Jalur Transaksi</th>
-                                        <td>{{ $pengajuan->metode_digital == 'bank_transfer' ? 'Transfer Bank' : 'E-Wallet' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Penyedia Layanan</th>
-                                        <td>{{ $pengajuan->metode_digital == 'bank_transfer' ? $pengajuan->bank_code : $pengajuan->ewallet_type }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Nomor Tujuan</th>
-                                        <td class="fw-bold">{{ $pengajuan->metode_digital == 'bank_transfer' ? $pengajuan->nomor_rekening : $pengajuan->ewallet_number }}</td>
-                                    </tr>
-                                @endif
-                                <tr>
-                                    <th>Alasan</th>
-                                    <td>{{ $pengajuan->alasan }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Dibuat Pada</th>
-                                    <td>{{ \Carbon\Carbon::parse($pengajuan->created_at)->format('d M Y H:i') }}</td>
-                                </tr>
-                            </table>
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
+    <div class="row">
+        <div class="col-12 col-md-8">
+            
+            {{-- WADAH CARD STATUS (Akan disembunyikan oleh JS jika tombol tutup diklik) --}}
+            <div id="status-card-container">
+                @if($pengajuan && $pengajuan->status == 'Pending')
+                    <div class="card shadow border-warning mb-4">
+                        <div class="card-body p-5 text-center">
+                            <i class="bi bi-hourglass-split text-warning display-1 mb-3 d-block"></i>
+                            <h4 class="fw-bold">Menunggu Persetujuan Bendahara</h4>
+                            <p class="text-muted mb-4">Pengajuan penarikan tabungan sebesar <strong>Rp {{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</strong> sedang dalam tahap peninjauan. Mohon ditunggu.</p>
+                            <button class="btn btn-outline-danger fw-bold px-4" onclick="openBatalModal({{ $pengajuan->id }})" {{ $isReadOnly ? 'disabled' : '' }}>Batalkan Pengajuan</button>
                         </div>
-                        <button class="btn btn-danger w-100 fw-bold" onclick="openBatalModal({{ $pengajuan->id }})">
-                            <i class="bi bi-x-circle me-1"></i> Batalkan Pengajuan
-                        </button>
-                    @else
+                    </div>
+
+                @elseif($pengajuan && $pengajuan->status == 'PROCESSING')
+                    <div class="card shadow border-info mb-4">
+                        <div class="card-body p-5 text-center">
+                            <div class="spinner-grow text-info mb-3" style="width: 4rem; height: 4rem;" role="status"></div>
+                            <h4 class="fw-bold text-info">Transfer Sedang Diproses</h4>
+                            <p class="text-muted mb-0">Bendahara telah menyetujui pengajuan Anda. Sistem sedang mentransfer dana secara otomatis ke rekening/e-wallet Anda melalui Xendit.</p>
+                            <button onclick="window.location.reload()" class="btn btn-info text-white mt-4 px-4 fw-bold">Muat Ulang Status</button>
+                        </div>
+                    </div>
+
+                @elseif($pengajuan && in_array($pengajuan->status, ['SUCCEEDED', 'Diterima']))
+                    <div class="card shadow border-success mb-4">
+                        <div class="card-body p-5 text-center bg-success bg-opacity-10 rounded">
+                            <i class="bi bi-check-circle-fill text-success display-1 mb-3 d-block"></i>
+                            <h4 class="fw-bold text-success">Penarikan Berhasil!</h4>
+                            <p class="text-dark mb-4">Dana tabungan Anda sebesar <strong>Rp {{ number_format($pengajuan->jumlah_penarikan, 0, ',', '.') }}</strong> telah berhasil dicairkan.</p>
+                            <button onclick="tampilkanForm()" class="btn btn-success px-4 fw-bold" {{ $isReadOnly ? 'disabled' : '' }}>Tutup & Ajukan Baru</button>
+                        </div>
+                    </div>
+
+                @elseif($pengajuan && $pengajuan->status == 'Tolak')
+                    <div class="card shadow border-danger mb-4">
+                        <div class="card-body p-5 text-center bg-danger bg-opacity-10 rounded">
+                            <i class="bi bi-x-octagon-fill text-danger display-1 mb-3 d-block"></i>
+                            <h4 class="fw-bold text-danger">Pengajuan Ditolak</h4>
+                            <p class="text-dark mb-4">Mohon maaf, pengajuan penarikan Anda belum dapat disetujui oleh Bendahara. Silakan periksa kembali alasan Anda dan coba lagi.</p>
+                            <button onclick="tampilkanForm()" class="btn btn-danger px-4 fw-bold" {{ $isReadOnly ? 'disabled' : '' }}>Ajukan Ulang</button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- WADAH FORM TARIK --}}
+            {{-- Form hanya otomatis tampil jika tidak ada pengajuan, atau pengajuan terakhir statusnya 'Batal' --}}
+            <div id="form-tarik-container" style="display: {{ (!$pengajuan || $pengajuan->status == 'Batal') ? 'block' : 'none' }};">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body">
+                        @if(session('success'))
+                            <div id="alert" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle me-1"></i> {{ session('alert-message') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-1"></i> {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+                        @if($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show pb-1" role="alert">
+                                <strong>Terjadi Kesalahan!</strong>
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <form action="{{ route('siswa.tabungan.ajukan') }}" method="POST">
                             @csrf
                             <h5 class="fw-bold text-primary mb-4">Form Tarik Tabungan Tunai/Digital</h5>
@@ -167,7 +185,7 @@
                                 <div class="col-sm-8">
                                     <div class="input-group mb-1">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" class="form-control fw-bold" value="{{ number_format($saldoSaatIni, 0, ',', '.') }}" readonly>
+                                        <input type="text" class="form-control fw-bold" value="{{ number_format($nominal, 0, ',', '.') }}" readonly>
                                     </div>
                                     <small class="fst-italic text-muted">*{{ $terbilang }}</small>
                                 </div>
@@ -178,7 +196,7 @@
                                 <div class="col-sm-8">
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="number" class="form-control form-control-lg" id="jumlah_tarik" name="jumlah_tarik" placeholder="Minimal 1.000" min="1000" max="{{ $saldoSaatIni }}" required>
+                                        <input type="number" class="form-control form-control-lg" id="jumlah_tarik" name="jumlah_tarik" placeholder="Minimal 1.000" min="1000" max="{{ $nominal }}" required>
                                     </div>
                                     <small class="text-muted d-block mt-2">Biaya Admin (Estimasi): <span id="biaya_admin_text" class="fw-bold text-danger">Rp 0</span></small>
                                     <input type="hidden" id="biaya_admin" name="biaya_admin">
@@ -203,7 +221,7 @@
                                 </div>
                             </div>
 
-                            <div id="digital-payment-details" style="display: none;" class="p-3 border rounded mb-4">
+                            <div id="digital-payment-details" style="display: none;" class="p-3 border bg-light rounded mb-4">
                                 <h6 class="fw-bold text-primary mb-3">Informasi Tujuan Transfer</h6>
                                 
                                 <div class="mb-3 row">
@@ -253,13 +271,13 @@
                             <div class="row">
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-8">
-                                    <button class="btn btn-primary w-100 fw-bold" type="submit">
+                                    <button class="btn btn-primary w-100 fw-bold" type="submit" {{ $isReadOnly ? 'disabled' : '' }}>
                                         <i class="bi bi-send me-1"></i> Ajukan Penarikan
                                     </button>
                                 </div>
                             </div>
                         </form>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -316,6 +334,13 @@
 @endsection
 
 @section('js')
+<script>
+    // Fungsi ini dipanggil ketika user menekan tombol "Ajukan Ulang" atau "Tutup & Ajukan Baru"
+    function tampilkanForm() {
+        document.getElementById('status-card-container').style.display = 'none';
+        document.getElementById('form-tarik-container').style.display = 'block';
+    }
+</script>
 <script>
     // Menghilangkan alert otomatis
     @if(session('success') || session('error'))

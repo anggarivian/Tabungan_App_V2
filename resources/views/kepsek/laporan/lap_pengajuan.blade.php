@@ -419,29 +419,38 @@
                             <tr>
                                 <td class="text-center">{{ $pengajuan->firstItem() + $index }}</td>
                                 <td class="text-center">
-                                    <span class="badge bg-secondary">{{ $pengajuans->user->username }}</span>
+                                    {{-- Gunakan ?-> untuk mencegah crash jika user terhapus/kosong --}}
+                                    <span class="badge bg-secondary">{{ $pengajuans->user?->username ?? '-' }}</span>
                                 </td>
-                                <td class="fw-medium">{{ Str::limit($pengajuans->user->name, 20, '...') }}</td>
+                                <td class="fw-medium">{{ Str::limit($pengajuans->user?->name ?? 'Tidak Diketahui', 20, '...') }}</td>
                                 <td class="text-center">
                                     <span class="badge border text-muted">
-                                        {{ $pengajuans->user->rombels->first()->name ?? '-' }}
+                                        {{-- Gunakan ?-> bertingkat pada rombels --}}
+                                        {{ $pengajuans->user?->rombels?->first()?->name ?? '-' }}
                                     </span>
                                 </td>
-                                <td class="text-end">Rp {{ number_format($pengajuans->user->tabungan->saldo ?? 0, 0, ',', '.') }}</td>
+                                {{-- Gunakan ?-> pada tabungan untuk mengambil saldo --}}
+                                <td class="text-end">Rp {{ number_format($pengajuans->user?->tabungan?->first()?->saldo ?? 0, 0, ',', '.') }}</td>
                                 <td class="text-end fw-bold">Rp {{ number_format($pengajuans->jumlah_penarikan ?? 0, 0, ',', '.') }}</td>
                                 <td class="text-center">
-                                    @if (in_array($pengajuans->status, ['Pending', 'pending']))
+                                    @php 
+                                        // Ubah status ke huruf kecil semua agar pengecekan lebih mudah & aman
+                                        $statusStr = strtolower($pengajuans->status ?? ''); 
+                                    @endphp
+                                    
+                                    @if (in_array($statusStr, ['pending']))
                                         <span class="badge bg-warning text-dark">Pending</span>
-                                    @elseif (in_array($pengajuans->status, ['Batal', 'batal']))
+                                    @elseif (in_array($statusStr, ['batal']))
                                         <span class="badge bg-danger">Batal</span>
-                                    @elseif (in_array($pengajuans->status, ['Tolak', 'tolak']))
+                                    @elseif (in_array($statusStr, ['tolak']))
                                         <span class="badge bg-danger">Tolak</span>
-                                    @elseif (in_array($pengajuans->status, ['Terima', 'Diterima', 'SUCCEEDED']))
+                                    @elseif (in_array($statusStr, ['terima', 'diterima', 'succeeded']))
                                         <span class="badge bg-success">Terima</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
                                     @endif
-                                    <span class="badge border text-muted">{{ $pengajuans->pembayaran ?? '-' }}</span>
+                                    
+                                    <span class="badge border text-muted mt-1 d-block">{{ $pengajuans->pembayaran ?? '-' }}</span>
                                 </td>
                                 <td>{{ Str::limit($pengajuans->alasan, 20, '...') }}</td>
                                 <td class="text-center pe-4">{{ \Carbon\Carbon::parse($pengajuans->created_at)->format('d M Y H:i') }}</td>

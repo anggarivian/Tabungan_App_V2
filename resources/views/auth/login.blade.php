@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SakuRame</title>
 
-    <meta name="theme-color" content="#6777ef"/>
+    <meta name="theme-color" content="#2E45C7"/>
     <link rel="apple-touch-icon" href="{{ asset('Logo.png') }}">
     <link rel="manifest" href="{{ asset('/manifest.json') }}">
     <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
@@ -21,85 +21,181 @@
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="{{ asset('dist/assets/compiled/css/fonts/nunito-latin-800-normal.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #485cbc;
-            --light-bg: #f8faff;
-            --shadow-color: rgba(72, 92, 188, 0.2);
-            --text-color: #333;
+            --navy-950: #0A1128;
+            --blue-800: #1E2F87;
+            --blue-600: #2E45C7;
+            --blue-500: #4361EE;
+            --blue-400: #6C87F5;
+            --blue-200: #C4D0FF;
+            --sky-100: #EEF2FF;
+            --gold-400: #FFC24B;
+            --paper: #FBFCFF;
+            --ink-800: #1B2340;
+            --ink-500: #5C6584;
+            --danger: #D8455B;
+            --success: #1C8F6B;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             user-select: none;
-            overflow-y: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: var(--primary-color);
-            background-image: linear-gradient(135deg, #485cbc 0%, #3a4ba3 100%);
-            height: 100vh;
             font-family: 'Nunito', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 32px 16px;
+            position: relative;
+            background: var(--navy-950);
+            background-image:
+                radial-gradient(circle at 14% 18%, rgba(108, 135, 245, .55), transparent 42%),
+                radial-gradient(circle at 88% 12%, rgba(255, 194, 75, .22), transparent 38%),
+                radial-gradient(circle at 78% 88%, rgba(46, 69, 199, .65), transparent 46%),
+                linear-gradient(160deg, var(--navy-950) 0%, var(--blue-800) 48%, var(--blue-600) 100%);
+        }
+
+        /* ambient floating coin motifs */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .coin {
+            position: absolute;
+            border-radius: 50%;
+            opacity: .5;
+            background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.85), rgba(255, 194, 75, .35) 55%, transparent 72%);
+            animation: drift 10s ease-in-out infinite;
+        }
+
+        .coin-a { width: 120px; height: 120px; top: 8%; left: 6%; animation-delay: 0s; }
+        .coin-b { width: 70px; height: 70px; top: 68%; left: 12%; animation-delay: 1.4s; }
+        .coin-c { width: 160px; height: 160px; top: 62%; right: 8%; animation-delay: .6s; }
+        .coin-d { width: 54px; height: 54px; top: 14%; right: 16%; animation-delay: 2.2s; }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, -20px); }
         }
 
         .screen-1 {
-            background: var(--light-bg);
-            padding: 35px 30px 30px;
+            position: relative;
+            z-index: 1;
+            background: rgba(251, 252, 255, .88);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, .65);
+            padding: 38px 30px 30px;
             display: flex;
             flex-direction: column;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 330px;
-            position: relative;
+            border-radius: 28px;
+            box-shadow: 0 30px 60px -18px rgba(10, 17, 40, .55), 0 10px 24px rgba(10, 17, 40, .22);
+            width: min(360px, 100%);
         }
 
         .logo-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+        }
+
+        .logo-ring {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            padding: 4px;
+            background: conic-gradient(from 0deg, var(--blue-500), var(--gold-400), var(--blue-400), var(--blue-500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 24px -8px rgba(67, 97, 238, .5);
+        }
+
+        .logo-ring-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .logo img {
-            width: 120px;
+            width: 56px;
             height: auto;
         }
 
-        .form-title {
+        .eyebrow {
+            display: block;
             text-align: center;
-            margin-top: 5px;
-            margin-bottom: 25px;
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 1.5rem;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--blue-500);
+            margin-bottom: 6px;
+        }
+
+        .form-title {
+            font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 6px;
+            color: var(--ink-800);
+            font-weight: 800;
+            font-size: 1.55rem;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            margin: 0 0 22px;
+            color: var(--ink-500);
+            font-size: .92rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
-        .email, .password {
-            background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        .field {
+            background: var(--paper);
+            box-shadow: 0 4px 12px rgba(10, 17, 40, .04);
             padding: 12px 15px;
             display: flex;
             flex-direction: column;
-            border-radius: 12px;
-            color: var(--text-color);
-            transition: all 0.3s ease;
-            border: 1px solid #e1e5f2;
+            border-radius: 16px;
+            color: var(--ink-800);
+            border: 1.5px solid #E3E8FA;
+            transition: border-color .25s ease, box-shadow .25s ease, transform .15s ease;
         }
 
-        .email:focus-within, .password:focus-within {
-            box-shadow: 0 4px 12px rgba(72, 92, 188, 0.2);
-            border-color: var(--primary-color);
+        .field:focus-within {
+            border-color: var(--blue-500);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, .15);
+            transform: translateY(-1px);
         }
 
         label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #485cbc;
+            font-weight: 700;
+            font-size: .74rem;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            color: var(--blue-600);
             margin-bottom: 6px;
         }
 
@@ -110,195 +206,179 @@
         }
 
         ion-icon {
-            color: var(--primary-color);
+            color: var(--blue-500);
             margin-right: 10px;
             font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
-        .email input, .password input {
+        .field input {
             outline: none;
             border: none;
             width: 100%;
-            font-size: 0.95rem;
+            background: transparent;
+            font-size: .96rem;
             padding: 6px 0;
-            color: #333;
+            color: var(--ink-800);
+            font-family: 'Nunito', sans-serif;
         }
 
-        .email input::placeholder, .password input::placeholder {
-            color: #aab;
-            font-size: 0.9rem;
+        .field input::placeholder {
+            color: #a4acc9;
+            font-size: .9rem;
         }
 
         .show-hide {
             position: absolute;
-            right: 5px;
+            right: 0;
             cursor: pointer;
             margin-right: 0;
         }
 
         .login {
-            padding: 14px;
-            background: var(--primary-color);
+            padding: 15px;
+            background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
             color: white;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
+            border-radius: 16px;
+            font-weight: 700;
             font-size: 1rem;
+            font-family: 'Nunito', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
             width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(72, 92, 188, 0.3);
+            margin-top: 6px;
+            box-shadow: 0 14px 28px -10px rgba(67, 97, 238, .65);
         }
+
+        .login ion-icon { color: white; margin: 0; font-size: 1.1rem; }
 
         .login:hover {
-            background: #3a4ba3;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 92, 188, 0.4);
+            box-shadow: 0 18px 32px -10px rgba(67, 97, 238, .75);
+            filter: brightness(1.04);
         }
 
-        .login:active {
-            transform: translateY(0);
-        }
+        .login:active { transform: translateY(0); }
 
         .footer {
             text-align: center;
-            display: flex;
-            font-size: 0.85rem;
-            color: var(--text-color);
-            justify-content: space-between;
-            padding-top: 20px;
-            margin-top: 10px;
-            border-top: 1px solid #e1e5f2;
+            font-size: .84rem;
+            color: var(--ink-500);
+            justify-content: center;
+            padding-top: 18px;
+            margin-top: 20px;
+            border-top: 1px solid #E3E8FA;
         }
 
         .alert {
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px 15px;
-            font-size: 0.9rem;
+            font-size: .9rem;
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
+        .alert ion-icon { margin: 0; }
+
         .alert-danger {
-            background-color: #fff2f2;
-            color: #d32f2f;
-            border-left: 4px solid #d32f2f;
+            background-color: #FFF1F2;
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
         }
 
         .alert-success {
-            background-color: #f0fff0;
-            color: #2e7d32;
-            border-left: 4px solid #2e7d32;
+            background-color: #EFFBF5;
+            color: var(--success);
+            border-left: 4px solid var(--success);
         }
 
         .text-danger {
-            color: #d32f2f;
-            font-size: 0.8rem;
+            color: var(--danger);
+            font-size: .8rem;
             margin-top: 6px;
-            padding-left: 30px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-        }
-
-        .remember-me input {
-            margin-right: 8px;
-        }
-
-        .remember-me label {
-            font-size: 0.85rem;
-            color: #666;
-            font-weight: normal;
-            cursor: pointer;
+            padding-left: 4px;
         }
 
         .back-button {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(72, 92, 188, 0.1);
-            color: var(--primary-color);
-            width: 36px;
-            height: 36px;
+            background: rgba(255, 255, 255, .55);
+            backdrop-filter: blur(6px);
+            color: var(--blue-600);
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
+            transition: all .25s ease;
+            border: 1px solid rgba(255, 255, 255, .7);
         }
 
         .back-button:hover {
-            background: rgba(72, 92, 188, 0.2);
+            background: rgba(255, 255, 255, .8);
             transform: translateX(-3px);
         }
 
-        .back-button ion-icon {
-            margin: 0;
-            font-size: 1.4rem;
-        }
+        .back-button ion-icon { margin: 0; font-size: 1.35rem; }
+
         @keyframes fadeSlideIn {
-            0% {
-                opacity: 0;
-                transform: translateY(40px);
+            0% { opacity: 0; transform: translateY(32px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen-1 { animation: fadeSlideIn .7s ease-out; }
+        .logo-container { animation: fadeSlideIn .9s ease-out .15s both; }
+        .form-title, .form-subtitle { animation: fadeSlideIn .9s ease-out .3s both; }
+        form { animation: fadeSlideIn .9s ease-out .45s both; }
+        .footer { animation: fadeSlideIn .9s ease-out .6s both; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .coin, .screen-1, .logo-container, .form-title, .form-subtitle, form, .footer {
+                animation: none !important;
             }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
-        .screen-1 {
-            animation: fadeSlideIn 0.8s ease-out;
+        @media (max-width: 380px) {
+            .screen-1 { padding: 32px 22px 24px; }
         }
-
-        .logo-container {
-            animation: fadeSlideIn 1s ease-out;
-            animation-delay: 0.2s;
-            animation-fill-mode: both;
-        }
-
-        .form-title {
-            animation: fadeSlideIn 1s ease-out;
-            animation-delay: 0.4s;
-            animation-fill-mode: both;
-        }
-
-        form {
-            animation: fadeSlideIn 1s ease-out;
-            animation-delay: 0.6s;
-            animation-fill-mode: both;
-        }
-
-        .footer {
-            animation: fadeSlideIn 1s ease-out;
-            animation-delay: 0.8s;
-            animation-fill-mode: both;
-        }
-
     </style>
 </head>
 <body>
+
+    <div class="ambient" aria-hidden="true">
+        <span class="coin coin-a"></span>
+        <span class="coin coin-b"></span>
+        <span class="coin coin-c"></span>
+        <span class="coin coin-d"></span>
+    </div>
+
     <div class="screen-1">
-        <a href="/" class="back-button">
+        <a href="/" class="back-button" aria-label="Kembali">
             <ion-icon name="arrow-back-outline"></ion-icon>
         </a>
 
         <div class="logo-container">
-            <div class="logo">
-                <img src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" alt="Logo">
+            <div class="logo-ring">
+                <div class="logo-ring-inner">
+                    <div class="logo">
+                        <img src="{{ asset('/dist/assets/compiled/svg/Logo Dark.svg') }}" alt="Logo">
+                    </div>
+                </div>
             </div>
         </div>
 
+        <span class="eyebrow">SakuRame &bull; Tabungan Digital</span>
         <h3 class="form-title">Selamat Datang</h3>
-
-        <p style="text-align: center;">Silahkan login dengan akun anda.</p>
+        <p class="form-subtitle">Silahkan login dengan akun anda.</p>
 
         @if(session()->has('LoginError'))
             <div class="alert alert-danger">
@@ -320,7 +400,7 @@
         <form action="/login" method="POST">
             @csrf
             <div class="form-group">
-                <div class="email">
+                <div class="field">
                     <label for="username">Username / ID Tabungan</label>
                     <div class="sec-2">
                         <ion-icon name="person-outline"></ion-icon>
@@ -333,7 +413,7 @@
             </div>
 
             <div class="form-group">
-                <div class="password">
+                <div class="field">
                     <label for="password">Password</label>
                     <div class="sec-2">
                         <ion-icon name="lock-closed-outline"></ion-icon>
@@ -346,7 +426,10 @@
                 @enderror
             </div>
 
-            <button class="login">Masuk</button>
+            <button class="login">
+                Masuk
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+            </button>
         </form>
 
         <div class="footer">

@@ -17,6 +17,12 @@
         margin-bottom: 0.2rem;
     }
 
+    .disabled-link{
+        pointer-events: none;
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
     .page-heading h4 {
         font-size: 1.1rem;
         color: #6c757d;
@@ -49,6 +55,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .disabled-link{
+        pointer-events: none;
+        opacity: .5;
+        cursor: not-allowed;
     }
 
     .icon-box svg {
@@ -93,12 +105,38 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
     
     <!-- Section Kartu Statistik -->
     <div class="row g-3 mb-3">
         <!-- Card Uang Masuk & Keluar (Digabung biar lebih proporsional) -->
 
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-md-6 col-xl-6">
             <div class="card stat-card shadow-sm h-100 mb-0">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="icon-box bg-green-light me-3">
@@ -112,7 +150,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-md-6 col-xl-6">
             <div class="card stat-card shadow-sm h-100 mb-0">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="icon-box bg-red-light me-3">
@@ -122,19 +160,6 @@
                         <h6 class="text-muted mb-1 font-semibold">Transaksi Keluar</h6>
                         <h5 class="font-extrabold mb-1">Rp {{ number_format($transaksi_keluar) }}</h5>
                         <small class="text-danger fw-bold"><i class="bi bi-arrow-down-circle"></i> {{$tarikKali}}x Penarikan</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-12 col-xl-4">
-            <div class="card stat-card shadow-sm h-100 mb-0">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="icon-box bg-green-light me-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/></svg>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-1 font-semibold">Tunai | Digital</h6>
-                        <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_tunai) }} | Rp {{ number_format($jumlah_saldo_digital) }}</h5>
                     </div>
                 </div>
             </div>
@@ -153,7 +178,7 @@
                     <div class="d-flex flex-column flex-md-row gap-3">
                         
                         <div class="flex-fill">
-                            <a href="{{ route('bendahara.tabungan.stor') }}" class="btn btn-primary w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('bendahara.tabungan.stor') }}" class="btn {{ $isReadOnly ? 'disabled-link' : '' }} btn-primary w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" {{ $isReadOnly ? 'disabled' : '' }}>
                                 <i class="bi bi-person-plus-fill fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
                                 <span>Stor Per Orang</span>
                             </a>
@@ -161,10 +186,15 @@
 
                         <div class="flex-fill position-relative">
                             <div class="dropdown h-100">
-                                <button class="btn btn-primary dropdown-toggle w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <button {{ $isReadOnly ? 'disabled' : '' }} class="btn btn-primary dropdown-toggle w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" type="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-people-fill fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
                                     Stor Per Rombel
                                 </button>
+                                @if($isReadOnly)
+                                    <ul class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto;">
+                                        <li><span class="dropdown-item text-muted" style="margin-top: -18px; margin-left: -5px;">Tidak bisa melakukan stor rombel</span></li>
+                                    </ul>
+                                @else
                                 <ul class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto;">
                                     @forelse($rombels as $r)
                                         <li>
@@ -175,12 +205,13 @@
                                     @empty
                                         <li><span class="dropdown-item text-muted" style="margin-top: -18px; margin-left: -5px;">Belum ada rombel</span></li>
                                     @endforelse
+                                @endif
                                 </ul>
                             </div>
                         </div>
 
                         <div class="flex-fill">
-                            <a href="{{ route('bendahara.tabungan.tarik') }}" class="btn btn-danger w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('bendahara.tabungan.tarik') }}" class="btn {{ $isReadOnly ? 'disabled-link' : '' }} btn-danger w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" {{ $isReadOnly ? 'disabled' : '' }}>
                                 <i class="bi bi-cash-coin fs-5" style="margin-top: -18px; margin-left: -5px;"></i>
                                 <span>Tarik Tunai</span>
                             </a>
@@ -200,12 +231,15 @@
             
             <div class="d-flex align-items-center gap-2">
                 <label for="selectRombel" class="text-muted small fw-medium text-nowrap">Pilih Rombel:</label>
-                {{-- Hapus shadow dan border khusus, gunakan form-select standar agar ikuti tema --}}
                 <select id="selectRombel" class="form-select" style="min-width: 200px;" onchange="showTable(this.value)">
                     @foreach($rombels as $r)
                         <option value="{{ $r->id }}">{{ $r->name }}</option>
                     @endforeach
                 </select>
+
+                <button type="button" class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#rekapRombelModal">
+                    <i class="bi bi-table me-1"></i> Rekap Semua Rombel
+                </button>
             </div>
         </div>
         
@@ -329,10 +363,132 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="rekapRombelModal" tabindex="-1" aria-labelledby="rekapRombelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary" id="rekapRombelModalLabel">
+                    <i class="bi bi-bar-chart-line me-2"></i> Rekap Setoran Harian Per Rombel
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 1000px;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 50px;">No.</th>
+                                <th style="width: 120px;">Tanggal</th>
+                                @foreach ($rombels as $r)
+                                    <th class="text-end text-nowrap">{{ $r->name }}</th>
+                                @endforeach
+                                <th class="text-end fw-bold">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($rekapRombel as $index => $row)
+                                <tr>
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-nowrap">{{ \Carbon\Carbon::parse($row['tanggal'])->translatedFormat('d M Y') }}</td>
+                                    @foreach ($rombels as $r)
+                                        @php $nominal = $row['rombel_' . $r->id] ?? 0; @endphp
+                                        <td class="text-end">{{ $nominal == 0 ? '0' : number_format($nominal, 0, ',', '.') }}</td>
+                                    @endforeach
+                                    <td class="text-end fw-bold text-success">{{ number_format($row['total_semua'], 0, ',', '.') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ $rombels->count() + 3 }}" class="text-center py-4">Belum ada data transaksi setoran.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function loadRekapRombel() {
+        const thead = document.getElementById('rekapRombelHead');
+        const tbody = document.getElementById('rekapRombelBody');
+
+        // Tampilkan loading state
+        thead.innerHTML = '';
+        tbody.innerHTML = '<tr><td class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>';
+
+        // Ambil periode_id yang sedang aktif di filter halaman (kalau ada)
+        const params = new URLSearchParams(window.location.search);
+        const periodeId = params.get('periode_id') || document.getElementById('periode_id')?.value || '';
+
+        let url = '{{ route('bendahara.rekap.rombel.data') }}';
+        if (periodeId) {
+            url += '?periode_id=' + encodeURIComponent(periodeId);
+        }
+
+        fetch(url, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 1. Build Thead (Kolom)
+                let headHtml = '<tr><th class="text-center" style="width: 50px;">No.</th><th style="width: 120px;">Tanggal</th>';
+                data.rombels.forEach(r => {
+                    headHtml += `<th class="text-end text-nowrap">${r.name}</th>`;
+                });
+                headHtml += '<th class="text-end fw-bold">Total</th></tr>';
+                thead.innerHTML = headHtml;
+
+                // 2. Build Tbody (Baris Data)
+                if (data.rekap.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="${data.rombels.length + 3}" class="text-center py-4">Belum ada data transaksi setoran.</td></tr>`;
+                    return;
+                }
+
+                let bodyHtml = '';
+                data.rekap.forEach((row, index) => {
+                    bodyHtml += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td class="text-nowrap">${formatTanggal(row.tanggal)}</td>`;
+
+                    data.rombels.forEach(r => {
+                        let nominal = row['rombel_' + r.id] || 0;
+                        bodyHtml += `<td class="text-end">${nominal === 0 ? '0' : formatRupiah(nominal)}</td>`;
+                    });
+
+                    bodyHtml += `<td class="text-end fw-bold text-success">${formatRupiah(row.total_semua)}</td></tr>`;
+                });
+
+                tbody.innerHTML = bodyHtml;
+            })
+            .catch(error => {
+                tbody.innerHTML = '<tr><td colspan="100%" class="text-center text-danger py-4">Terjadi kesalahan saat memuat data.</td></tr>';
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    function formatTanggal(tgl) {
+        let date = new Date(tgl);
+        return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+</script>
 
 <script>
     // Logic untuk merubah tampilan tabel berdasarkan Select Option

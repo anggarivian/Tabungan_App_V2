@@ -390,15 +390,15 @@
                                     </p>
                                 </div>
                                 <div class="avatar avatar-md2" style="margin-left: 20px">
-                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/Logo SD.png') }}" alt="Avatar">
                                 </div>
                             </div>
                             <div class="d-md-none">
                                 <div class="avatar avatar-md2">
-                                    <img src="{{ asset('/dist/assets/compiled/jpg/1.jpg') }}" alt="Avatar">
+                                    <img src="{{ asset('/dist/assets/compiled/jpg/Logo SD.png') }}" alt="Avatar">
                                 </div>
                             </div>
-                            <a href="#" class="burger-btn d-block d-xl-none">
+                            <a href="#" class="burger-btn d-block d-xl-none" aria-label="Buka menu" aria-expanded="false">
                                 <i class="bi bi-justify fs-3"></i>
                             </a>
                         </div>
@@ -434,34 +434,7 @@
                             </li>
                             @endif
 
-                            {{-- Master Data --}}
-                            @if( auth()->user()->roles_id == 2 )
-                            <li class="menu-item {{ request()->routeIs('bendahara.periode*', 'bendahara.rombel*', 'bendahara.walikelas*', 'bendahara.siswa*') ? 'active' : '' }} has-sub">
-                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
-                                    <i class="bi-folder2-open"></i><span> Master Data</span>
-                                </a>
-                                <div class="submenu">
-                                    <div class="submenu-group-wrapper">
-                                        <ul class="submenu-group">
-                                            <li class="submenu-item {{ request()->routeIs('bendahara.periode*') ? 'active' : '' }}">
-                                                <a href="{{ route ('bendahara.periode.index')}}" class="submenu-link">Periode</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('bendahara.rombel*') ? 'active' : '' }}">
-                                                <a href="{{ route ('bendahara.rombel.index')}}" class="submenu-link">Rombel</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('bendahara.walikelas*') ? 'active' : '' }}">
-                                                <a href="{{ route('bendahara.walikelas.index') }}" class="submenu-link">Walikelas</a>
-                                            </li>
-                                            <li class="submenu-item {{ request()->routeIs('bendahara.siswa*') ? 'active' : '' }}">
-                                                <a href="{{ route('bendahara.siswa.index') }}" class="submenu-link">Siswa</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            @endif
-
-                            {{-- Transaksi --}}
+                            {{-- Transaksi (Tabungan / Stor / Tarik / Pengajuan) --}}
                             @if( auth()->user()->roles_id == 2 )
                             <li class="menu-item {{ request()->routeIs('bendahara.tabungan*', 'tabungan.stor', 'tabungan.tarik', 'bendahara.pengajuan*') ? 'active' : '' }} has-sub">
                                 <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
@@ -496,6 +469,33 @@
                                 <a href="{{ route ('siswa.tabungan.tarik')}}" class='menu-link' style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
                                     <i class="bi-box-arrow-up"></i><span> Tarik Tabungan</span>
                                 </a>
+                            </li>
+                            @endif
+
+                            {{-- Master Data --}}
+                            @if( auth()->user()->roles_id == 2 )
+                            <li class="menu-item {{ request()->routeIs('bendahara.periode*', 'bendahara.rombel*', 'bendahara.walikelas*', 'bendahara.siswa*') ? 'active' : '' }} has-sub">
+                                <a href="#" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px">
+                                    <i class="bi-folder2-open"></i><span> Master Data</span>
+                                </a>
+                                <div class="submenu">
+                                    <div class="submenu-group-wrapper">
+                                        <ul class="submenu-group">
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.periode*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.periode.index')}}" class="submenu-link">Periode</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.rombel*') ? 'active' : '' }}">
+                                                <a href="{{ route ('bendahara.rombel.index')}}" class="submenu-link">Rombel</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.walikelas*') ? 'active' : '' }}">
+                                                <a href="{{ route('bendahara.walikelas.index') }}" class="submenu-link">Walikelas</a>
+                                            </li>
+                                            <li class="submenu-item {{ request()->routeIs('bendahara.siswa*') ? 'active' : '' }}">
+                                                <a href="{{ route('bendahara.siswa.index') }}" class="submenu-link">Siswa</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </li>
                             @endif
 
@@ -570,8 +570,8 @@
                                     <i class="bi-person-circle"></i><span>Profil</span>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a href="{{ route('logout') }}" class="menu-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <li class="menu-item logout-item">
+                                <a href="{{ route('logout') }}" class="menu-link logout-link" style="display: flex; align-items: center; gap: 10px; margin-top: -13px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bi-box-arrow-right"></i><span>Logout</span>
                                 </a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
@@ -579,6 +579,121 @@
                         </ul>
                     </div>
                 </nav>
+
+                <style>
+                    /* Logout ditandai merah biar beda dari menu lain */
+                    .logout-link,
+                    .logout-link i,
+                    .logout-link span {
+                        color: #ff0019 !important;
+                    }
+
+                    .logout-link:hover,
+                    .logout-link:hover i {
+                        color: #ff001e !important;
+                        background-color: rgba(220, 53, 69, 0.08);
+                    }
+
+                    /* Burger toggle: animasi icon + panel mobile */
+                    .burger-btn i {
+                        transition: transform 0.25s ease;
+                    }
+
+                    .burger-btn.active i {
+                        transform: rotate(90deg);
+                    }
+
+                    @media (max-width: 1199.98px) {
+                        .main-navbar > .container > ul,
+                        .main-navbar ul {
+                            display: none;
+                            flex-direction: column;
+                            width: 100%;
+                            padding: 8px 0 16px;
+                        }
+
+                        .main-navbar.mobile-open > .container > ul,
+                        .main-navbar.mobile-open ul {
+                            display: flex;
+                        }
+
+                        .main-navbar .menu-item {
+                            width: 100%;
+                        }
+
+                        .main-navbar .menu-link {
+                            margin-top: 0 !important;
+                            padding: 12px 4px;
+                            width: 100%;
+                        }
+
+                        .main-navbar .has-sub .submenu {
+                            display: none;
+                            position: static;
+                            box-shadow: none;
+                            width: 100%;
+                            padding-left: 16px;
+                        }
+
+                        .main-navbar .has-sub.submenu-open .submenu {
+                            display: block;
+                        }
+                    }
+                </style>
+
+                <script>
+                    (function () {
+                        const burgerBtn = document.querySelector('.burger-btn');
+                        const mainNavbar = document.querySelector('.main-navbar');
+
+                        if (!burgerBtn || !mainNavbar) {
+                            return;
+                        }
+
+                        const burgerIcon = burgerBtn.querySelector('i');
+
+                        function closeMobileNav() {
+                            mainNavbar.classList.remove('mobile-open');
+                            burgerBtn.classList.remove('active');
+                            burgerBtn.setAttribute('aria-expanded', 'false');
+                            if (burgerIcon) {
+                                burgerIcon.classList.remove('bi-x-lg');
+                                burgerIcon.classList.add('bi-justify');
+                            }
+                        }
+
+                        burgerBtn.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const isOpen = mainNavbar.classList.toggle('mobile-open');
+                            burgerBtn.classList.toggle('active', isOpen);
+                            burgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+                            if (burgerIcon) {
+                                burgerIcon.classList.toggle('bi-justify', !isOpen);
+                                burgerIcon.classList.toggle('bi-x-lg', isOpen);
+                            }
+                        });
+
+                        // Submenu jadi accordion (klik untuk buka) khusus di layar kecil
+                        document.querySelectorAll('.main-navbar .has-sub > .menu-link').forEach(function (link) {
+                            link.addEventListener('click', function (e) {
+                                if (window.innerWidth < 1200) {
+                                    e.preventDefault();
+                                    this.closest('.has-sub').classList.toggle('submenu-open');
+                                }
+                            });
+                        });
+
+                        // Tutup menu mobile setelah memilih item tanpa submenu
+                        document.querySelectorAll('.main-navbar .menu-item:not(.has-sub) > .menu-link').forEach(function (link) {
+                            link.addEventListener('click', function () {
+                                if (window.innerWidth < 1200) {
+                                    closeMobileNav();
+                                }
+                            });
+                        });
+                    })();
+                </script>
 
             </header>
 

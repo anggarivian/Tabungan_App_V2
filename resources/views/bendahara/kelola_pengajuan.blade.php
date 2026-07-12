@@ -20,6 +20,33 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
     <div class="card shadow">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
@@ -35,12 +62,24 @@
                 </div>
             @endif
 
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
                     <h5 class="card-title mb-1">Data Pengajuan Penarikan Tabungan</h5>
-                    <small class="text-muted">Periode Aktif: Tarik data otomatis sesuai kalender akademik</small>
+                    <small class="text-muted d-block mb-3">Periode Aktif: Tarik data otomatis sesuai kalender akademik</small>
+                    
+                    {{-- Tampilan Saldo Xendit --}}
+                    @if($saldoXendit !== null)
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary fs-6 px-3 py-2">
+                            <i class="bi bi-wallet2 me-2"></i>Saldo Kas Digital (Xendit): <strong>Rp {{ number_format($saldoXendit, 0, ',', '.') }}</strong>
+                        </span>
+                    @else
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger fs-6 px-3 py-2">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Gagal memuat saldo Xendit
+                        </span>
+                    @endif
                 </div>
-                <form action="/bendahara/kelola-pengajuan" method="GET" class="w-100 w-md-auto">
+                
+                <form action="/bendahara/kelola-pengajuan" method="GET" class="w-100 w-md-auto mt-2 mt-md-0">
                     <div class="input-group">
                         <input type="text" class="form-control rounded" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama atau rombel...">
                         <button class="btn btn-primary" type="submit">Cari</button>
@@ -83,7 +122,7 @@
                                     <span class="badge bg-warning text-dark">Pending</span>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-success px-3 btn-proses" data-id="{{ $pengajuans->id }}">
+                                    <button type="button" class="btn btn-sm btn-success px-3 btn-proses" data-id="{{ $pengajuans->id }}" {{ $isReadOnly ? 'disabled' : '' }}>
                                         Proses
                                     </button>
                                 </td>
@@ -262,6 +301,23 @@ $(document).ready(function() {
                     let admin = Math.ceil(jumlah * 0.05);
                     let dibulatkan = Math.ceil(admin / 1000) * 1000;
                     $('#edit-premi').val(formatter.format(dibulatkan));
+
+                    let jumlah = parseInt(response.jumlah_penarikan) || 0;
+                    let admin = Math.ceil(jumlah * 0.05);
+                    let dibulatkan = Math.ceil(admin / 1000) * 1000;
+                    let totalTarikSiswa = jumlah + dibulatkan;
+
+                    if (response.pembayaran === 'Digital' && response.saldo_xendit < totalTarikSiswa) {
+                        $('#btn-submit-terima').attr('disabled', true)
+                                            .removeClass('btn-primary')
+                                            .addClass('btn-danger')
+                                            .text('Saldo Xendit Sekolah Kurang');
+                    } else {
+                        $('#btn-submit-terima').attr('disabled', false)
+                                            .removeClass('btn-danger')
+                                            .addClass('btn-primary')
+                                            .html('<i class="bi bi-check-circle me-1"></i> Setujui & Transfer');
+                    }
                     
                     // Update action form agar dinamis mengarah ke persetujuan penarikan
                     $('#editForm').attr('action', '/bendahara/pengajuan/setuju/' + response.pengajuan_id);

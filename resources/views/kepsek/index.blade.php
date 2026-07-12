@@ -86,7 +86,7 @@
 
 <div class="page-content">
     <div class="row g-3 mb-3 mt-4">
-        <div class="col-12 col-md-6 col-xl-4 mt-3">
+        <div class="col-12 col-md-6 col-xl-6 mt-3">
             <div class="card stat-card shadow-sm h-100 mb-0">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="icon-box bg-blue-light me-3">
@@ -100,7 +100,7 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 col-xl-4 mt-3">
+        <div class="col-12 col-md-6 col-xl-6 mt-3">
             <div class="card stat-card shadow-sm h-100 mb-0">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="icon-box bg-green-light me-3">
@@ -109,20 +109,6 @@
                     <div>
                         <h6 class="text-muted mb-1 font-semibold">Saldo Tunai</h6>
                         <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_tunai) }}</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-xl-4 mt-3">
-            <div class="card stat-card shadow-sm h-100 mb-0">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="icon-box bg-purple-light me-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2Zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7Z"/><path d="M2 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-1 font-semibold">Saldo Digital</h6>
-                        <h5 class="font-extrabold mb-0">Rp {{ number_format($jumlah_saldo_digital) }}</h5>
                     </div>
                 </div>
             </div>

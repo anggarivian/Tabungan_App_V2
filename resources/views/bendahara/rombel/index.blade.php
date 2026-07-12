@@ -41,6 +41,33 @@
 </div>
 
 <div class="page-content">
+
+{{-- ================= SNIPPET CEK RENTANG PERIODE (UI) ================= --}}
+@php
+    $activePeriode = \App\Models\Periode::find(\App\Helpers\PeriodeHelper::id());
+    $isReadOnly = true; 
+    
+    if($activePeriode) {
+        $now = \Carbon\Carbon::now();
+        $mulai = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+        $akhir = \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->endOfDay();
+        
+        if($now->between($mulai, $akhir)) {
+            $isReadOnly = false;
+        }
+    }
+@endphp
+
+@if($isReadOnly)
+    <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-lock-fill fs-4 me-3" style="margin-top: -25px;"></i>
+        <div>
+            <strong>Mode Hanya Baca!</strong><br>
+            <small>Anda tidak bisa melakukan perubahan data atau transaksi dikarenakan hari ini berada di luar rentang tanggal ({{ \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($activePeriode->tanggal_berakhir)->format('d M Y') }}) periode ini.</small>
+        </div>
+    </div>
+@endif
+
     <div class="card stat-card shadow-sm border-0">
         <div class="card-body" style="margin-bottom: -20px">
             @if(session('success'))
@@ -70,7 +97,7 @@
                 </div>
             @endif
             <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahRombelModal">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahRombelModal" {{ $isReadOnly ? 'disabled' : '' }}>
                     <i class="bi bi-plus-circle"></i>    
                     Tambah Rombel
                 </button>
@@ -115,7 +142,7 @@
                                 <button class="btn btn-primary btn-sm btn-anggota" data-id="{{ $rombel->id }}">
                                     <i class="bi-people"></i> Anggota
                                 </button>
-                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $rombel->id }})">
+                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $rombel->id }})" {{ $isReadOnly ? 'disabled' : '' }}>
                                     <i class="bi-trash"></i>
                                 </button>
                             </td>
@@ -187,7 +214,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary" form="formTambahRombel">Simpan</button>
+        <button type="submit" class="btn btn-primary" form="formTambahRombel" {{ $isReadOnly ? 'disabled' : '' }}>Simpan</button>
       </div>
     </div>
   </div>
@@ -250,7 +277,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary" form="formEditRombel">Simpan</button>
+        <button type="submit" class="btn btn-primary" form="formEditRombel" {{ $isReadOnly ? 'disabled' : '' }}>Simpan</button>
       </div>
     </div>
   </div>
@@ -289,7 +316,7 @@
                 <form id="deleteForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger px-4 py-2">
+                    <button type="submit" class="btn btn-danger px-4 py-2" {{ $isReadOnly ? 'disabled' : '' }}>
                         <i class="bi bi-trash me-1"></i> Hapus Data
                     </button>
                 </form>
